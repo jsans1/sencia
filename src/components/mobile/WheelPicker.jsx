@@ -42,7 +42,6 @@ const WheelPicker = ({
   return (
     <div className={`wheel-picker ${className}`}>
       <div className="wheel-picker-mask-top"></div>
-      <div className="wheel-picker-selection-line"></div>
       <div 
         ref={containerRef}
         className="wheel-picker-container"

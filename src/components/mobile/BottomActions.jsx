@@ -6,10 +6,11 @@ const BottomActions = ({
   primaryDisabled = false,
   secondaryLabel,
   onSecondary,
-  showSecondary = false 
+  showSecondary = false,
+  solidBackground = false
 }) => {
   return (
-    <div className="bottom-actions">
+    <div className={`bottom-actions${solidBackground ? ' solid' : ''}`}>
       <button 
         className="primary-button" 
         onClick={onPrimary}

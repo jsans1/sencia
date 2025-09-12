@@ -5,7 +5,7 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: #none;
+  background: transparent;
   overflow-x: hidden;
   font-family: "SF Pro Display", -apple-system, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
@@ -16,7 +16,7 @@ body {
   margin: 0 auto;
   padding: 0;
   min-height: 100vh;
-  background: #FFFFFF;
+  background: transparent;
 }
 
 .logo {
@@ -157,10 +157,9 @@ body {
 }
 
 .feature-dot {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 8px;
-  background: #e5e7eb;
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -497,6 +496,55 @@ body {
   margin-bottom: 10px;
 }
 
+/* Care plan time cards */
+.care-times {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.care-time-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: #FFFFFF;
+  border: 1px solid #E5E5EA;
+  border-radius: 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.care-time-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.care-time-title {
+  font-size: 14px;
+  color: #111;
+  text-align: left;
+}
+
+.care-time-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2563eb;
+  letter-spacing: 0.5px;
+}
+
+.care-time-edit {
+  background: none;
+  border: none;
+  color: #111;
+  opacity: 0.85;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
 .switch {
   position: relative;
   width: 52px;
@@ -545,7 +593,7 @@ body {
   border: 1px solid #e5e7eb;
   font-size: 1rem;
   margin-bottom: 8px;
-  background: #f7f7fa;
+  background: #ffffff;
   color: #222;
   box-sizing: border-box;
 }

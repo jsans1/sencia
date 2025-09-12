@@ -24,8 +24,8 @@ const stepsOrder = [
   'poids',
   'taille',
   'infosPerso',
+  'checkinFrequency',
   'carePlanV2',
-  'notifs',
   'sync',
   'widget',
 ]
@@ -97,6 +97,32 @@ export default function Onboarding() {
           />
         )}
 
+        {stepKey === 'checkinFrequency' && (
+          <div className="step-content">
+            <img className="onb-logo small" src={logo} alt="Sencia" />
+            <h1 className="step-title" style={{ marginTop: 8 }}>How often do you want to <span style={{ color: '#2563eb' }}>check-in</span> ?</h1>
+            <p className="step-subtitle" style={{ maxWidth: 320 }}>
+              By creating repetition with your check-ins, you can uncover more about your emotional self.
+            </p>
+            <div className="selection-grid grid-2x2">
+              {[1,2,3,4].map((num) => (
+                <div
+                  key={num}
+                  className={`selection-card ${data.frequence === num ? 'selected' : ''}`}
+                  onClick={() => updateField('frequence', num)}
+                >
+                  <div className="card-text">
+                    {num} fois par jour{num === 2 ? ' ' : ''}
+                    {num === 2 && (
+                      <div style={{ fontSize: 12, color: '#2563eb', marginTop: 4 }}>(recommandé)</div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {stepKey === 'welcome' && (
           <div className="step-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center' }}>
             <img className="onb-logo centered" src={logo} alt="Sencia" />
@@ -105,7 +131,7 @@ export default function Onboarding() {
         )}
 
         {stepKey === 'propoval' && (
-          <div className="step-content">
+          <div className="step-content"style={{height: '100%'}}>
             <img className="onb-logo" src={logo} alt="Sencia" />
             <p className="splash-tagline">Bienvenue sur <span className="splash-tagline-accent">Sencia</span></p>
             <ul className="features-list" style={{ textAlign: 'left' }}>
@@ -125,35 +151,35 @@ export default function Onboarding() {
         )}
 
         {stepKey === 'features' && (
-          <div className="step-content" style={{ padding: '24px 20px' }}>
+          <div className="step-content" style={{ padding: '24px 20px', textAlign: 'left', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
             <img className="onb-logo" src={logo} alt="Sencia" style={{ width: '80px', marginBottom: '16px' }} />
-            <h2 className="features-title" style={{ fontSize: '20px', marginBottom: '20px' }}>Bienvenue sur <span className="welcome-loris">Sencia</span></h2>
+            <h2 className="features-title" style={{ fontSize: '30px', marginBottom: '20px', fontWeight: '300', marginTop: '20px' }}>Bienvenue sur <span className="welcome-loris">Sencia</span></h2>
             <ul className="features-list" style={{ listStyle: 'none', padding: '0', margin: '0' }}>
               <li className="feature-item" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
-                <div className="feature-dot"><img src="/feature-1.png" alt="" style={{ width: '24px', height: '24px' }} /></div>
+                <div className="feature-dot"><img src="/feature-1.png" alt="" style={{ width: '35px', height: '35px' }} /></div>
                 <div>
-                  <div className="feature-title" style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>Suivez vos symptômes</div>
+                  <div className="feature-title" style={{ fontSize: '16px', fontWeight: '600', marginBottom: '4px' }}>Suivez vos symptômes</div>
                   <p className="feature-desc" style={{ fontSize: '12px', color: '#666', margin: '0', lineHeight: '1.3' }}>Suivez quotidiennement vos symptômes et vos ressentis.</p>
                 </div>
               </li>
               <li className="feature-item" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
-                <div className="feature-dot"><img src="/feature-2.png" alt="" style={{ width: '24px', height: '24px' }} /></div>
+                <div className="feature-dot"><img src="/feature-2.png" alt="" style={{ width: '35px', height: '35px' }} /></div>
                 <div>
-                  <div className="feature-title" style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>Visualisez votre progression</div>
+                  <div className="feature-title" style={{ fontSize: '16px', fontWeight: '600', marginBottom: '4px' }}>Visualisez votre progression</div>
                   <p className="feature-desc" style={{ fontSize: '12px', color: '#666', margin: '0', lineHeight: '1.3' }}>Visualisez vos tendances pour identifier vos symptômes.</p>
                 </div>
               </li>
               <li className="feature-item" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
-                <div className="feature-dot"><img src="/feature-3.png" alt="" style={{ width: '24px', height: '24px' }} /></div>
+                <div className="feature-dot"><img src="/feature-3.png" alt="" style={{ width: '35px', height: '35px' }} /></div>
                 <div>
-                  <div className="feature-title" style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>Communiquez avec votre médecin</div>
+                  <div className="feature-title" style={{ fontSize: '16px', fontWeight: '600', marginBottom: '4px' }}>Communiquez avec votre médecin</div>
                   <p className="feature-desc" style={{ fontSize: '12px', color: '#666', margin: '0', lineHeight: '1.3' }}>Exportez vos données pour vos praticiens.</p>
                 </div>
               </li>
               <li className="feature-item" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                <div className="feature-dot"><img src="/feature-4.png" alt="" style={{ width: '24px', height: '24px' }} /></div>
+                  <div className="feature-dot"><img src="/feature-4.png" alt="" style={{ width: '35px', height: '35px' }} /></div>
                 <div>
-                  <div className="feature-title" style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>Vos données sécurisées</div>
+                  <div className="feature-title" style={{ fontSize: '16px', fontWeight: '600', marginBottom: '4px' }}>Vos données sécurisées</div>
                   <p className="feature-desc" style={{ fontSize: '12px', color: '#666', margin: '0', lineHeight: '1.3' }}>Hébergées en France selon les plus hauts standards.</p>
                 </div>
               </li>
@@ -246,20 +272,43 @@ export default function Onboarding() {
           <div className="step-content">
             <img className="onb-logo small" src={logo} alt="Sencia" />
             <h1 className="step-title">Set up de votre care plan</h1>
-            <div className="toggle-row"><span>Matin - 8h</span><div className={`switch ${data.matin!==false?'on':''}`} onClick={()=>updateField('matin', !(data.matin!==false))} /></div>
-            <div className="toggle-row"><span>Midi - 12h</span><div className={`switch ${data.midi? 'on':''}`} onClick={()=>updateField('midi', !data.midi)} /></div>
-            <div className="toggle-row"><span>Soir - 19h</span><div className={`switch ${data.soir!==false?'on':''}`} onClick={()=>updateField('soir', !(data.soir!==false))} /></div>
+            <div className="care-times">
+              {[
+                { label: 'Matin', idx: 0, defaultTime: '08:00' },
+                { label: 'Midi', idx: 1, defaultTime: '12:00' },
+                { label: 'Soir', idx: 2, defaultTime: '19:00' },
+              ].map(({ label, idx, defaultTime }) => {
+                const current = (data.heures && data.heures[idx]) || defaultTime
+                return (
+                  <div className="care-time-card" key={label}>
+                    <div className="care-time-left">
+                      <div className="care-time-title">{label}</div>
+                      <div className="care-time-value">
+                        {current}
+                      </div>
+                    </div>
+                    <div className="care-time-right">
+                      <button
+                        type="button"
+                        className="care-time-edit"
+                        onClick={() => {
+                          const next = window.prompt(`Choisir l'heure pour ${label}`, current) || current
+                          const nextHeures = [...(data.heures || ['08:00','12:00','19:00'])]
+                          nextHeures[idx] = next
+                          updateField('heures', nextHeures)
+                        }}
+                      >
+                        Modifier
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         )}
 
-        {stepKey === 'notifs' && (
-          <div className="step-content">
-            <img className="onb-logo small" src={logo} alt="Sencia" />
-            <h1 className="step-title">Autoriser les notifs push</h1>
-            <div className="toggle-row"><span>Rappel du matin</span><div className={`switch ${data.notifMorning? 'on':''}`} onClick={()=>updateField('notifMorning', !data.notifMorning)} /></div>
-            <div className="toggle-row"><span>Rappel du soir</span><div className={`switch ${data.notifEvening? 'on':''}`} onClick={()=>updateField('notifEvening', !data.notifEvening)} /></div>
-          </div>
-        )}
+        {/* notifs step removed */}
 
         {stepKey === 'sync' && (
           <div className="step-content">
@@ -290,6 +339,7 @@ export default function Onboarding() {
           primaryLabel={stepKey === 'widget' ? 'Commencer' : stepKey === 'cguWelcome' ? "J'accepte et je continue" : stepKey === 'login' ? 'Commencer' : 'Continuer'}
           onPrimary={stepKey === 'widget' ? () => navigate('/app') : stepKey === 'login' ? () => setShowLoginModal(true) : next}
           disabled={stepKey === 'cguWelcome' && !data.cguAccepted}
+          solidBackground={stepKey === 'cguWelcome'}
         />
       </MobileFrame>
       

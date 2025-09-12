@@ -178,12 +178,12 @@
 .selection-card {
   background: #FFFFFF;
   border: 2px solid #E5E5EA;
-  border-radius: 12px;
+  border-radius: 9999px;
   padding: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
-  min-height: 60px;
+  min-height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -233,10 +233,13 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: #FFFFFF;
   padding: 16px 24px calc(env(safe-area-inset-bottom) + 16px);
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
   z-index: 10;
+}
+
+.bottom-actions.solid {
+  background: #FFFFFF;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .primary-button {
@@ -276,10 +279,10 @@
 /* Wheel Picker */
 .wheel-picker {
   position: relative;
-  height: 300px;
+  height: 400px;
   width: 100%;
   margin: 40px 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .wheel-picker-container {
@@ -307,8 +310,8 @@
 }
 
 .wheel-picker-item:not(.selected) {
-  opacity: 0.3;
-  color: #C7C7CC;
+  opacity: 0.5;
+  color: #515153;
 }
 
 .wheel-picker-item.selected {
@@ -334,7 +337,7 @@
   margin-left: 8px;
   font-size: 16px;
   font-weight: 400;
-  color: #8E8E93;
+  color: #00000046;
 }
 
 .wheel-picker-padding {
@@ -345,19 +348,25 @@
   position: absolute;
   left: 0;
   right: 0;
-  height: 125px;
+  height: 96px;
   pointer-events: none;
   z-index: 2;
 }
 
 .wheel-picker-mask-top {
-  top: 0;
-  background: linear-gradient(to bottom, rgba(248, 250, 255, 1) 0%, rgba(248, 250, 255, 0.8) 70%, transparent 100%);
+  top: -8px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  overflow: visible;
 }
 
 .wheel-picker-mask-bottom {
-  bottom: 0;
-  background: linear-gradient(to top, rgba(248, 250, 255, 1) 0%, rgba(248, 250, 255, 0.8) 70%, transparent 100%);
+  bottom: -8px;
+  background: linear-gradient(to top, rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  overflow: visible;
 }
 
 .wheel-picker-selection-line {
@@ -551,14 +560,16 @@
 
 .pills-container {
   display: flex;
+  align-items: flex-start;
+  align-content: flex-start;
+  gap: 9px;
+  align-self: stretch;
   flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
 }
 
 .medication-pill {
-  background: #F2F2F7;
-  border: 2px solid transparent;
+  background: #FFFFFF;
+  border: 1px solid #DEDEDE;
   border-radius: 20px;
   padding: 8px 16px;
   font-size: 14px;
@@ -750,7 +761,7 @@
   border: 1px solid #E5E5EA;
   border-radius: 12px;
   font-size: 16px;
-  background: #fff;
+  background: #FFFFFF;
   color: #000;
   box-sizing: border-box;
 }
@@ -837,7 +848,7 @@
 
 .terms-acceptance {
   position: fixed;
-  bottom: 100px; /* Above bottom actions */
+  bottom: calc(env(safe-area-inset-bottom) + 72px); /* sit flush above bottom actions */
   left: 0;
   right: 0;
   background: #FFFFFF;

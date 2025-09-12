@@ -1,13 +1,27 @@
 export default function GradientBackground() {
   return (
-    <div className="fixed inset-0 -z-10">
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 0,
+        pointerEvents: 'none'
+      }}
+    >
       {/* Base background */}
-      <div className="absolute inset-0 bg-white" />
-      
-      {/* Gradient overlays to recreate the Figma design */}
-      <div 
-        className="absolute inset-0"
+      <div
         style={{
+          position: 'absolute',
+          inset: 0,
+          background: '#FFFFFF'
+        }}
+      />
+
+      {/* Gradient overlays to recreate the Figma design */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
           background: `
             radial-gradient(ellipse 368px 264px at 47% 15%, rgba(196, 225, 255, 0.7) 0%, transparent 70%),
             radial-gradient(ellipse 264px 338px at 100% 20%, rgba(255, 209, 183, 0.7) 0%, transparent 70%),
@@ -17,15 +31,16 @@ export default function GradientBackground() {
           `
         }}
       />
-      
+
       {/* Additional blur overlay for extra softness */}
-      <div 
-        className="absolute inset-0"
+      <div
         style={{
+          position: 'absolute',
+          inset: 0,
           backdropFilter: 'blur(1px)',
           background: 'rgba(255, 255, 255, 0.1)'
         }}
       />
     </div>
-  );
+  )
 }
