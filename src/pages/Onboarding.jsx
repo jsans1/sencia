@@ -10,6 +10,7 @@ import BottomActions from '../components/mobile/BottomActions'
 import LoginModal from '../components/mobile/LoginModal'
 import WearablesGrid from '../components/mobile/WearablesGrid'
 import TermsAndConditions from '../components/mobile/TermsAndConditions'
+import MedicationPills from '../components/mobile/MedicationPills'
 import MultiSelectChips from '../components/onboarding/MultiSelectChips'
 
 const stepsOrder = [
