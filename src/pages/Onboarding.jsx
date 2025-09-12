@@ -201,17 +201,14 @@ export default function Onboarding() {
             <img className="onb-logo small" src={logo} alt="Sencia" />
             <h1 className="step-title">Informations personnelles</h1>
             <label className="onboarding-label">Maladie chronique</label>
-            <select className="onboarding-input" value={data.maladie || ''} onChange={(e) => updateField('maladie', e.target.value)}>
-              <option value="">Sélectionner…</option>
-              {infosPersoOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-            </select>
+            <input type="text" className="onboarding-input" placeholder="Ex: Hypertension" value={data.maladie || ''} onChange={(e) => updateField('maladie', e.target.value)} />
             <label className="onboarding-label">Date de diagnostic</label>
             <input type="date" className="onboarding-input" value={data.diagDate || ''} onChange={(e)=>updateField('diagDate', e.target.value)} />
             <label className="onboarding-label">Médicaments</label>
-            <MultiSelectChips options={["Ramipril","Lisinopril","Amlodipine","Bisoprolol","Hydrochlorothiazide","Valsartan"]} selected={data.medicaments || []} onToggle={(v)=>updateField('medicaments', (data.medicaments||[]).includes(v)?(data.medicaments||[]).filter(x=>x!==v):[...(data.medicaments||[]), v])} />
-            <div style={{ width:'100%', marginTop:'8px' }}>
-              <input className="onboarding-input" placeholder="J'ajoute un nouveau médicament" value={data.newMed || ''} onChange={(e)=>updateField('newMed', e.target.value)} onKeyDown={(e)=>{ if(e.key==='Enter' && data.newMed){ updateField('medicaments', [ ...(data.medicaments||[]), data.newMed ]); updateField('newMed',''); e.preventDefault(); } }} />
-            </div>
+            <MedicationPills
+              selectedMedications={data.medicaments || []}
+              onMedicationChange={(arr) => updateField('medicaments', arr)}
+            />
           </div>
         )}
 
