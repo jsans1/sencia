@@ -9,6 +9,7 @@ import WheelPicker from '../components/mobile/WheelPicker'
 import BottomActions from '../components/mobile/BottomActions'
 import LoginModal from '../components/mobile/LoginModal'
 import WearablesGrid from '../components/mobile/WearablesGrid'
+import TermsAndConditions from '../components/mobile/TermsAndConditions'
 import MultiSelectChips from '../components/onboarding/MultiSelectChips'
 
 const stepsOrder = [
@@ -131,17 +132,10 @@ export default function Onboarding() {
         )}
 
         {stepKey === 'cguWelcome' && (
-          <div className="step-content">
-            <img className="onb-logo small" src={logo} alt="Sencia" />
-            <h2 className="welcome-title">Bienvenue <span className="welcome-loris">Loris</span></h2>
-            <div className="cgu-wrap">
-              <div className="cgu-scroll">
-                <p><strong>Conditions générales d'utilisation</strong></p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer dignissim, risus non pharetra finibus, urna tellus varius elit, a pulvinar odio neque sit amet odio. Mauris eget condimentum enim. Curabitur suscipit quam quis aliquet cursus. Proin luctus luctus arcu, vel efficitur odio luctus non. Donec id ultricies sem. Cras a arcu id sem scelerisque molestie. Suspendisse nec consectetur enim. Mauris mattis purus id nisl hendrerit, sed efficitur arcu ullamcorper. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. (texte factice)</p>
-                <p>…</p>
-              </div>
-            </div>
-          </div>
+          <TermsAndConditions
+            accepted={data.cguAccepted}
+            onAcceptanceChange={(accepted) => updateField('cguAccepted', accepted)}
+          />
         )}
 
         {stepKey === 'genre' && (
@@ -257,8 +251,9 @@ export default function Onboarding() {
         )}
         
         <BottomActions
-          primaryLabel={stepKey === 'widget' ? 'Commencer' : stepKey === 'cguWelcome' ? "J'ai compris" : stepKey === 'login' ? 'Commencer' : 'Continuer'}
+          primaryLabel={stepKey === 'widget' ? 'Commencer' : stepKey === 'cguWelcome' ? "J'accepte et je continue" : stepKey === 'login' ? 'Commencer' : 'Continuer'}
           onPrimary={stepKey === 'widget' ? () => navigate('/app') : stepKey === 'login' ? () => setShowLoginModal(true) : next}
+          disabled={stepKey === 'cguWelcome' && !data.cguAccepted}
         />
       </MobileFrame>
       
