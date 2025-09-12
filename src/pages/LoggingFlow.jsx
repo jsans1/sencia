@@ -242,9 +242,10 @@ const MoodScreen = ({ value, onChange, onContinue }) => {
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center', 
-        flex: 1, 
+        height: '450px',
         justifyContent: 'center',
-        position: 'relative'
+        position: 'relative',
+        marginBottom: '80px'
       }}>
         <div style={{ fontSize: '14px', marginBottom: '20px', color: 'black' }}>Très bien</div>
         
@@ -324,7 +325,7 @@ const SymptomsScreen = ({ selectedSymptoms, customSymptoms, onSymptomsChange, on
         </p>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px', alignItems: 'center' }}>
         {symptoms.map((symptom, index) => (
           <button
             key={index}
@@ -339,7 +340,9 @@ const SymptomsScreen = ({ selectedSymptoms, customSymptoms, onSymptomsChange, on
               fontWeight: selectedSymptoms.includes(symptom) ? '600' : '400',
               cursor: 'pointer',
               textAlign: 'center',
-              transition: 'all 0.2s'
+              transition: 'all 0.2s',
+              width: 'fit-content',
+              minWidth: '250px'
             }}
           >
             {symptom}
@@ -554,14 +557,93 @@ const BloodPressureScreen = ({ data, onChange, onContinue }) => {
   )
 }
 
-// Screen 4: Treatment (Circular selector)
+// Screen 4: Treatment (Figma-accurate wheel selector)
 const TreatmentScreen = ({ value, onChange, onContinue }) => {
   const [hasInteracted, setHasInteracted] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const [selectorPosition, setSelectorPosition] = useState({ x: 50, y: 50 }) // Center position as percentage
+  const wheelRef = useRef(null)
 
-  const handleSelect = (selectedValue) => {
-    onChange(selectedValue)
-    setHasInteracted(true)
-  }
+  const updatePositionAndValue = useCallback((clientX, clientY) => {
+    if (!wheelRef.current) return
+    
+    const rect = wheelRef.current.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    
+    // Calculate position relative to wheel center
+    const deltaX = clientX - centerX
+    const deltaY = clientY - centerY
+    
+    // Convert to percentage within wheel bounds
+    const wheelRadius = rect.width / 2 * 0.8 // 80% of wheel radius to keep selector inside
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
+    
+    if (distance <= wheelRadius) {
+      const newX = ((deltaX / rect.width) * 100) + 50
+      const newY = ((deltaY / rect.height) * 100) + 50
+      setSelectorPosition({ x: newX, y: newY })
+      
+      // Determine selection based on position (left half = oui, right half = non)
+      const newValue = deltaX < 0 ? true : false // left = oui (true), right = non (false)
+      if (newValue !== value) {
+        onChange(newValue)
+        setHasInteracted(true)
+      }
+    }
+  }, [value, onChange])
+
+  const handleMouseDown = useCallback((e) => {
+    e.preventDefault()
+    setIsDragging(true)
+    updatePositionAndValue(e.clientX, e.clientY)
+  }, [updatePositionAndValue])
+
+  const handleMouseMove = useCallback((e) => {
+    if (isDragging) {
+      e.preventDefault()
+      updatePositionAndValue(e.clientX, e.clientY)
+    }
+  }, [isDragging, updatePositionAndValue])
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  const handleTouchStart = useCallback((e) => {
+    e.preventDefault()
+    setIsDragging(true)
+    const touch = e.touches[0]
+    updatePositionAndValue(touch.clientX, touch.clientY)
+  }, [updatePositionAndValue])
+
+  const handleTouchMove = useCallback((e) => {
+    if (isDragging) {
+      e.preventDefault()
+      const touch = e.touches[0]
+      updatePositionAndValue(touch.clientX, touch.clientY)
+    }
+  }, [isDragging, updatePositionAndValue])
+
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('touchmove', handleTouchMove, { passive: false })
+      document.addEventListener('touchend', handleTouchEnd)
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
 
   return (
     <>
@@ -569,12 +651,12 @@ const TreatmentScreen = ({ value, onChange, onContinue }) => {
         <h2 style={{ fontSize: '26px', fontWeight: '500', marginBottom: '12px', lineHeight: '1.1' }}>
           Avez-vous pris votre traitement aujourd'hui ?
         </h2>
-        <p style={{ fontSize: '14px', color: '#7a7a7a', lineHeight: 'normal' }}>
+        <p style={{ fontSize: '14px', color: '#646464', lineHeight: 'normal' }}>
           Sélectionnez les traitements que vous avez pris jusqu'à présent. Fiez-vous toujours à votre ordonnance.
         </p>
       </div>
 
-      {/* Circular selector */}
+      {/* Figma-accurate Wheel */}
       <div style={{ 
         display: 'flex', 
         justifyContent: 'center', 
@@ -582,61 +664,130 @@ const TreatmentScreen = ({ value, onChange, onContinue }) => {
         flex: 1,
         position: 'relative'
       }}>
-        <svg width="260" height="260" viewBox="0 0 260 260">
-          <defs>
-            <path id="leftSide" d="M 130 130 L 130 10 A 120 120 0 0 0 10 130 Z" />
-            <path id="rightSide" d="M 130 130 L 130 10 A 120 120 0 0 1 250 130 Z" />
-          </defs>
+        <div 
+          ref={wheelRef}
+          style={{
+            position: 'relative',
+            width: '340px',
+            height: '340px',
+            cursor: 'pointer',
+            userSelect: 'none'
+          }}
+        >
+          {/* Main wheel SVG */}
+          <div style={{ position: 'absolute', inset: '-0.441%' }}>
+            <svg width="344" height="344" viewBox="0 0 344 344" style={{ display: 'block', width: '100%', height: '100%' }}>
+              {/* Center circle */}
+              <circle cx="172" cy="172" r="20" fill="white" />
+              
+              {/* Outer circle */}
+              <circle cx="172" cy="172" r="170" fill="white" stroke="#DADADA" strokeWidth="3" />
+              
+              {/* Vertical divider line */}
+              <line x1="172" y1="3" x2="172" y2="151" stroke="#DADADA" strokeWidth="3" />
+              <line x1="172" y1="193" x2="172" y2="341" stroke="#DADADA" strokeWidth="3" />
+              
+              {/* Visual feedback for selection */}
+              {value === true && (
+                <path 
+                  d="M172 2C78.1116 2 2 78.1116 2 172C2 265.888 78.1116 342 172 342L172 2Z" 
+                  fill="rgba(14, 122, 254, 0.1)" 
+                />
+              )}
+              {value === false && (
+                <path 
+                  d="M172 2C265.888 2 342 78.1116 342 172C342 265.888 265.888 342 172 342L172 2Z" 
+                  fill="rgba(14, 122, 254, 0.1)" 
+                />
+              )}
+            </svg>
+          </div>
           
-          <path 
-            d="M 130 130 L 130 10 A 120 120 0 0 0 10 130 Z" 
-            fill="white" 
-            stroke="#e0e0e0" 
-            strokeWidth="2"
-            style={{ cursor: 'pointer' }}
-            onClick={() => handleSelect(false)}
-          />
-          <path 
-            d="M 130 130 L 130 10 A 120 120 0 0 1 250 130 Z" 
-            fill="white" 
-            stroke="#e0e0e0" 
-            strokeWidth="2"
-            style={{ cursor: 'pointer' }}
-            onClick={() => handleSelect(true)}
-          />
-          <line x1="130" y1="10" x2="130" y2="130" stroke="#e0e0e0" strokeWidth="2" />
+          {/* Labels positioned exactly as in Figma */}
+          <div style={{
+            position: 'absolute',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '213px',
+            height: '15px',
+            left: '64px', // 16px margin from Figma
+            top: '162px',
+            fontFamily: 'SF Pro Display, sans-serif',
+            fontSize: '16px',
+            fontWeight: '600',
+            textAlign: 'center',
+            color: 'black',
+            pointerEvents: 'none'
+          }}>
+            <div style={{
+              color: value === true ? '#0e7afe' : 'black',
+              transition: 'color 0.2s'
+            }}>Oui</div>
+            <div style={{
+              color: value === false ? '#0e7afe' : 'black',
+              transition: 'color 0.2s'
+            }}>Non</div>
+          </div>
           
-          <text x="65" y="75" textAnchor="middle" fontSize="16" fontWeight="bold">Non</text>
-          <text x="195" y="75" textAnchor="middle" fontSize="16" fontWeight="bold">Oui</text>
-          
-          {/* Selector dot */}
-          <circle
-            cx={value === true ? 195 : value === false ? 65 : 130}
-            cy={value !== null ? 70 : 10}
-            r="12"
-            fill={value !== null ? '#007AFF' : '#d9d9d9'}
-            style={{ cursor: 'pointer' }}
-          />
-        </svg>
+          {/* Draggable Selector */}
+          <div
+            style={{
+              position: 'absolute',
+              left: `${selectorPosition.x}%`,
+              top: `${selectorPosition.y}%`,
+              transform: 'translate(-50%, -50%)',
+              width: '43px',
+              height: '43px',
+              zIndex: 10,
+              cursor: isDragging ? 'grabbing' : 'grab',
+              transition: isDragging ? 'none' : 'all 0.2s ease-out'
+            }}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+          >
+            <div style={{ position: 'absolute', inset: '-45.12% -35.81% -26.51% -35.81%' }}>
+              <svg width="75" height="75" viewBox="0 0 75 75" style={{ display: 'block', width: '100%', height: '100%' }}>
+                <defs>
+                  <filter id="selector-shadow" x="0.6" y="0.6" width="73.8" height="73.8">
+                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                    <feColorMatrix in="SourceAlpha" result="hardAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" />
+                    <feOffset dy="-4" />
+                    <feGaussianBlur stdDeviation="7.7" />
+                    <feComposite in2="hardAlpha" operator="out" />
+                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.06 0" />
+                    <feBlend in2="BackgroundImageFix" mode="normal" result="effect1_dropShadow" />
+                    <feBlend in="SourceGraphic" in2="effect1_dropShadow" mode="normal" result="shape" />
+                  </filter>
+                </defs>
+                <circle 
+                  cx="37.5" 
+                  cy="41.5" 
+                  r="21.5" 
+                  fill={isDragging ? "rgba(14, 122, 254, 0.9)" : "white"}
+                  filter="url(#selector-shadow)"
+                  style={{ transition: 'fill 0.2s' }}
+                />
+                <circle 
+                  cx="37.5" 
+                  cy="41.5" 
+                  r="21" 
+                  stroke={isDragging ? "#0e7afe" : "#DADADA"}
+                  fill="none"
+                  style={{ transition: 'stroke 0.2s' }}
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <button 
-        onClick={onContinue}
-        disabled={!hasInteracted}
-        style={{
-          width: '100%',
-          height: '52px',
-          borderRadius: '20px',
-          border: '1px solid #ececec',
-          backgroundColor: hasInteracted ? '#212121' : '#d9d9d9',
-          color: hasInteracted ? 'white' : '#a0a0a0',
-          fontSize: '16px',
-          fontWeight: '500',
-          cursor: hasInteracted ? 'pointer' : 'not-allowed'
-        }}
-      >
-        Continuer
-      </button>
+      <BottomActions 
+        primaryLabel="Continuer"
+        onPrimary={onContinue}
+        primaryDisabled={!hasInteracted}
+        solidBackground={true}
+      />
     </>
   )
 }
@@ -669,7 +820,7 @@ const ConsumptionScreen = ({ selectedItems, customItems, onItemsChange, onCustom
         </p>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px', alignItems: 'center' }}>
         {items.map((item, index) => (
           <button
             key={index}
@@ -684,7 +835,9 @@ const ConsumptionScreen = ({ selectedItems, customItems, onItemsChange, onCustom
               fontWeight: selectedItems.includes(item) ? '600' : '400',
               cursor: 'pointer',
               textAlign: 'center',
-              transition: 'all 0.2s'
+              transition: 'all 0.2s',
+              width: 'fit-content',
+              minWidth: '250px'
             }}
           >
             {item}
@@ -732,20 +885,110 @@ const ConsumptionScreen = ({ selectedItems, customItems, onItemsChange, onCustom
   )
 }
 
-// Screen 6: Physical Activity (3-way circular selector)
+// Screen 6: Physical Activity (3-way draggable wheel)
 const ActivityScreen = ({ value, onChange, onContinue }) => {
   const [hasInteracted, setHasInteracted] = useState(false)
-  
+  const [isDragging, setIsDragging] = useState(false)
+  const [selectorAngle, setSelectorAngle] = useState(() => {
+    if (value === 'plus_30') return -60 // Top right
+    if (value === 'moins_30') return 180 // Left  
+    if (value === 'non') return 60 // Bottom right
+    return 0 // Default position
+  })
+  const wheelRef = useRef(null)
+
   const options = [
-    { label: 'Oui,\n+ de 30 mins', value: 'plus_30', angle: 30 },
-    { label: 'Oui,\n- de 30 mins', value: 'moins_30', angle: 150 },
-    { label: 'Non', value: 'non', angle: 270 }
+    { value: 'plus_30', angle: -60, label: 'Oui, + de 30 mins' },
+    { value: 'moins_30', angle: 180, label: 'Oui, - de 30 mins' },
+    { value: 'non', angle: 60, label: 'Non' }
   ]
 
-  const handleSelect = (selectedValue) => {
-    onChange(selectedValue)
-    setHasInteracted(true)
+  const getValueFromAngle = (angle) => {
+    // Normalize angle to 0-360 range
+    const normalizedAngle = ((angle % 360) + 360) % 360
+    
+    // Define zones for each option (120 degrees each)
+    if ((normalizedAngle >= 300 && normalizedAngle <= 360) || (normalizedAngle >= 0 && normalizedAngle <= 60)) {
+      return 'plus_30' // Top right section
+    } else if (normalizedAngle >= 120 && normalizedAngle <= 240) {
+      return 'moins_30' // Left section
+    } else {
+      return 'non' // Bottom right section
+    }
   }
+
+  const updateAngleAndValue = useCallback((clientX, clientY) => {
+    if (!wheelRef.current) return
+    
+    const rect = wheelRef.current.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    
+    const angle = Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI)
+    setSelectorAngle(angle)
+    
+    const newValue = getValueFromAngle(angle)
+    if (newValue !== value) {
+      onChange(newValue)
+      setHasInteracted(true)
+    }
+  }, [value, onChange])
+
+  const handleMouseDown = useCallback((e) => {
+    e.preventDefault()
+    setIsDragging(true)
+    updateAngleAndValue(e.clientX, e.clientY)
+  }, [updateAngleAndValue])
+
+  const handleMouseMove = useCallback((e) => {
+    if (isDragging) {
+      e.preventDefault()
+      updateAngleAndValue(e.clientX, e.clientY)
+    }
+  }, [isDragging, updateAngleAndValue])
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  const handleTouchStart = useCallback((e) => {
+    e.preventDefault()
+    setIsDragging(true)
+    const touch = e.touches[0]
+    updateAngleAndValue(touch.clientX, touch.clientY)
+  }, [updateAngleAndValue])
+
+  const handleTouchMove = useCallback((e) => {
+    if (isDragging) {
+      e.preventDefault()
+      const touch = e.touches[0]
+      updateAngleAndValue(touch.clientX, touch.clientY)
+    }
+  }, [isDragging, updateAngleAndValue])
+
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('touchmove', handleTouchMove, { passive: false })
+      document.addEventListener('touchend', handleTouchEnd)
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
+
+  const selectorRadius = 80
+  const selectorX = 130 + selectorRadius * Math.cos(selectorAngle * Math.PI / 180)
+  const selectorY = 130 + selectorRadius * Math.sin(selectorAngle * Math.PI / 180)
 
   return (
     <>
@@ -758,7 +1001,7 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
         </p>
       </div>
 
-      {/* 3-way circular selector */}
+      {/* 3-way draggable wheel */}
       <div style={{ 
         display: 'flex', 
         justifyContent: 'center', 
@@ -766,86 +1009,63 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
         flex: 1,
         position: 'relative'
       }}>
-        <svg width="260" height="260" viewBox="0 0 260 260">
-          <defs>
-            <path id="section1" d="M 130 130 L 130 20 A 110 110 0 0 1 225 85 Z" />
-            <path id="section2" d="M 130 130 L 225 85 A 110 110 0 0 1 35 85 Z" />
-            <path id="section3" d="M 130 130 L 35 85 A 110 110 0 0 1 130 20 Z" />
-          </defs>
-          
-          <path 
-            d="M 130 130 L 130 20 A 110 110 0 0 1 225 85 Z" 
-            fill="white" 
-            stroke="#e0e0e0" 
+        <svg width="260" height="260" viewBox="0 0 260 260" ref={wheelRef}>
+          {/* Full circle background */}
+          <circle
+            cx="130"
+            cy="130"
+            r="110"
+            fill="white"
+            stroke="#e0e0e0"
             strokeWidth="2"
-            style={{ cursor: 'pointer' }}
-            onClick={() => handleSelect('plus_30')}
-          />
-          <path 
-            d="M 130 130 L 225 85 A 110 110 0 0 1 35 85 Z" 
-            fill="white" 
-            stroke="#e0e0e0" 
-            strokeWidth="2"
-            style={{ cursor: 'pointer' }}
-            onClick={() => handleSelect('moins_30')}
-          />
-          <path 
-            d="M 130 130 L 35 85 A 110 110 0 0 1 130 20 Z" 
-            fill="white" 
-            stroke="#e0e0e0" 
-            strokeWidth="2"
-            style={{ cursor: 'pointer' }}
-            onClick={() => handleSelect('non')}
           />
           
-          <text x="178" y="60" textAnchor="middle" fontSize="14" fontWeight="bold">Oui,</text>
-          <text x="178" y="75" textAnchor="middle" fontSize="14" fontWeight="bold">+ de 30 mins</text>
+          {/* Divider lines */}
+          <line x1="130" y1="20" x2="130" y2="130" stroke="#e0e0e0" strokeWidth="1" />
+          <line x1="35" y1="85" x2="130" y2="130" stroke="#e0e0e0" strokeWidth="1" />
+          <line x1="225" y1="175" x2="130" y2="130" stroke="#e0e0e0" strokeWidth="1" />
           
-          <text x="82" y="60" textAnchor="middle" fontSize="14" fontWeight="bold">Oui,</text>
-          <text x="82" y="75" textAnchor="middle" fontSize="14" fontWeight="bold">- de 30 mins</text>
+          {/* Text labels */}
+          <text x="178" y="60" textAnchor="middle" fontSize="12" fontWeight="bold">Oui,</text>
+          <text x="178" y="75" textAnchor="middle" fontSize="12" fontWeight="bold">+ de 30 mins</text>
           
-          <text x="130" y="200" textAnchor="middle" fontSize="14" fontWeight="bold">Non</text>
+          <text x="82" y="60" textAnchor="middle" fontSize="12" fontWeight="bold">Oui,</text>
+          <text x="82" y="75" textAnchor="middle" fontSize="12" fontWeight="bold">- de 30 mins</text>
           
-          {/* Selector dots */}
-          {options.map((option) => {
-            const isSelected = value === option.value
-            const angle = (option.angle - 90) * Math.PI / 180
-            const radius = 90
-            const x = 130 + radius * Math.cos(angle)
-            const y = 130 + radius * Math.sin(angle)
-            
-            return (
-              <circle
-                key={option.value}
-                cx={x}
-                cy={y}
-                r="12"
-                fill={isSelected ? '#007AFF' : '#d9d9d9'}
-                style={{ cursor: 'pointer' }}
-                onClick={() => handleSelect(option.value)}
-              />
-            )
-          })}
+          <text x="130" y="200" textAnchor="middle" fontSize="12" fontWeight="bold">Non</text>
+          
+          {/* Draggable selector */}
+          <circle
+            cx={selectorX}
+            cy={selectorY}
+            r="16"
+            fill={hasInteracted ? '#007AFF' : '#d9d9d9'}
+            stroke="white"
+            strokeWidth="3"
+            style={{ 
+              cursor: isDragging ? 'grabbing' : 'grab',
+              filter: isDragging ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' : 'none'
+            }}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+          />
+          
+          {/* Center dot */}
+          <circle
+            cx="130"
+            cy="130"
+            r="8"
+            fill="#e0e0e0"
+          />
         </svg>
       </div>
 
-      <button 
-        onClick={onContinue}
-        disabled={!hasInteracted}
-        style={{
-          width: '100%',
-          height: '52px',
-          borderRadius: '20px',
-          border: '1px solid #ececec',
-          backgroundColor: hasInteracted ? '#212121' : '#d9d9d9',
-          color: hasInteracted ? 'white' : '#a0a0a0',
-          fontSize: '16px',
-          fontWeight: '500',
-          cursor: hasInteracted ? 'pointer' : 'not-allowed'
-        }}
-      >
-        Continuer
-      </button>
+      <BottomActions 
+        primaryLabel="Continuer"
+        onPrimary={onContinue}
+        primaryDisabled={!hasInteracted}
+        solidBackground={true}
+      />
     </>
   )
 }
