@@ -11,6 +11,7 @@ import LoginModal from '../components/mobile/LoginModal'
 import WearablesGrid from '../components/mobile/WearablesGrid'
 import TermsAndConditions from '../components/mobile/TermsAndConditions'
 import MedicationPills from '../components/mobile/MedicationPills'
+import GradientBackground from '../components/mobile/GradientBackground'
 import MultiSelectChips from '../components/onboarding/MultiSelectChips'
 
 const stepsOrder = [
@@ -78,7 +79,8 @@ export default function Onboarding() {
 
 
   return (
-    <div className="splash-bg" style={{ backgroundImage: 'url(/Gradient.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+    <>
+      <GradientBackground />
       <MobileFrame showStatusBar={!showHeader}>
         {showHeader && (
           <OnboardingNavigation
@@ -270,6 +272,6 @@ export default function Onboarding() {
           next()
         }}
       />
-    </div>
+    </>
   )
 }
