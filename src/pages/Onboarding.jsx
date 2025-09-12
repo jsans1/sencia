@@ -8,6 +8,7 @@ import CardSelection from '../components/mobile/CardSelection'
 import WheelPicker from '../components/mobile/WheelPicker'
 import BottomActions from '../components/mobile/BottomActions'
 import LoginModal from '../components/mobile/LoginModal'
+import WearablesGrid from '../components/mobile/WearablesGrid'
 import MultiSelectChips from '../components/onboarding/MultiSelectChips'
 
 const stepsOrder = [
@@ -50,6 +51,7 @@ export default function Onboarding() {
     heures: ['08:00', '12:00', '19:00'],
     notifications: true,
     cguAccepted: false,
+    selectedDevices: [],
   })
 
   const stepKey = stepsOrder[stepIndex]
@@ -234,13 +236,18 @@ export default function Onboarding() {
 
         {stepKey === 'sync' && (
           <div className="step-content">
-            <img className="onb-logo small" src={logo} alt="Sencia" />
-            <h1 className="step-title">Synchronisez vos appareils</h1>
-            <div className="grid-devices">
-              {['Apple Health','Google Fit','Samsung Health','Garmin','Withings','Oura','Fitbit','Whoop'].map((d) => (
-                <button key={d} type="button" className="device-tile" onClick={() => {}}>{d}</button>
-              ))}
-            </div>
+            <h1 className="step-title">Synchronisez vos <span style={{color: '#007AFF'}}>appareils</span><br />et données de santé</h1>
+            <WearablesGrid
+              selectedDevices={data.selectedDevices}
+              onToggleDevice={(deviceId) => {
+                setData(prev => ({
+                  ...prev,
+                  selectedDevices: prev.selectedDevices.includes(deviceId)
+                    ? prev.selectedDevices.filter(id => id !== deviceId)
+                    : [...prev.selectedDevices, deviceId]
+                }))
+              }}
+            />
           </div>
         )}
 

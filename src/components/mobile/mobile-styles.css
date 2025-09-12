@@ -542,6 +542,73 @@
   line-height: 1.4;
 }
 
+/* Wearables Grid */
+.wearables-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 0 24px;
+  margin: 24px 0;
+}
+
+.wearable-card {
+  background: #FFFFFF;
+  border: 2px solid #E5E5EA;
+  border-radius: 12px;
+  padding: 20px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.wearable-card:hover {
+  border-color: #007AFF;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.wearable-card.selected {
+  border-color: #007AFF;
+  background: rgba(0, 122, 255, 0.05);
+}
+
+.wearable-content {
+  width: 100%;
+  position: relative;
+}
+
+.wearable-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #000;
+  display: block;
+}
+
+.wearable-card.selected .wearable-name {
+  color: #007AFF;
+  font-weight: 600;
+}
+
+.check-icon {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #007AFF;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
 /* Responsive Design */
 @media (max-width: 430px) {
   .mobile-frame {
