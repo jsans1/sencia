@@ -4,9 +4,10 @@
   max-width: 430px;
   min-height: 100vh;
   margin: 0 auto;
-  background: #FFFFFF;
+  background: transparent;
   position: relative;
   overflow: hidden;
+  z-index: 1;
 }
 
 .mobile-content {
@@ -679,11 +680,11 @@
   background: #FFFFFF;
   border: 2px solid #E5E5EA;
   border-radius: 12px;
-  padding: 20px 16px;
+  padding: 12px 10px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
-  min-height: 80px;
+  min-height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -707,7 +708,7 @@
 }
 
 .wearable-name {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   color: #000;
   display: block;

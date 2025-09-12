@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../App.css'
 import logo from '../assets/logo.svg'
@@ -16,8 +16,6 @@ import MultiSelectChips from '../components/onboarding/MultiSelectChips'
 
 const stepsOrder = [
   'welcome',
-  'propoval',
-  'welcomeText',
   'features',
   'login',
   'cguWelcome',
@@ -61,6 +59,13 @@ export default function Onboarding() {
   const showHeader = useMemo(() => stepIndex > stepsOrder.indexOf('login'), [stepIndex])
   const progress = (stepIndex + 1) / stepsOrder.length
 
+  // Auto-open modal on login step
+  useEffect(() => {
+    if (stepKey === 'login') {
+      setShowLoginModal(true)
+    }
+  }, [stepKey])
+
   const next = () => setStepIndex((i) => Math.min(i + 1, stepsOrder.length - 1))
   const back = () => setStepIndex((i) => Math.max(i - 1, 0))
 
@@ -93,8 +98,8 @@ export default function Onboarding() {
         )}
 
         {stepKey === 'welcome' && (
-          <div className="step-content">
-            <img className="onb-logo" src={logo} alt="Sencia" />
+          <div className="step-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center' }}>
+            <img className="onb-logo centered" src={logo} alt="Sencia" />
             <p className="splash-tagline">Votre santé, <span className="splash-tagline-accent">en toute clarté.</span></p>
           </div>
         )}
@@ -120,10 +125,38 @@ export default function Onboarding() {
         )}
 
         {stepKey === 'features' && (
-          <div className="step-content">
-            <h2 className="features-title">Bienvenue sur <span className="welcome-loris">Sencia</span></h2>
-            <ul className="features-list">
-              <li className="feature-item"><div className="feature-dot" /><div><div className="feature-title">Vos données sécurisées</div><p className="feature-desc">Hébergées en France.</p></div></li>
+          <div className="step-content" style={{ padding: '24px 20px' }}>
+            <img className="onb-logo" src={logo} alt="Sencia" style={{ width: '80px', marginBottom: '16px' }} />
+            <h2 className="features-title" style={{ fontSize: '20px', marginBottom: '20px' }}>Bienvenue sur <span className="welcome-loris">Sencia</span></h2>
+            <ul className="features-list" style={{ listStyle: 'none', padding: '0', margin: '0' }}>
+              <li className="feature-item" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
+                <div className="feature-dot"><img src="/feature-1.png" alt="" style={{ width: '24px', height: '24px' }} /></div>
+                <div>
+                  <div className="feature-title" style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>Suivez vos symptômes</div>
+                  <p className="feature-desc" style={{ fontSize: '12px', color: '#666', margin: '0', lineHeight: '1.3' }}>Suivez quotidiennement vos symptômes et vos ressentis.</p>
+                </div>
+              </li>
+              <li className="feature-item" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
+                <div className="feature-dot"><img src="/feature-2.png" alt="" style={{ width: '24px', height: '24px' }} /></div>
+                <div>
+                  <div className="feature-title" style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>Visualisez votre progression</div>
+                  <p className="feature-desc" style={{ fontSize: '12px', color: '#666', margin: '0', lineHeight: '1.3' }}>Visualisez vos tendances pour identifier vos symptômes.</p>
+                </div>
+              </li>
+              <li className="feature-item" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
+                <div className="feature-dot"><img src="/feature-3.png" alt="" style={{ width: '24px', height: '24px' }} /></div>
+                <div>
+                  <div className="feature-title" style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>Communiquez avec votre médecin</div>
+                  <p className="feature-desc" style={{ fontSize: '12px', color: '#666', margin: '0', lineHeight: '1.3' }}>Exportez vos données pour vos praticiens.</p>
+                </div>
+              </li>
+              <li className="feature-item" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                <div className="feature-dot"><img src="/feature-4.png" alt="" style={{ width: '24px', height: '24px' }} /></div>
+                <div>
+                  <div className="feature-title" style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>Vos données sécurisées</div>
+                  <p className="feature-desc" style={{ fontSize: '12px', color: '#666', margin: '0', lineHeight: '1.3' }}>Hébergées en France selon les plus hauts standards.</p>
+                </div>
+              </li>
             </ul>
           </div>
         )}
