@@ -2,8 +2,11 @@ import React, { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../App.css'
 import logo from '../assets/logo.svg'
-import WheelPicker from '../components/onboarding/WheelPicker'
-import OnboardingHeader from '../components/onboarding/OnboardingHeader'
+import MobileFrame from '../components/mobile/MobileFrame'
+import OnboardingNavigation from '../components/mobile/OnboardingNavigation'
+import CardSelection from '../components/mobile/CardSelection'
+import WheelPicker from '../components/mobile/WheelPicker'
+import BottomActions from '../components/mobile/BottomActions'
 import MultiSelectChips from '../components/onboarding/MultiSelectChips'
 
 const stepsOrder = [
@@ -64,35 +67,32 @@ export default function Onboarding() {
   }
 
   const updateField = (key, value) => setData((prev) => ({ ...prev, [key]: value }))
+  
+  // Force refresh to clear cache
 
-  const NextButton = (
-    <div className="onb-bottom-fixed">
-      <button type="button" className="splash-btn onboarding-btn" onClick={next}>Continuer</button>
-    </div>
-  )
 
   return (
     <div className="splash-bg" style={{ backgroundImage: 'url(/Gradient.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-      <div className="splash-container onboarding-form">
+      <MobileFrame showStatusBar={!showHeader}>
         {showHeader && (
-          <div className="onb-top-fixed">
-            <div className="onb-topbar">
-              <img className="onb-logo small" src={logo} alt="Sencia" />
-            </div>
-            <OnboardingHeader showNav={showHeader} onBack={back} onClose={() => navigate('/')} progress={progress} />
-          </div>
+          <OnboardingNavigation
+            onBack={back}
+            onClose={() => navigate('/')}
+            progress={progress}
+            currentStep={stepIndex + 1}
+            totalSteps={stepsOrder.length}
+          />
         )}
 
         {stepKey === 'welcome' && (
-          <>
+          <div className="step-content">
             <img className="onb-logo" src={logo} alt="Sencia" />
             <p className="splash-tagline">Votre santé, <span className="splash-tagline-accent">en toute clarté.</span></p>
-            {NextButton}
-          </>
+          </div>
         )}
 
         {stepKey === 'propoval' && (
-          <>
+          <div className="step-content">
             <img className="onb-logo" src={logo} alt="Sencia" />
             <p className="splash-tagline">Bienvenue sur <span className="splash-tagline-accent">Sencia</span></p>
             <ul className="features-list" style={{ textAlign: 'left' }}>
@@ -101,30 +101,27 @@ export default function Onboarding() {
               <li className="feature-item"><div className="feature-dot"><img src="/feature-3.png" alt="" /></div><div><div className="feature-title">Communiquez avec votre médecin</div><p className="feature-desc">Exportez un résumé clair de vos données pour faciliter le dialogue avec vos praticiens.</p></div></li>
               <li className="feature-item"><div className="feature-dot"><img src="/feature-4.png" alt="" /></div><div><div className="feature-title">Vos données sont sécurisées</div><p className="feature-desc">Vos données sont hébergées et protégées selon les plus hauts standards de sécurité en France.</p></div></li>
             </ul>
-            {NextButton}
-          </>
+          </div>
         )}
 
         {stepKey === 'welcomeText' && (
-          <>
+          <div className="step-content">
             <img className="onb-logo" src={logo} alt="Sencia" />
             <p className="welcome-subtitle">L'aventure commence ici...</p>
-            {NextButton}
-          </>
+          </div>
         )}
 
         {stepKey === 'features' && (
-          <>
+          <div className="step-content">
             <h2 className="features-title">Bienvenue sur <span className="welcome-loris">Sencia</span></h2>
             <ul className="features-list">
               <li className="feature-item"><div className="feature-dot" /><div><div className="feature-title">Vos données sécurisées</div><p className="feature-desc">Hébergées en France.</p></div></li>
             </ul>
-            {NextButton}
-          </>
+          </div>
         )}
 
         {stepKey === 'login' && (
-          <>
+          <div className="step-content">
             <img className="onb-logo" src={logo} alt="Sencia" />
             <div className="login-card">
               <h3 className="feature-title" style={{ marginBottom: '8px' }}>L'aventure commence ici…</h3>
@@ -132,12 +129,11 @@ export default function Onboarding() {
               <button type="button" className="splash-btn auth-btn" onClick={next}>Via E-mail</button>
               <button type="button" className="splash-btn auth-btn-secondary" onClick={next}>Via Téléphone</button>
             </div>
-            {NextButton}
-          </>
+          </div>
         )}
 
         {stepKey === 'cguWelcome' && (
-          <>
+          <div className="step-content">
             <img className="onb-logo small" src={logo} alt="Sencia" />
             <h2 className="welcome-title">Bienvenue <span className="welcome-loris">Loris</span></h2>
             <div className="cgu-wrap">
@@ -147,59 +143,65 @@ export default function Onboarding() {
                 <p>…</p>
               </div>
             </div>
-            <div className="onb-bottom-fixed"><button type="button" className="splash-btn onboarding-btn" onClick={next}>J'ai compris</button></div>
-          </>
+          </div>
         )}
 
         {stepKey === 'genre' && (
-          <>
+          <div className="step-content">
             <img className="onb-logo small" src={logo} alt="Sencia" />
-            <p className="onboarding-title">Comment vous identifiez-vous ?</p>
-            <div className="chips-grid four">
-              {genreOptions.map((g) => (
-                <button
-                  type="button"
-                  key={g}
-                  className={`chip ${data.genre === g ? 'selected' : ''}`}
-                  onClick={() => updateField('genre', g)}
-                >{g}</button>
-              ))}
-            </div>
-            {NextButton}
-          </>
+            <h1 className="step-title">Comment vous identifiez-vous ?</h1>
+            <CardSelection
+              options={genreOptions}
+              selectedValue={data.genre}
+              onSelect={(value) => updateField('genre', value)}
+              gridLayout="grid-2x2"
+            />
+          </div>
         )}
 
         {stepKey === 'age' && (
-          <>
+          <div className="step-content">
             <img className="onb-logo small" src={logo} alt="Sencia" />
-            <p className="onboarding-title">Quel âge avez-vous ?</p>
-            <WheelPicker value={data.age} options={ageOptions} onChange={(v) => updateField('age', v)} ariaLabel="Âge" />
-            {NextButton}
-          </>
+            <h1 className="step-title">Quel âge avez-vous ?</h1>
+            <WheelPicker
+              options={ageOptions}
+              selectedValue={data.age}
+              onChange={(value) => updateField('age', value)}
+              unit="ans"
+            />
+          </div>
         )}
 
         {stepKey === 'poids' && (
-          <>
+          <div className="step-content">
             <img className="onb-logo small" src={logo} alt="Sencia" />
-            <p className="onboarding-title">Quel est votre poids ?</p>
-            <WheelPicker value={data.poids} options={poidsOptions} onChange={(v) => updateField('poids', v)} ariaLabel="Poids" />
-            {NextButton}
-          </>
+            <h1 className="step-title">Quel est votre poids ?</h1>
+            <WheelPicker
+              options={poidsOptions}
+              selectedValue={data.poids}
+              onChange={(value) => updateField('poids', value)}
+              unit="kg"
+            />
+          </div>
         )}
 
         {stepKey === 'taille' && (
-          <>
+          <div className="step-content">
             <img className="onb-logo small" src={logo} alt="Sencia" />
-            <p className="onboarding-title">Combien mesurez-vous ?</p>
-            <WheelPicker value={data.taille} options={tailleOptions} onChange={(v) => updateField('taille', v)} ariaLabel="Taille" />
-            {NextButton}
-          </>
+            <h1 className="step-title">Combien mesurez-vous ?</h1>
+            <WheelPicker
+              options={tailleOptions}
+              selectedValue={data.taille}
+              onChange={(value) => updateField('taille', value)}
+              unit="cm"
+            />
+          </div>
         )}
 
         {stepKey === 'infosPerso' && (
-          <>
+          <div className="step-content">
             <img className="onb-logo small" src={logo} alt="Sencia" />
-            <p className="onboarding-title">Informations personnelles</p>
+            <h1 className="step-title">Informations personnelles</h1>
             <label className="onboarding-label">Maladie chronique</label>
             <select className="onboarding-input" value={data.maladie || ''} onChange={(e) => updateField('maladie', e.target.value)}>
               <option value="">Sélectionner…</option>
@@ -212,53 +214,53 @@ export default function Onboarding() {
             <div style={{ width:'100%', marginTop:'8px' }}>
               <input className="onboarding-input" placeholder="J'ajoute un nouveau médicament" value={data.newMed || ''} onChange={(e)=>updateField('newMed', e.target.value)} onKeyDown={(e)=>{ if(e.key==='Enter' && data.newMed){ updateField('medicaments', [ ...(data.medicaments||[]), data.newMed ]); updateField('newMed',''); e.preventDefault(); } }} />
             </div>
-            {NextButton}
-          </>
+          </div>
         )}
 
         {stepKey === 'carePlanV2' && (
-          <>
+          <div className="step-content">
             <img className="onb-logo small" src={logo} alt="Sencia" />
-            <p className="onboarding-title">Set up de votre care plan</p>
+            <h1 className="step-title">Set up de votre care plan</h1>
             <div className="toggle-row"><span>Matin - 8h</span><div className={`switch ${data.matin!==false?'on':''}`} onClick={()=>updateField('matin', !(data.matin!==false))} /></div>
             <div className="toggle-row"><span>Midi - 12h</span><div className={`switch ${data.midi? 'on':''}`} onClick={()=>updateField('midi', !data.midi)} /></div>
             <div className="toggle-row"><span>Soir - 19h</span><div className={`switch ${data.soir!==false?'on':''}`} onClick={()=>updateField('soir', !(data.soir!==false))} /></div>
-            {NextButton}
-          </>
+          </div>
         )}
 
         {stepKey === 'notifs' && (
-          <>
+          <div className="step-content">
             <img className="onb-logo small" src={logo} alt="Sencia" />
-            <p className="onboarding-title">Autoriser les notifs push</p>
+            <h1 className="step-title">Autoriser les notifs push</h1>
             <div className="toggle-row"><span>Rappel du matin</span><div className={`switch ${data.notifMorning? 'on':''}`} onClick={()=>updateField('notifMorning', !data.notifMorning)} /></div>
             <div className="toggle-row"><span>Rappel du soir</span><div className={`switch ${data.notifEvening? 'on':''}`} onClick={()=>updateField('notifEvening', !data.notifEvening)} /></div>
-            {NextButton}
-          </>
+          </div>
         )}
 
         {stepKey === 'sync' && (
-          <>
+          <div className="step-content">
             <img className="onb-logo small" src={logo} alt="Sencia" />
-            <p className="onboarding-title">Synchronisez vos appareils</p>
+            <h1 className="step-title">Synchronisez vos appareils</h1>
             <div className="grid-devices">
               {['Apple Health','Google Fit','Samsung Health','Garmin','Withings','Oura','Fitbit','Whoop'].map((d) => (
                 <button key={d} type="button" className="device-tile" onClick={() => {}}>{d}</button>
               ))}
             </div>
-            {NextButton}
-          </>
+          </div>
         )}
 
         {stepKey === 'widget' && (
-          <>
+          <div className="step-content">
             <img className="onb-logo" src={logo} alt="Sencia" />
             <h2 className="features-title">Ajoutez le widget</h2>
             <img src="/widget.png" alt="widget" style={{ width: '220px', borderRadius: '24px', marginBottom: '16px' }} />
-            <button type="button" className="splash-btn onboarding-btn" onClick={() => navigate('/app')}>Commencer</button>
-          </>
+          </div>
         )}
-      </div>
+        
+        <BottomActions
+          primaryLabel={stepKey === 'widget' ? 'Commencer' : stepKey === 'cguWelcome' ? "J'ai compris" : 'Continuer'}
+          onPrimary={stepKey === 'widget' ? () => navigate('/app') : next}
+        />
+      </MobileFrame>
     </div>
   )
 }

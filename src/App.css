@@ -1,17 +1,21 @@
-html, body, #root {
+/* Import mobile styles */
+@import url('./components/mobile/mobile-styles.css');
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #FFFFFF;
+  overflow-x: hidden;
+  font-family: "SF Pro Display", -apple-system, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+#root {
   max-width: 430px;
   width: 100vw;
   margin: 0 auto;
   padding: 0;
+  min-height: 100vh;
   background: #FFFFFF;
-  overflow-x: hidden;
-}
-
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
 }
 
 .logo {
