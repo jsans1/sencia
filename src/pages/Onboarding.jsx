@@ -7,6 +7,7 @@ import OnboardingNavigation from '../components/mobile/OnboardingNavigation'
 import CardSelection from '../components/mobile/CardSelection'
 import WheelPicker from '../components/mobile/WheelPicker'
 import BottomActions from '../components/mobile/BottomActions'
+import LoginModal from '../components/mobile/LoginModal'
 import MultiSelectChips from '../components/onboarding/MultiSelectChips'
 
 const stepsOrder = [
@@ -38,6 +39,7 @@ const tailleOptions = range(120, 210)
 export default function Onboarding() {
   const navigate = useNavigate()
   const [stepIndex, setStepIndex] = useState(0)
+  const [showLoginModal, setShowLoginModal] = useState(false)
   const [data, setData] = useState({
     genre: '',
     age: 35,
@@ -123,12 +125,6 @@ export default function Onboarding() {
         {stepKey === 'login' && (
           <div className="step-content">
             <img className="onb-logo" src={logo} alt="Sencia" />
-            <div className="login-card">
-              <h3 className="feature-title" style={{ marginBottom: '8px' }}>L'aventure commence ici…</h3>
-              <p className="feature-desc" style={{ marginBottom: '14px' }}>Suivez quotidiennement vos symptômes et vos ressentis.</p>
-              <button type="button" className="splash-btn auth-btn" onClick={next}>Via E-mail</button>
-              <button type="button" className="splash-btn auth-btn-secondary" onClick={next}>Via Téléphone</button>
-            </div>
           </div>
         )}
 
@@ -257,10 +253,23 @@ export default function Onboarding() {
         )}
         
         <BottomActions
-          primaryLabel={stepKey === 'widget' ? 'Commencer' : stepKey === 'cguWelcome' ? "J'ai compris" : 'Continuer'}
-          onPrimary={stepKey === 'widget' ? () => navigate('/app') : next}
+          primaryLabel={stepKey === 'widget' ? 'Commencer' : stepKey === 'cguWelcome' ? "J'ai compris" : stepKey === 'login' ? 'Commencer' : 'Continuer'}
+          onPrimary={stepKey === 'widget' ? () => navigate('/app') : stepKey === 'login' ? () => setShowLoginModal(true) : next}
         />
       </MobileFrame>
+      
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onEmailLogin={() => {
+          setShowLoginModal(false)
+          next()
+        }}
+        onPhoneLogin={() => {
+          setShowLoginModal(false)
+          next()
+        }}
+      />
     </div>
   )
 }
