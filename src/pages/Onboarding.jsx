@@ -72,7 +72,7 @@ export default function Onboarding() {
   )
 
   return (
-    <div className="splash-bg" style={{ backgroundImage: 'url(/src/assets/Gradient.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+    <div className="splash-bg" style={{ backgroundImage: 'url(/Gradient.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
       <div className="splash-container onboarding-form">
         {showHeader && (
           <div className="onb-top-fixed">
@@ -96,10 +96,10 @@ export default function Onboarding() {
             <img className="onb-logo" src={logo} alt="Sencia" />
             <p className="splash-tagline">Bienvenue sur <span className="splash-tagline-accent">Sencia</span></p>
             <ul className="features-list" style={{ textAlign: 'left' }}>
-              <li className="feature-item"><div className="feature-dot"><img src="/src/assets/feature-1.png" alt="" /></div><div><div className="feature-title">Suivez vos symptômes</div><p className="feature-desc">Suivez quotidiennement vos symptômes et vos ressentis.</p></div></li>
-              <li className="feature-item"><div className="feature-dot"><img src="/src/assets/feature-2.png" alt="" /></div><div><div className="feature-title">Visualisez votre progression</div><p className="feature-desc">Visualisez vos tendances en fonction le temps pour identifier vos symptômes.</p></div></li>
-              <li className="feature-item"><div className="feature-dot"><img src="/src/assets/feature-3.png" alt="" /></div><div><div className="feature-title">Communiquez avec votre médecin</div><p className="feature-desc">Exportez un résumé clair de vos données pour faciliter le dialogue avec vos praticiens.</p></div></li>
-              <li className="feature-item"><div className="feature-dot"><img src="/src/assets/feature-4.png" alt="" /></div><div><div className="feature-title">Vos données sont sécurisées</div><p className="feature-desc">Vos données sont hébergées et protégées selon les plus hauts standards de sécurité en France.</p></div></li>
+              <li className="feature-item"><div className="feature-dot"><img src="/feature-1.png" alt="" /></div><div><div className="feature-title">Suivez vos symptômes</div><p className="feature-desc">Suivez quotidiennement vos symptômes et vos ressentis.</p></div></li>
+              <li className="feature-item"><div className="feature-dot"><img src="/feature-2.png" alt="" /></div><div><div className="feature-title">Visualisez votre progression</div><p className="feature-desc">Visualisez vos tendances en fonction le temps pour identifier vos symptômes.</p></div></li>
+              <li className="feature-item"><div className="feature-dot"><img src="/feature-3.png" alt="" /></div><div><div className="feature-title">Communiquez avec votre médecin</div><p className="feature-desc">Exportez un résumé clair de vos données pour faciliter le dialogue avec vos praticiens.</p></div></li>
+              <li className="feature-item"><div className="feature-dot"><img src="/feature-4.png" alt="" /></div><div><div className="feature-title">Vos données sont sécurisées</div><p className="feature-desc">Vos données sont hébergées et protégées selon les plus hauts standards de sécurité en France.</p></div></li>
             </ul>
             {NextButton}
           </>
@@ -254,7 +254,7 @@ export default function Onboarding() {
           <>
             <img className="onb-logo" src={logo} alt="Sencia" />
             <h2 className="features-title">Ajoutez le widget</h2>
-            <img src="/src/assets/widget.png" alt="widget" style={{ width: '220px', borderRadius: '24px', marginBottom: '16px' }} />
+            <img src="/widget.png" alt="widget" style={{ width: '220px', borderRadius: '24px', marginBottom: '16px' }} />
             <button type="button" className="splash-btn onboarding-btn" onClick={() => navigate('/app')}>Commencer</button>
           </>
         )}
