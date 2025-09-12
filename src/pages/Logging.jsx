@@ -1,357 +1,1215 @@
-import React, { useState } from 'react';
-import '../App.css';
-import illuLogging from '../assets/illu-logging.png';
+import React, { useState, useCallback, useRef, useEffect } from 'react'
+import '../App.css'
+import GradientBackground from '../components/mobile/GradientBackground'
+import MobileFrame from '../components/mobile/MobileFrame'
+import BottomActions from '../components/mobile/BottomActions'
+import StatusBar from '../components/mobile/StatusBar'
+import illuLogging from '../assets/illu-logging.png'
 
-const MOOD_GRADIENTS = [
-  'radial-gradient(ellipse at center, #b6f0c6 0%, #e8f5e9 60%, #fff 100%)', // very good
-  'radial-gradient(ellipse at center, #eaf7c6 0%, #f7f5e9 60%, #fff 100%)', // neutral
-  'radial-gradient(ellipse at center, #f7d6c6 0%, #f7f5e9 60%, #fff 100%)', // bad
-  'radial-gradient(ellipse at center, #f7b6b6 0%, #f7e9e9 60%, #fff 100%)', // very bad
-];
-
-const SYMPTOMS = [
-  'Maux de tête inhabituels',
-  'Vertiges',
-  'Palpitations',
-  "Bourdonnements d'oreilles",
-  'Tension dans la nuque ou poitrine',
-  'Aucun de ces symptômes',
-];
-
-const TREATMENTS = [
-  'Acébutolol Zydus',
-  'Indapamide',
-  'Ramipril',
-  'Valsartan',
-  'Valsartan',
-  'Furosémide',
-];
-
-const FOODS = [
-  'Aliments salés (charcuterie, plats préparés...)',
-  'Alcool',
-  'Café ou boissons énergisantes',
-  'Aucun de ces éléments',
-];
-
-const PHYSICAL_ACTIVITY = [
-  { label: 'Oui, + de 30 mins', value: 'plus_30' },
-  { label: 'Oui, - de 30 mins', value: 'moins_30' },
-  { label: 'Non', value: 'non' },
-];
-
-function getMoodGradient(value) {
-  // value: 0 (top, good) to 1 (bottom, bad)
-  if (value < 0.33) return MOOD_GRADIENTS[0];
-  if (value < 0.66) return MOOD_GRADIENTS[1];
-  if (value < 0.85) return MOOD_GRADIENTS[2];
-  return MOOD_GRADIENTS[3];
-}
+// Define the same 7 steps as LoggingFlow
+const LOGGING_STEPS = [
+  'mood',      // Screen 1: How are you feeling this morning?
+  'symptoms',  // Screen 2: Did you have these symptoms today?  
+  'bloodPressure', // Screen 3: Blood pressure measurement
+  'treatment', // Screen 4: Did you take your treatment today?
+  'consumption', // Screen 5: Did you consume these items today?
+  'activity',  // Screen 6: Were you physically active today?
+  'stress',    // Screen 7: How would you rate your stress level?
+]
 
 export const LoggingModal = ({ open, onClose, onSubmit }) => {
-  const [step, setStep] = useState(1);
-  const [mood, setMood] = useState(0); // 0 (good) to 1 (bad)
-  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
-  const [customSymptoms, setCustomSymptoms] = useState('');
-  const [tension, setTension] = useState(null); // null, 'oui', 'non'
-  const [tensionValue, setTensionValue] = useState('');
-  const [selectedTreatments, setSelectedTreatments] = useState([]);
-  const [customTreatments, setCustomTreatments] = useState('');
-  const [selectedFoods, setSelectedFoods] = useState([]);
-  const [customFoods, setCustomFoods] = useState('');
-  const [physicalActivity, setPhysicalActivity] = useState(null); // 'plus_30', 'moins_30', 'non'
-  const [stress, setStress] = useState(0.5); // 0 (aucun stress) to 1 (stress extrême)
+  const [currentStep, setCurrentStep] = useState(0)
+  const [loggingData, setLoggingData] = useState({
+    mood: 50, // 0-100 scale
+    symptoms: [],
+    customSymptoms: '',
+    bloodPressure: { systolic: '', diastolic: '', notes: '' },
+    treatment: null, // null, true, false
+    consumption: [],
+    customConsumption: '',
+    activity: null, // null, 'plus_30', 'moins_30', 'non'
+    stress: 50, // 0-100 scale
+  })
 
-  const handleSlider = (e) => setMood(1 - Number(e.target.value));
-  const handleSymptomClick = (symptom) => {
-    if (selectedSymptoms.includes(symptom)) {
-      setSelectedSymptoms(selectedSymptoms.filter(s => s !== symptom));
+  const stepKey = LOGGING_STEPS[currentStep]
+
+  const nextStep = () => {
+    if (currentStep < LOGGING_STEPS.length - 1) {
+      setCurrentStep(currentStep + 1)
     } else {
-      setSelectedSymptoms([...selectedSymptoms, symptom]);
+      // Complete logging flow
+      if (onSubmit) onSubmit({
+        mood: loggingData.mood / 100, // Convert to 0-1 range for compatibility
+        symptoms: loggingData.symptoms,
+        customSymptoms: loggingData.customSymptoms,
+        tension: loggingData.treatment === true ? 'oui' : loggingData.treatment === false ? 'non' : null,
+        tensionValue: `${loggingData.bloodPressure.systolic}/${loggingData.bloodPressure.diastolic}`,
+        treatments: [], // Keep empty for now
+        customTreatments: '',
+        foods: loggingData.consumption,
+        customFoods: loggingData.customConsumption,
+        physicalActivity: loggingData.activity,
+        stress: loggingData.stress / 100, // Convert to 0-1 range for compatibility
+      })
+      
+      // Reset and close
+      resetModal()
+      if (onClose) onClose()
     }
-  };
-  const handleCustomSymptoms = (e) => setCustomSymptoms(e.target.value);
+  }
 
-  const handleContinue = () => setStep(s => Math.min(s + 1, 8));
-  const handlePhysicalActivity = (value) => setPhysicalActivity(value);
-  const handleStressSlider = (e) => setStress(1 - Number(e.target.value));
-  const handleValidate = () => {
-    if (onSubmit) onSubmit({
-      mood,
-      symptoms: selectedSymptoms,
-      customSymptoms,
-      tension,
-      tensionValue,
-      treatments: selectedTreatments,
-      customTreatments,
-      foods: selectedFoods,
-      customFoods,
-      physicalActivity,
-      stress,
-    });
-    if (onClose) onClose();
-    setStep(1);
-    setSelectedSymptoms([]);
-    setCustomSymptoms('');
-    setTension(null);
-    setTensionValue('');
-    setSelectedTreatments([]);
-    setCustomTreatments('');
-    setSelectedFoods([]);
-    setCustomFoods('');
-    setPhysicalActivity(null);
-    setStress(0.5);
-  };
-  // Pie slider logic
-  const pieAngle = tension === 'oui' ? 90 : -90;
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1)
+    }
+  }
+
+  const updateData = (field, value) => {
+    setLoggingData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const resetModal = () => {
+    setCurrentStep(0)
+    setLoggingData({
+      mood: 50,
+      symptoms: [],
+      customSymptoms: '',
+      bloodPressure: { systolic: '', diastolic: '', notes: '' },
+      treatment: null,
+      consumption: [],
+      customConsumption: '',
+      activity: null,
+      stress: 50,
+    })
+  }
+
+  const handleModalClose = () => {
+    resetModal()
+    if (onClose) onClose()
+  }
+
   return (
-    <div className={`logging-modal-bg${open ? ' open' : ''}`} onClick={onClose}>
+    <div className={`logging-modal-bg${open ? ' open' : ''}`} onClick={handleModalClose}>
       <div
         className="logging-modal"
         style={{
           transform: open ? 'translateY(0)' : 'translateY(100%)',
-          background: getMoodGradient(mood),
           maxWidth: 430,
           width: '100%',
           margin: '0 auto',
+          height: '100vh',
+          position: 'relative',
+          backgroundColor: 'transparent',
+          borderRadius: '0',
+          overflow: 'hidden'
         }}
         onClick={e => e.stopPropagation()}
       >
-        <button className="logging-modal-close" onClick={onClose} aria-label="Fermer">×</button>
-        <div className="logging-modal-content" style={{marginTop: 32, marginBottom: 16}}>
-          {step === 1 && <>
-            <h2 className="logging-modal-title">Comment vous sentez-vous ce matin ?</h2>
-            <p className="logging-modal-desc">Glissez le cercle vers votre réponse et relâchez pour confirmer.</p>
-            <div className="mood-slider-wrap">
-              <span className="mood-label mood-label-top">Très bien</span>
-              <div style={{height: 220, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                <input
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  value={1 - mood}
-                  onChange={handleSlider}
-                  className="mood-slider mood-slider-vertical"
-                  style={{ writingMode: 'vertical-lr', direction: 'rtl', height: 220, width: 48, background: 'linear-gradient(to bottom, #b6f0c6 0%, #f77 100%)' }}
-                />
-              </div>
-              <span className="mood-label mood-label-bottom">Très mal</span>
-            </div>
-            <button className="logging-modal-btn" onClick={handleContinue}>Suivant</button>
-          </>}
-          {step === 2 && <>
-            <h2 className="logging-modal-title">Avez-vous eu des symptômes suivants aujourd'hui ?</h2>
-            <p className="logging-modal-desc">Glissez le cercle vers votre réponse et relâchez pour confirmer.</p>
-            <div className="symptoms-btns-wrap">
-              {SYMPTOMS.map(symptom => (
-                <button
-                  key={symptom}
-                  className={
-                    'symptom-btn' + (selectedSymptoms.includes(symptom) ? ' selected' : '')
-                  }
-                  onClick={() => handleSymptomClick(symptom)}
-                  type="button"
-                >
-                  {symptom}
-                </button>
-              ))}
-            </div>
-            <div className="symptoms-input-wrap">
-              <label className="symptoms-input-label">Ajoutez les autres symptômes ressentis :</label>
-              <input
-                className="symptoms-input"
-                type="text"
-                placeholder="Stress, changement d'humeurs..."
-                value={customSymptoms}
-                onChange={handleCustomSymptoms}
-              />
-            </div>
-            <button className="logging-modal-btn" onClick={handleContinue}>Suivant</button>
-          </>}
-          {step === 3 && <>
-            <h2 className="logging-modal-title">Avez-vous mesuré votre tension artérielle aujourd'hui ?</h2>
-            <p className="logging-modal-desc">Glissez le cercle vers votre réponse et relâchez pour confirmer.</p>
-            <div className="pie-slider" style={{marginBottom: 24}}>
-              <svg width="260" height="260" viewBox="0 0 260 260" style={{position: 'absolute', left: 0, top: 0}}>
-                <path d="M130,130 L130,10 A120,120 0 0,1 250,130 Z" fill="#fff" stroke="#f7bfa3" strokeWidth="2" />
-                <path d="M130,130 L250,130 A120,120 0 0,1 130,10 Z" fill="#fff" stroke="#f7bfa3" strokeWidth="2" />
-                <line x1="130" y1="10" x2="130" y2="250" stroke="#f7bfa3" strokeWidth="2" />
-              </svg>
-              <div style={{position: 'absolute', left: 0, top: 0, width: 260, height: 260, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+        <GradientBackground />
+        
+        <MobileFrame>
+          {/* Status Bar */}
+          <StatusBar />
+
+          {/* Progress Bar */}
+          <div className="progress-bar" style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '20px',
+            marginBottom: '20px'
+          }}>
+            <button onClick={prevStep} disabled={currentStep === 0} style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '18px',
+              cursor: currentStep > 0 ? 'pointer' : 'not-allowed',
+              opacity: currentStep > 0 ? 1 : 0.3
+            }}>
+              ←
+            </button>
+            <div style={{ display: 'flex', gap: '2px', flex: 1, margin: '0 20px' }}>
+              {LOGGING_STEPS.map((_, index) => (
                 <div
-                  className="pie-slider-thumb"
+                  key={index}
                   style={{
-                    left: `calc(50% + 90px * ${tension === 'oui' ? 1 : -1})`,
-                    top: '50%',
-                    background: '#ffbfa3',
-                    border: '4px solid #fff',
-                    transform: 'translate(-50%, -50%)',
-                    transition: 'left 0.3s',
+                    flex: 1,
+                    height: '1px',
+                    backgroundColor: index <= currentStep ? '#0e7afe' : '#d9d9d9'
                   }}
-                  onClick={() => setTension(tension === 'oui' ? 'non' : 'oui')}
                 />
-                <span style={{position: 'absolute', left: 40, top: '50%', transform: 'translateY(-50%)', fontWeight: 500, color: '#222'}}>Non</span>
-                <span style={{position: 'absolute', right: 40, top: '50%', transform: 'translateY(-50%)', fontWeight: 500, color: '#222'}}>Oui</span>
-              </div>
+              ))}
             </div>
-            {tension === 'oui' && (
-              <div className="symptoms-input-wrap">
-                <label className="symptoms-input-label">Si oui, quelle était la dernière valeur ?</label>
-                <input
-                  className="symptoms-input"
-                  type="text"
-                  placeholder="ex : 140/90 mmHg"
-                  value={tensionValue}
-                  onChange={e => setTensionValue(e.target.value)}
-                />
-              </div>
+            <button onClick={handleModalClose} style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '18px',
+              cursor: 'pointer'
+            }}>
+              ✕
+            </button>
+          </div>
+
+          {/* Step Content */}
+          <div className="step-content" style={{ 
+            padding: '0 30px', 
+            height: 'calc(100vh - 200px)',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {stepKey === 'mood' && (
+              <MoodScreen 
+                value={loggingData.mood} 
+                onChange={(value) => updateData('mood', value)}
+                onContinue={nextStep}
+              />
             )}
-            <button className="logging-modal-btn" onClick={handleContinue}>Suivant</button>
-          </>}
-          {step === 4 && <>
-            <h2 className="logging-modal-title">Avez-vous pris tous vos traitements aujourd'hui ?</h2>
-            <p className="logging-modal-desc">Glissez le cercle vers votre réponse et relâchez pour confirmer.</p>
-            <div className="treatments-grid">
-              {TREATMENTS.map((t, i) => (
-                <button
-                  key={t + i}
-                  className={
-                    'treatment-btn' + (selectedTreatments.includes(t) ? ' selected' : '')
-                  }
-                  onClick={() => setSelectedTreatments(selectedTreatments.includes(t) ? selectedTreatments.filter(x => x !== t) : [...selectedTreatments, t])}
-                  type="button"
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-            <div className="symptoms-input-wrap">
-              <label className="symptoms-input-label">Avez-vous pris d'autres médicaments ?</label>
-              <input
-                className="symptoms-input"
-                type="text"
-                placeholder="ex : Doliprane, Izalgi"
-                value={customTreatments}
-                onChange={e => setCustomTreatments(e.target.value)}
+            
+            {stepKey === 'symptoms' && (
+              <SymptomsScreen 
+                selectedSymptoms={loggingData.symptoms}
+                customSymptoms={loggingData.customSymptoms}
+                onSymptomsChange={(symptoms) => updateData('symptoms', symptoms)}
+                onCustomChange={(custom) => updateData('customSymptoms', custom)}
+                onContinue={nextStep}
               />
-            </div>
-            <button className="logging-modal-btn" onClick={handleContinue}>Suivant</button>
-          </>}
-          {step === 5 && <>
-            <h2 className="logging-modal-title">Avez-vous consommé l'un des éléments suivants aujourd'hui ?</h2>
-            <p className="logging-modal-desc">Glissez le cercle vers votre réponse et relâchez pour confirmer.</p>
-            <div className="symptoms-btns-wrap">
-              {FOODS.map(food => (
-                <button
-                  key={food}
-                  className={
-                    'symptom-btn' + (selectedFoods.includes(food) ? ' selected' : '')
-                  }
-                  onClick={() => setSelectedFoods(selectedFoods.includes(food) ? selectedFoods.filter(x => x !== food) : [...selectedFoods, food])}
-                  type="button"
-                >
-                  {food}
-                </button>
-              ))}
-            </div>
-            <div className="symptoms-input-wrap">
-              <label className="symptoms-input-label">Avez-vous d'autres aliments à signaler ?</label>
-              <input
-                className="symptoms-input"
-                type="text"
-                placeholder="ex : Réglisse"
-                value={customFoods}
-                onChange={e => setCustomFoods(e.target.value)}
+            )}
+
+            {stepKey === 'bloodPressure' && (
+              <BloodPressureScreen 
+                data={loggingData.bloodPressure}
+                onChange={(data) => updateData('bloodPressure', data)}
+                onContinue={nextStep}
               />
-            </div>
-            <button className="logging-modal-btn" onClick={handleContinue}>Suivant</button>
-          </>}
-          {step === 6 && <>
-            <h2 className="logging-modal-title">Avez-vous été physiquement actif(ve) aujourd'hui ?</h2>
-            <p className="logging-modal-desc">Glissez le cercle vers votre réponse et relâchez pour confirmer.</p>
-            <div className="pie-slider-activity" style={{margin: '32px auto', position: 'relative', width: 260, height: 260}}>
-              <svg width="260" height="260" viewBox="0 0 260 260">
-                <g>
-                  <path d="M130,130 L130,20 A110,110 0 0,1 236.6,195 Z" fill="#fff" stroke="#bbb" strokeWidth="1.5" />
-                  <path d="M130,130 L236.6,195 A110,110 0 0,1 23.4,195 Z" fill="#fff" stroke="#bbb" strokeWidth="1.5" />
-                  <path d="M130,130 L23.4,195 A110,110 0 0,1 130,20 Z" fill="#fff" stroke="#bbb" strokeWidth="1.5" />
-                </g>
-                <g>
-                  <text x="60" y="110" textAnchor="middle" fontSize="16" fontWeight="bold">Oui, {'\n'}+ de 30 mins</text>
-                  <text x="200" y="110" textAnchor="middle" fontSize="16" fontWeight="bold">Oui, {'\n'}- de 30 mins</text>
-                  <text x="130" y="230" textAnchor="middle" fontSize="16" fontWeight="bold">Non</text>
-                </g>
-              </svg>
-              {/* Thumb */}
-              {PHYSICAL_ACTIVITY.map((opt, idx) => {
-                const angle = [210, 330, 90][idx];
-                const rad = (angle - 90) * Math.PI / 180;
-                const x = 130 + 90 * Math.cos(rad);
-                const y = 130 + 90 * Math.sin(rad);
-                return (
-                  <div
-                    key={opt.value}
-                    className={`pie-slider-thumb-activity${physicalActivity === opt.value ? ' selected' : ''}`}
-                    style={{
-                      position: 'absolute',
-                      left: x - 20,
-                      top: y - 20,
-                      width: 40,
-                      height: 40,
-                      borderRadius: '50%',
-                      background: physicalActivity === opt.value ? '#111' : '#fff',
-                      border: '4px solid #bbb',
-                      boxShadow: physicalActivity === opt.value ? '0 0 0 4px #b6f0c6' : 'none',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      transition: 'background 0.2s, box-shadow 0.2s',
-                      zIndex: 2,
-                    }}
-                    onClick={() => handlePhysicalActivity(opt.value)}
-                  />
-                );
-              })}
-            </div>
-            <button className="logging-modal-btn" onClick={handleContinue} disabled={!physicalActivity}>Suivant</button>
-          </>}
-          {step === 7 && <>
-            <h2 className="logging-modal-title">Comment évalueriez-vous votre niveau de stress aujourd'hui ?</h2>
-            <p className="logging-modal-desc">Glissez le cercle vers votre réponse et relâchez pour confirmer.</p>
-            <div className="mood-slider-wrap">
-              <span className="mood-label mood-label-top">Aucun stress</span>
-              <div style={{height: 220, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                <input
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  value={1 - stress}
-                  onChange={handleStressSlider}
-                  className="mood-slider mood-slider-vertical"
-                  style={{ writingMode: 'vertical-lr', direction: 'rtl', height: 220, width: 48, background: 'linear-gradient(to bottom, #b6f0c6 0%, #f77 100%)' }}
-                />
-              </div>
-              <span className="mood-label mood-label-bottom">Stress extrême</span>
-            </div>
-            <button className="logging-modal-btn" onClick={handleContinue}>Suivant</button>
-          </>}
-          {step === 8 && <>
-            <div className="logging-confirm-illu-wrap" style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 400}}>
-              <img src={illuLogging} alt="Bravo illustration" style={{width: 180, marginBottom: 24}} />
-              <h2 className="logging-modal-title" style={{textAlign: 'center'}}>Votre informations sont bien prises en compte !</h2>
-              <h3 style={{fontWeight: 700, fontSize: 24, margin: '16px 0 8px', textAlign: 'center'}}>BRAVO !</h3>
-              <p style={{fontWeight: 500, fontSize: 18, margin: 0, textAlign: 'center'}}>Vous avez enregistré des informations 30 jours de suite</p>
-              <p style={{marginTop: 12, color: '#444', textAlign: 'center', maxWidth: 320}}>En mettant vos symptômes quotidiens sur Sencia, vous contribuez à établir un parcours clair de votre santé, pour vous et pour vos praticiens.</p>
-            </div>
-            <button className="logging-modal-btn" onClick={onClose} style={{marginTop: 24}}>Fermer</button>
-          </>}
-        </div>
+            )}
+
+            {stepKey === 'treatment' && (
+              <TreatmentScreen 
+                value={loggingData.treatment}
+                onChange={(value) => updateData('treatment', value)}
+                onContinue={nextStep}
+              />
+            )}
+
+            {stepKey === 'consumption' && (
+              <ConsumptionScreen 
+                selectedItems={loggingData.consumption}
+                customItems={loggingData.customConsumption}
+                onItemsChange={(items) => updateData('consumption', items)}
+                onCustomChange={(custom) => updateData('customConsumption', custom)}
+                onContinue={nextStep}
+              />
+            )}
+
+            {stepKey === 'activity' && (
+              <ActivityScreen 
+                value={loggingData.activity}
+                onChange={(value) => updateData('activity', value)}
+                onContinue={nextStep}
+              />
+            )}
+
+            {stepKey === 'stress' && (
+              <StressScreen 
+                value={loggingData.stress}
+                onChange={(value) => updateData('stress', value)}
+                onContinue={nextStep}
+              />
+            )}
+          </div>
+        </MobileFrame>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default LoggingModal; 
+// Individual screen components - identical to LoggingFlow
+// Screen 1: Mood Rating with gradient slider
+const MoodScreen = ({ value, onChange, onContinue }) => {
+  const [hasInteracted, setHasInteracted] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const sliderRef = useRef(null)
+
+  const updateValue = useCallback((clientY) => {
+    if (!sliderRef.current) return
+    
+    const rect = sliderRef.current.getBoundingClientRect()
+    const y = clientY - rect.top
+    const percentage = Math.max(0, Math.min(100, (y / rect.height) * 100))
+    
+    // Invert because top = 100% (very good), bottom = 0% (very bad)
+    const newValue = 100 - percentage
+    onChange(newValue)
+    setHasInteracted(true)
+  }, [onChange])
+
+  const handleMouseDown = useCallback((e) => {
+    e.preventDefault()
+    setIsDragging(true)
+    updateValue(e.clientY)
+  }, [updateValue])
+
+  const handleMouseMove = useCallback((e) => {
+    if (isDragging) {
+      e.preventDefault()
+      updateValue(e.clientY)
+    }
+  }, [isDragging, updateValue])
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  const handleTouchStart = useCallback((e) => {
+    e.preventDefault()
+    setIsDragging(true)
+    updateValue(e.touches[0].clientY)
+  }, [updateValue])
+
+  const handleTouchMove = useCallback((e) => {
+    if (isDragging) {
+      e.preventDefault()
+      updateValue(e.touches[0].clientY)
+    }
+  }, [isDragging, updateValue])
+
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('touchmove', handleTouchMove, { passive: false })
+      document.addEventListener('touchend', handleTouchEnd)
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
+
+  return (
+    <>
+      <div style={{ textAlign: 'center', marginBottom: '50px' }}>
+        <h2 style={{ fontSize: '26px', fontWeight: '500', marginBottom: '12px', lineHeight: '1.1' }}>
+          Comment vous sentez-vous ce matin Alima ?
+        </h2>
+        <p style={{ fontSize: '14px', color: '#7a7a7a', lineHeight: 'normal' }}>
+          Remember to check in regularly to spot patterns.
+        </p>
+      </div>
+
+      {/* Mood Slider */}
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        height: '450px',
+        justifyContent: 'center',
+        position: 'relative',
+        marginBottom: '80px'
+      }}>
+        <div style={{ fontSize: '14px', marginBottom: '20px', color: 'black' }}>Très bien</div>
+        
+        <div 
+          ref={sliderRef}
+          style={{ 
+            width: '38px', 
+            height: '327px', 
+            background: 'linear-gradient(to bottom, #62ffa4, #ffb48b, #ff5d5d)', 
+            borderRadius: '19px',
+            position: 'relative',
+            cursor: 'pointer'
+          }}
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+        >
+          <div 
+            style={{
+              position: 'absolute',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              top: `${(100 - value)}%`,
+              width: '32px',
+              height: '32px',
+              backgroundColor: 'white',
+              borderRadius: '50%',
+              boxShadow: isDragging ? '0 4px 16px rgba(0,0,0,0.25)' : '0 2px 8px rgba(0,0,0,0.15)',
+              border: '1px solid #e0e0e0',
+              cursor: isDragging ? 'grabbing' : 'grab',
+              transition: isDragging ? 'none' : 'box-shadow 0.2s ease'
+            }}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+          />
+        </div>
+        
+        <div style={{ fontSize: '14px', marginTop: '20px', color: 'black' }}>Très mal</div>
+      </div>
+
+      <BottomActions 
+        primaryLabel="Continuer"
+        onPrimary={onContinue}
+        primaryDisabled={!hasInteracted}
+        solidBackground={true}
+      />
+    </>
+  )
+}
+
+// Screen 2: Symptoms selection
+const SymptomsScreen = ({ selectedSymptoms, customSymptoms, onSymptomsChange, onCustomChange, onContinue }) => {
+  const symptoms = [
+    'Maux de tête inhabituels',
+    'Vertiges', 
+    'Tension dans la nuque ou poitrine',
+    'Bourdonnements d\'oreille',
+    'Palpitations'
+  ]
+
+  const toggleSymptom = (symptom) => {
+    if (selectedSymptoms.includes(symptom)) {
+      onSymptomsChange(selectedSymptoms.filter(s => s !== symptom))
+    } else {
+      onSymptomsChange([...selectedSymptoms, symptom])
+    }
+  }
+
+  return (
+    <>
+      <div style={{ marginBottom: '40px' }}>
+        <h2 style={{ fontSize: '26px', fontWeight: '500', marginBottom: '12px', lineHeight: '1.1' }}>
+          Avez-vous eu les symptômes suivants aujourd'hui ?
+        </h2>
+        <p style={{ fontSize: '14px', color: '#7a7a7a', lineHeight: 'normal' }}>
+          Sélectionnez les symptômes que vous avez ressenti aujourd'hui. Si vous n'en avez eu aucun, cliquez sur Suivant.
+        </p>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px', alignItems: 'center' }}>
+        {symptoms.map((symptom, index) => (
+          <button
+            key={index}
+            onClick={() => toggleSymptom(symptom)}
+            style={{
+              padding: '16px 20px',
+              borderRadius: '25px',
+              border: selectedSymptoms.includes(symptom) ? '2px solid #007AFF' : '1px solid #e0e0e0',
+              backgroundColor: selectedSymptoms.includes(symptom) ? 'rgba(0, 122, 255, 0.05)' : 'white',
+              color: selectedSymptoms.includes(symptom) ? '#007AFF' : 'black',
+              fontSize: '16px',
+              fontWeight: selectedSymptoms.includes(symptom) ? '600' : '400',
+              cursor: 'pointer',
+              textAlign: 'center',
+              transition: 'all 0.2s',
+              width: 'fit-content',
+              minWidth: '250px'
+            }}
+          >
+            {symptom}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ marginBottom: '40px' }}>
+        <label style={{ fontSize: '16px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>
+          Ajoutez d'autres symptômes ressentis
+        </label>
+        <input
+          type="text"
+          placeholder="Stress, changements d'humeur..."
+          value={customSymptoms}
+          onChange={(e) => onCustomChange(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '12px 16px',
+            borderRadius: '20px',
+            border: '1px solid #e0e0e0',
+            fontSize: '16px',
+            backgroundColor: 'white'
+          }}
+        />
+      </div>
+
+      <BottomActions 
+        primaryLabel="Continuer"
+        onPrimary={onContinue}
+        solidBackground={true}
+      />
+    </>
+  )
+}
+
+// Screen 3: Blood Pressure
+const BloodPressureScreen = ({ data, onChange, onContinue }) => {
+  const [errors, setErrors] = useState({ systolic: '', diastolic: '' })
+
+  const validateBloodPressure = (type, value) => {
+    if (!value || value === '') return ''
+    
+    const numValue = parseInt(value)
+    if (isNaN(numValue)) return 'Valeur invalide'
+    
+    if (type === 'systolic') {
+      if (numValue < 80) return 'Trop bas (min: 80)'
+      if (numValue > 250) return 'Trop élevé (max: 250)'
+    } else if (type === 'diastolic') {
+      if (numValue < 40) return 'Trop bas (min: 40)'
+      if (numValue > 150) return 'Trop élevé (max: 150)'
+    }
+    
+    return ''
+  }
+
+  const updateField = (field, value) => {
+    if (field === 'notes') {
+      onChange({ ...data, [field]: value })
+      return
+    }
+    
+    // Only allow numbers and limit to 3 digits
+    const numericValue = value.replace(/[^\d]/g, '').slice(0, 3)
+    
+    // Update the field
+    onChange({ ...data, [field]: numericValue })
+    
+    // Validate and set errors
+    const error = validateBloodPressure(field, numericValue)
+    setErrors(prev => ({ ...prev, [field]: error }))
+  }
+
+  const isValidData = () => {
+    const systolicValid = data.systolic.trim() !== '' && !errors.systolic
+    const diastolicValid = data.diastolic.trim() !== '' && !errors.diastolic
+    return systolicValid && diastolicValid
+  }
+
+  const hasRequiredData = isValidData()
+
+  return (
+    <>
+      <div style={{ marginBottom: '50px' }}>
+        <h2 style={{ fontSize: '26px', fontWeight: '500', marginBottom: '12px', lineHeight: '1.1' }}>
+          Quelle est votre dernière mesure de tension artérielle ?
+        </h2>
+        <p style={{ fontSize: '14px', color: '#646464', lineHeight: 'normal' }}>
+          Entrez la dernière mesure que vous avez prise. Une prise actuelle permet des analyses plus exactes.
+        </p>
+      </div>
+
+      <div style={{
+        backgroundColor: '#fffffe',
+        borderRadius: '20px',
+        border: '1px solid #f0f0f0',
+        padding: '20px',
+        marginBottom: '18px'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '13px' }}>
+          <span style={{ fontSize: '18px', fontWeight: '500' }}>Systolique</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+            <input
+              type="tel"
+              inputMode="numeric"
+              placeholder="140"
+              value={data.systolic}
+              onChange={(e) => updateField('systolic', e.target.value)}
+              style={{
+                width: '80px',
+                padding: '8px 12px',
+                borderRadius: '84px',
+                border: errors.systolic ? '1px solid #ff5d5d' : '1px solid rgba(228,228,228,0.55)',
+                fontSize: '14px',
+                textAlign: 'center',
+                outline: 'none'
+              }}
+            />
+            <span style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>mmHg</span>
+            {errors.systolic && (
+              <span style={{ fontSize: '11px', color: '#ff5d5d', marginTop: '2px' }}>
+                {errors.systolic}
+              </span>
+            )}
+          </div>
+        </div>
+        <hr style={{ border: 'none', borderTop: '0.5px solid #BCBCBC', margin: '13px 0' }} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: '18px', fontWeight: '500' }}>Diastolique</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+            <input
+              type="tel"
+              inputMode="numeric"
+              placeholder="90"
+              value={data.diastolic}
+              onChange={(e) => updateField('diastolic', e.target.value)}
+              style={{
+                width: '80px',
+                padding: '8px 12px',
+                borderRadius: '84px',
+                border: errors.diastolic ? '1px solid #ff5d5d' : '1px solid rgba(228,228,228,0.55)',
+                fontSize: '14px',
+                textAlign: 'center',
+                outline: 'none'
+              }}
+            />
+            <span style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>mmHg</span>
+            {errors.diastolic && (
+              <span style={{ fontSize: '11px', color: '#ff5d5d', marginTop: '2px' }}>
+                {errors.diastolic}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div style={{
+        backgroundColor: '#fffffe',
+        borderRadius: '20px',
+        border: '1px solid #f0f0f0',
+        padding: '20px',
+        marginBottom: '40px'
+      }}>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+          <div style={{ fontSize: '18px', color: '#A0A0A0', marginTop: '4px' }}>📄</div>
+          <textarea
+            placeholder="Notes..."
+            value={data.notes}
+            onChange={(e) => updateField('notes', e.target.value)}
+            style={{
+              flex: 1,
+              border: 'none',
+              outline: 'none',
+              fontSize: '16px',
+              resize: 'none',
+              minHeight: '100px',
+              backgroundColor: 'transparent'
+            }}
+          />
+        </div>
+      </div>
+
+      <BottomActions 
+        primaryLabel="Continuer"
+        onPrimary={onContinue}
+        primaryDisabled={!hasRequiredData}
+        solidBackground={true}
+      />
+    </>
+  )
+}
+
+// Screen 4: Treatment (Figma-accurate wheel selector)
+const TreatmentScreen = ({ value, onChange, onContinue }) => {
+  const [hasInteracted, setHasInteracted] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const [selectorPosition, setSelectorPosition] = useState({ x: 50, y: 50 })
+  const wheelRef = useRef(null)
+
+  const updatePositionAndValue = useCallback((clientX, clientY) => {
+    if (!wheelRef.current) return
+    
+    const rect = wheelRef.current.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    
+    const deltaX = clientX - centerX
+    const deltaY = clientY - centerY
+    
+    const wheelRadius = rect.width / 2 * 0.8
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
+    
+    if (distance <= wheelRadius) {
+      const newX = ((deltaX / rect.width) * 100) + 50
+      const newY = ((deltaY / rect.height) * 100) + 50
+      setSelectorPosition({ x: newX, y: newY })
+      
+      const newValue = deltaX < 0 ? true : false
+      if (newValue !== value) {
+        onChange(newValue)
+        setHasInteracted(true)
+      }
+    }
+  }, [value, onChange])
+
+  const handleMouseDown = useCallback((e) => {
+    e.preventDefault()
+    setIsDragging(true)
+    updatePositionAndValue(e.clientX, e.clientY)
+  }, [updatePositionAndValue])
+
+  const handleMouseMove = useCallback((e) => {
+    if (isDragging) {
+      e.preventDefault()
+      updatePositionAndValue(e.clientX, e.clientY)
+    }
+  }, [isDragging, updatePositionAndValue])
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  const handleTouchStart = useCallback((e) => {
+    e.preventDefault()
+    setIsDragging(true)
+    const touch = e.touches[0]
+    updatePositionAndValue(touch.clientX, touch.clientY)
+  }, [updatePositionAndValue])
+
+  const handleTouchMove = useCallback((e) => {
+    if (isDragging) {
+      e.preventDefault()
+      const touch = e.touches[0]
+      updatePositionAndValue(touch.clientX, touch.clientY)
+    }
+  }, [isDragging, updatePositionAndValue])
+
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('touchmove', handleTouchMove, { passive: false })
+      document.addEventListener('touchend', handleTouchEnd)
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
+
+  return (
+    <>
+      <div style={{ textAlign: 'center', marginBottom: '50px' }}>
+        <h2 style={{ fontSize: '26px', fontWeight: '500', marginBottom: '12px', lineHeight: '1.1' }}>
+          Avez-vous pris votre traitement aujourd'hui ?
+        </h2>
+        <p style={{ fontSize: '14px', color: '#646464', lineHeight: 'normal' }}>
+          Sélectionnez les traitements que vous avez pris jusqu'à présent. Fiez-vous toujours à votre ordonnance.
+        </p>
+      </div>
+
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        flex: 1,
+        position: 'relative'
+      }}>
+        <div 
+          ref={wheelRef}
+          style={{
+            position: 'relative',
+            width: '340px',
+            height: '340px',
+            cursor: 'pointer',
+            userSelect: 'none'
+          }}
+        >
+          <div style={{ position: 'absolute', inset: '-0.441%' }}>
+            <svg width="344" height="344" viewBox="0 0 344 344" style={{ display: 'block', width: '100%', height: '100%' }}>
+              <circle cx="172" cy="172" r="20" fill="white" />
+              <circle cx="172" cy="172" r="170" fill="white" stroke="#DADADA" strokeWidth="3" />
+              <line x1="172" y1="3" x2="172" y2="151" stroke="#DADADA" strokeWidth="3" />
+              <line x1="172" y1="193" x2="172" y2="341" stroke="#DADADA" strokeWidth="3" />
+              
+              {value === true && (
+                <path 
+                  d="M172 2C78.1116 2 2 78.1116 2 172C2 265.888 78.1116 342 172 342L172 2Z" 
+                  fill="rgba(14, 122, 254, 0.1)" 
+                />
+              )}
+              {value === false && (
+                <path 
+                  d="M172 2C265.888 2 342 78.1116 342 172C342 265.888 265.888 342 172 342L172 2Z" 
+                  fill="rgba(14, 122, 254, 0.1)" 
+                />
+              )}
+            </svg>
+          </div>
+          
+          <div style={{
+            position: 'absolute',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '213px',
+            height: '15px',
+            left: '64px',
+            top: '162px',
+            fontFamily: 'SF Pro Display, sans-serif',
+            fontSize: '16px',
+            fontWeight: '600',
+            textAlign: 'center',
+            color: 'black',
+            pointerEvents: 'none'
+          }}>
+            <div style={{
+              color: value === true ? '#0e7afe' : 'black',
+              transition: 'color 0.2s'
+            }}>Oui</div>
+            <div style={{
+              color: value === false ? '#0e7afe' : 'black',
+              transition: 'color 0.2s'
+            }}>Non</div>
+          </div>
+          
+          <div
+            style={{
+              position: 'absolute',
+              left: `${selectorPosition.x}%`,
+              top: `${selectorPosition.y}%`,
+              transform: 'translate(-50%, -50%)',
+              width: '43px',
+              height: '43px',
+              zIndex: 10,
+              cursor: isDragging ? 'grabbing' : 'grab',
+              transition: isDragging ? 'none' : 'all 0.2s ease-out'
+            }}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+          >
+            <div style={{ position: 'absolute', inset: '-45.12% -35.81% -26.51% -35.81%' }}>
+              <svg width="75" height="75" viewBox="0 0 75 75" style={{ display: 'block', width: '100%', height: '100%' }}>
+                <defs>
+                  <filter id="selector-shadow" x="0.6" y="0.6" width="73.8" height="73.8">
+                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                    <feColorMatrix in="SourceAlpha" result="hardAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" />
+                    <feOffset dy="-4" />
+                    <feGaussianBlur stdDeviation="7.7" />
+                    <feComposite in2="hardAlpha" operator="out" />
+                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.06 0" />
+                    <feBlend in2="BackgroundImageFix" mode="normal" result="effect1_dropShadow" />
+                    <feBlend in="SourceGraphic" in2="effect1_dropShadow" mode="normal" result="shape" />
+                  </filter>
+                </defs>
+                <circle 
+                  cx="37.5" 
+                  cy="41.5" 
+                  r="21.5" 
+                  fill={isDragging ? "rgba(14, 122, 254, 0.9)" : "white"}
+                  filter="url(#selector-shadow)"
+                  style={{ transition: 'fill 0.2s' }}
+                />
+                <circle 
+                  cx="37.5" 
+                  cy="41.5" 
+                  r="21" 
+                  stroke={isDragging ? "#0e7afe" : "#DADADA"}
+                  fill="none"
+                  style={{ transition: 'stroke 0.2s' }}
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <BottomActions 
+        primaryLabel="Continuer"
+        onPrimary={onContinue}
+        primaryDisabled={!hasInteracted}
+        solidBackground={true}
+      />
+    </>
+  )
+}
+
+// Screen 5: Consumption
+const ConsumptionScreen = ({ selectedItems, customItems, onItemsChange, onCustomChange, onContinue }) => {
+  const items = [
+    'Aliments salés (charcuterie, plats préparés...)',
+    'Alcool',
+    'Café ou boissons énergisantes',
+    'Aucun de ces éléments'
+  ]
+
+  const toggleItem = (item) => {
+    if (selectedItems.includes(item)) {
+      onItemsChange(selectedItems.filter(s => s !== item))
+    } else {
+      onItemsChange([...selectedItems, item])
+    }
+  }
+
+  return (
+    <>
+      <div style={{ marginBottom: '40px' }}>
+        <h2 style={{ fontSize: '26px', fontWeight: '500', marginBottom: '12px', lineHeight: '1.1' }}>
+          Avez-vous consommé l'un des éléments suivants aujourd'hui ?
+        </h2>
+        <p style={{ fontSize: '14px', color: '#7a7a7a', lineHeight: 'normal' }}>
+          Sélectionnez les symptômes que vous avez ressenti aujourd'hui.
+        </p>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px', alignItems: 'center' }}>
+        {items.map((item, index) => (
+          <button
+            key={index}
+            onClick={() => toggleItem(item)}
+            style={{
+              padding: '16px 20px',
+              borderRadius: '25px',
+              border: selectedItems.includes(item) ? '2px solid #007AFF' : '1px solid #e0e0e0',
+              backgroundColor: selectedItems.includes(item) ? 'rgba(0, 122, 255, 0.05)' : 'white',
+              color: selectedItems.includes(item) ? '#007AFF' : 'black',
+              fontSize: '16px',
+              fontWeight: selectedItems.includes(item) ? '600' : '400',
+              cursor: 'pointer',
+              textAlign: 'center',
+              transition: 'all 0.2s',
+              width: 'fit-content',
+              minWidth: '250px'
+            }}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ marginBottom: '40px' }}>
+        <label style={{ fontSize: '16px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>
+          D'autres aliments consommés ?
+        </label>
+        <input
+          type="text"
+          placeholder="Stress, changements d'humeur..."
+          value={customItems}
+          onChange={(e) => onCustomChange(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '12px 16px',
+            borderRadius: '20px',
+            border: '1px solid #e0e0e0',
+            fontSize: '16px',
+            backgroundColor: 'white'
+          }}
+        />
+      </div>
+
+      <BottomActions 
+        primaryLabel="Continuer"
+        onPrimary={onContinue}
+        solidBackground={true}
+      />
+    </>
+  )
+}
+
+// Screen 6: Physical Activity (3-way draggable wheel)
+const ActivityScreen = ({ value, onChange, onContinue }) => {
+  const [hasInteracted, setHasInteracted] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const [selectorAngle, setSelectorAngle] = useState(() => {
+    if (value === 'plus_30') return -60
+    if (value === 'moins_30') return 180
+    if (value === 'non') return 60
+    return 0
+  })
+  const wheelRef = useRef(null)
+
+  const getValueFromAngle = (angle) => {
+    const normalizedAngle = ((angle % 360) + 360) % 360
+    
+    if ((normalizedAngle >= 300 && normalizedAngle <= 360) || (normalizedAngle >= 0 && normalizedAngle <= 60)) {
+      return 'plus_30'
+    } else if (normalizedAngle >= 120 && normalizedAngle <= 240) {
+      return 'moins_30'
+    } else {
+      return 'non'
+    }
+  }
+
+  const updateAngleAndValue = useCallback((clientX, clientY) => {
+    if (!wheelRef.current) return
+    
+    const rect = wheelRef.current.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    
+    const angle = Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI)
+    setSelectorAngle(angle)
+    
+    const newValue = getValueFromAngle(angle)
+    if (newValue !== value) {
+      onChange(newValue)
+      setHasInteracted(true)
+    }
+  }, [value, onChange])
+
+  const handleMouseDown = useCallback((e) => {
+    e.preventDefault()
+    setIsDragging(true)
+    updateAngleAndValue(e.clientX, e.clientY)
+  }, [updateAngleAndValue])
+
+  const handleMouseMove = useCallback((e) => {
+    if (isDragging) {
+      e.preventDefault()
+      updateAngleAndValue(e.clientX, e.clientY)
+    }
+  }, [isDragging, updateAngleAndValue])
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  const handleTouchStart = useCallback((e) => {
+    e.preventDefault()
+    setIsDragging(true)
+    const touch = e.touches[0]
+    updateAngleAndValue(touch.clientX, touch.clientY)
+  }, [updateAngleAndValue])
+
+  const handleTouchMove = useCallback((e) => {
+    if (isDragging) {
+      e.preventDefault()
+      const touch = e.touches[0]
+      updateAngleAndValue(touch.clientX, touch.clientY)
+    }
+  }, [isDragging, updateAngleAndValue])
+
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('touchmove', handleTouchMove, { passive: false })
+      document.addEventListener('touchend', handleTouchEnd)
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
+
+  const selectorRadius = 80
+  const selectorX = 130 + selectorRadius * Math.cos(selectorAngle * Math.PI / 180)
+  const selectorY = 130 + selectorRadius * Math.sin(selectorAngle * Math.PI / 180)
+
+  return (
+    <>
+      <div style={{ textAlign: 'center', marginBottom: '50px' }}>
+        <h2 style={{ fontSize: '26px', fontWeight: '500', marginBottom: '12px', lineHeight: '1.1' }}>
+          Avez-vous été physiquement actif(ve) aujourd'hui ?
+        </h2>
+        <p style={{ fontSize: '14px', color: '#7a7a7a', lineHeight: 'normal' }}>
+          Glissez le cercle vers votre réponse et relâchez pour confirmer.
+        </p>
+      </div>
+
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        flex: 1,
+        position: 'relative'
+      }}>
+        <svg width="260" height="260" viewBox="0 0 260 260" ref={wheelRef}>
+          <circle
+            cx="130"
+            cy="130"
+            r="110"
+            fill="white"
+            stroke="#e0e0e0"
+            strokeWidth="2"
+          />
+          
+          <line x1="130" y1="20" x2="130" y2="130" stroke="#e0e0e0" strokeWidth="1" />
+          <line x1="35" y1="85" x2="130" y2="130" stroke="#e0e0e0" strokeWidth="1" />
+          <line x1="225" y1="175" x2="130" y2="130" stroke="#e0e0e0" strokeWidth="1" />
+          
+          <text x="178" y="60" textAnchor="middle" fontSize="12" fontWeight="bold">Oui,</text>
+          <text x="178" y="75" textAnchor="middle" fontSize="12" fontWeight="bold">+ de 30 mins</text>
+          
+          <text x="82" y="60" textAnchor="middle" fontSize="12" fontWeight="bold">Oui,</text>
+          <text x="82" y="75" textAnchor="middle" fontSize="12" fontWeight="bold">- de 30 mins</text>
+          
+          <text x="130" y="200" textAnchor="middle" fontSize="12" fontWeight="bold">Non</text>
+          
+          <circle
+            cx={selectorX}
+            cy={selectorY}
+            r="16"
+            fill={hasInteracted ? '#007AFF' : '#d9d9d9'}
+            stroke="white"
+            strokeWidth="3"
+            style={{ 
+              cursor: isDragging ? 'grabbing' : 'grab',
+              filter: isDragging ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' : 'none'
+            }}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+          />
+          
+          <circle
+            cx="130"
+            cy="130"
+            r="8"
+            fill="#e0e0e0"
+          />
+        </svg>
+      </div>
+
+      <BottomActions 
+        primaryLabel="Continuer"
+        onPrimary={onContinue}
+        primaryDisabled={!hasInteracted}
+        solidBackground={true}
+      />
+    </>
+  )
+}
+
+// Screen 7: Stress Level
+const StressScreen = ({ value, onChange, onContinue }) => {
+  const [hasInteracted, setHasInteracted] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const sliderRef = useRef(null)
+
+  const updateValue = useCallback((clientY) => {
+    if (!sliderRef.current) return
+    
+    const rect = sliderRef.current.getBoundingClientRect()
+    const y = clientY - rect.top
+    const percentage = Math.max(0, Math.min(100, (y / rect.height) * 100))
+    
+    const newValue = 100 - percentage
+    onChange(newValue)
+    setHasInteracted(true)
+  }, [onChange])
+
+  const handleMouseDown = useCallback((e) => {
+    e.preventDefault()
+    setIsDragging(true)
+    updateValue(e.clientY)
+  }, [updateValue])
+
+  const handleMouseMove = useCallback((e) => {
+    if (isDragging) {
+      e.preventDefault()
+      updateValue(e.clientY)
+    }
+  }, [isDragging, updateValue])
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  const handleTouchStart = useCallback((e) => {
+    e.preventDefault()
+    setIsDragging(true)
+    updateValue(e.touches[0].clientY)
+  }, [updateValue])
+
+  const handleTouchMove = useCallback((e) => {
+    if (isDragging) {
+      e.preventDefault()
+      updateValue(e.touches[0].clientY)
+    }
+  }, [isDragging, updateValue])
+
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('touchmove', handleTouchMove, { passive: false })
+      document.addEventListener('touchend', handleTouchEnd)
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
+
+  return (
+    <>
+      <div style={{ textAlign: 'center', marginBottom: '50px' }}>
+        <h2 style={{ fontSize: '26px', fontWeight: '500', marginBottom: '12px', lineHeight: '1.1' }}>
+          Comment évalueriez-vous votre niveau de stress aujourd'hui ?
+        </h2>
+        <p style={{ fontSize: '14px', color: '#7a7a7a', lineHeight: 'normal' }}>
+          Glissez le cercle vers votre réponse et relâchez pour confirmer.
+        </p>
+      </div>
+
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        flex: 1, 
+        justifyContent: 'center',
+        position: 'relative'
+      }}>
+        <div style={{ fontSize: '14px', marginBottom: '20px', color: 'black' }}>Aucun stress</div>
+        
+        <div 
+          ref={sliderRef}
+          style={{ 
+            width: '38px', 
+            height: '327px', 
+            background: 'linear-gradient(to bottom, #62ffa4, #ffb48b, #ff5d5d)', 
+            borderRadius: '19px',
+            position: 'relative',
+            cursor: 'pointer'
+          }}
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+        >
+          <div 
+            style={{
+              position: 'absolute',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              top: `${(100 - value)}%`,
+              width: '32px',
+              height: '32px',
+              backgroundColor: 'white',
+              borderRadius: '50%',
+              boxShadow: isDragging ? '0 4px 16px rgba(0,0,0,0.25)' : '0 2px 8px rgba(0,0,0,0.15)',
+              border: '1px solid #e0e0e0',
+              cursor: isDragging ? 'grabbing' : 'grab',
+              transition: isDragging ? 'none' : 'box-shadow 0.2s ease'
+            }}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+          />
+        </div>
+        
+        <div style={{ fontSize: '14px', marginTop: '20px', color: 'black' }}>Stress extrême</div>
+      </div>
+
+      <BottomActions 
+        primaryLabel="Terminer"
+        onPrimary={onContinue}
+        primaryDisabled={!hasInteracted}
+        solidBackground={true}
+      />
+    </>
+  )
+}
+
+export default LoggingModal
