@@ -885,67 +885,73 @@ const ConsumptionScreen = ({ selectedItems, customItems, onItemsChange, onCustom
   )
 }
 
-// Screen 6: Physical Activity (3-way draggable wheel)
+// Screen 6: Physical Activity (Figma-accurate 3-way wheel)
 const ActivityScreen = ({ value, onChange, onContinue }) => {
   const [hasInteracted, setHasInteracted] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
-  const [selectorAngle, setSelectorAngle] = useState(() => {
-    if (value === 'plus_30') return -60 // Top right
-    if (value === 'moins_30') return 180 // Left  
-    if (value === 'non') return 60 // Bottom right
-    return 0 // Default position
-  })
+  const [selectorPosition, setSelectorPosition] = useState({ x: 50, y: 50 })
   const wheelRef = useRef(null)
 
-  const options = [
-    { value: 'plus_30', angle: -60, label: 'Oui, + de 30 mins' },
-    { value: 'moins_30', angle: 180, label: 'Oui, - de 30 mins' },
-    { value: 'non', angle: 60, label: 'Non' }
-  ]
-
-  const getValueFromAngle = (angle) => {
-    // Normalize angle to 0-360 range
-    const normalizedAngle = ((angle % 360) + 360) % 360
+  const getSelectionFromAngle = (angle) => {
+    // Convert angle to degrees and normalize to 0-360
+    let degrees = (angle * 180 / Math.PI + 360) % 360
     
-    // Define zones for each option (120 degrees each)
-    if ((normalizedAngle >= 300 && normalizedAngle <= 360) || (normalizedAngle >= 0 && normalizedAngle <= 60)) {
-      return 'plus_30' // Top right section
-    } else if (normalizedAngle >= 120 && normalizedAngle <= 240) {
-      return 'moins_30' // Left section
+    // Define sectors based on actual label positions:
+    // "Oui, + de 30 mins" is top-left: 90-210 degrees
+    // "Oui, - de 30 mins" is top-right: 330-90 degrees (wraps around 0)
+    // "Non" is bottom: 210-330 degrees
+    
+    if (degrees >= 210 && degrees <= 330) {
+      return 'non'
+    } else if (degrees >= 90 && degrees <= 210) {
+      return 'plus_30'
     } else {
-      return 'non' // Bottom right section
+      // This covers 330-360 and 0-90 degrees (top-right)
+      return 'moins_30'
     }
   }
 
-  const updateAngleAndValue = useCallback((clientX, clientY) => {
+  const updatePositionAndValue = useCallback((clientX, clientY) => {
     if (!wheelRef.current) return
     
     const rect = wheelRef.current.getBoundingClientRect()
     const centerX = rect.left + rect.width / 2
     const centerY = rect.top + rect.height / 2
     
-    const angle = Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI)
-    setSelectorAngle(angle)
+    const deltaX = clientX - centerX
+    const deltaY = clientY - centerY
     
-    const newValue = getValueFromAngle(angle)
-    if (newValue !== value) {
-      onChange(newValue)
-      setHasInteracted(true)
+    const wheelRadius = rect.width / 2 * 0.8
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
+    
+    if (distance <= wheelRadius) {
+      const newX = ((deltaX / rect.width) * 100) + 50
+      const newY = ((deltaY / rect.height) * 100) + 50
+      setSelectorPosition({ x: newX, y: newY })
+      
+      // Calculate angle for sector detection
+      const angle = Math.atan2(-deltaY, deltaX) // Negative deltaY because screen coordinates are flipped
+      const newValue = getSelectionFromAngle(angle)
+      
+      if (newValue !== value) {
+        onChange(newValue)
+        setHasInteracted(true)
+      }
     }
   }, [value, onChange])
 
   const handleMouseDown = useCallback((e) => {
     e.preventDefault()
     setIsDragging(true)
-    updateAngleAndValue(e.clientX, e.clientY)
-  }, [updateAngleAndValue])
+    updatePositionAndValue(e.clientX, e.clientY)
+  }, [updatePositionAndValue])
 
   const handleMouseMove = useCallback((e) => {
     if (isDragging) {
       e.preventDefault()
-      updateAngleAndValue(e.clientX, e.clientY)
+      updatePositionAndValue(e.clientX, e.clientY)
     }
-  }, [isDragging, updateAngleAndValue])
+  }, [isDragging, updatePositionAndValue])
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false)
@@ -955,16 +961,16 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
     e.preventDefault()
     setIsDragging(true)
     const touch = e.touches[0]
-    updateAngleAndValue(touch.clientX, touch.clientY)
-  }, [updateAngleAndValue])
+    updatePositionAndValue(touch.clientX, touch.clientY)
+  }, [updatePositionAndValue])
 
   const handleTouchMove = useCallback((e) => {
     if (isDragging) {
       e.preventDefault()
       const touch = e.touches[0]
-      updateAngleAndValue(touch.clientX, touch.clientY)
+      updatePositionAndValue(touch.clientX, touch.clientY)
     }
-  }, [isDragging, updateAngleAndValue])
+  }, [isDragging, updatePositionAndValue])
 
   const handleTouchEnd = useCallback(() => {
     setIsDragging(false)
@@ -986,10 +992,6 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
     }
   }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
 
-  const selectorRadius = 80
-  const selectorX = 130 + selectorRadius * Math.cos(selectorAngle * Math.PI / 180)
-  const selectorY = 130 + selectorRadius * Math.sin(selectorAngle * Math.PI / 180)
-
   return (
     <>
       <div style={{ textAlign: 'center', marginBottom: '50px' }}>
@@ -1001,7 +1003,7 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
         </p>
       </div>
 
-      {/* 3-way draggable wheel */}
+      {/* Figma-accurate 3-way wheel */}
       <div style={{ 
         display: 'flex', 
         justifyContent: 'center', 
@@ -1009,55 +1011,152 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
         flex: 1,
         position: 'relative'
       }}>
-        <svg width="260" height="260" viewBox="0 0 260 260" ref={wheelRef}>
-          {/* Full circle background */}
-          <circle
-            cx="130"
-            cy="130"
-            r="110"
-            fill="white"
-            stroke="#e0e0e0"
-            strokeWidth="2"
-          />
+        <div 
+          ref={wheelRef}
+          style={{
+            position: 'relative',
+            width: '340px',
+            height: '340px',
+            cursor: 'pointer',
+            userSelect: 'none'
+          }}
+        >
+          {/* Main wheel SVG */}
+          <div style={{ position: 'absolute', inset: '-0.441%' }}>
+            <svg width="344" height="344" viewBox="0 0 344 344" style={{ display: 'block', width: '100%', height: '100%' }}>
+              {/* Center circle */}
+              <circle cx="172" cy="172" r="20" fill="white" />
+              
+              {/* Outer circle */}
+              <circle cx="172" cy="172" r="170" fill="white" stroke="#DADADA" strokeWidth="3" />
+              
+              {/* Figma-accurate divider lines */}
+              <path d="M327 241.923L190.5 175.587M17.0348 242L153.5 175.724M172.28 3L172.033 153" stroke="#DADADA" strokeWidth="3" />
+              
+              {/* Visual feedback for selection */}
+              {value === 'plus_30' && (
+                <path 
+                  d="M172 2C78.1116 2 2 78.1116 2 172L172 172L172 2Z" 
+                  fill="rgba(14, 122, 254, 0.1)" 
+                />
+              )}
+              {value === 'moins_30' && (
+                <path 
+                  d="M172 2C265.888 2 342 78.1116 342 172L172 172L172 2Z" 
+                  fill="rgba(14, 122, 254, 0.1)" 
+                />
+              )}
+              {value === 'non' && (
+                <path 
+                  d="M2 172C2 265.888 78.1116 342 172 342C265.888 342 342 265.888 342 172L172 172L2 172Z" 
+                  fill="rgba(14, 122, 254, 0.1)" 
+                />
+              )}
+            </svg>
+          </div>
           
-          {/* Divider lines */}
-          <line x1="130" y1="20" x2="130" y2="130" stroke="#e0e0e0" strokeWidth="1" />
-          <line x1="35" y1="85" x2="130" y2="130" stroke="#e0e0e0" strokeWidth="1" />
-          <line x1="225" y1="175" x2="130" y2="130" stroke="#e0e0e0" strokeWidth="1" />
+          {/* Labels positioned exactly as in Figma */}
+          <div style={{
+            position: 'absolute',
+            left: '87px',
+            top: '98px',
+            transform: 'translateX(-50%)',
+            width: '92px',
+            fontFamily: 'SF Pro Display, sans-serif',
+            fontSize: '16px',
+            fontWeight: '600',
+            textAlign: 'center',
+            color: value === 'plus_30' ? '#0e7afe' : 'black',
+            transition: 'color 0.2s',
+            pointerEvents: 'none'
+          }}>
+            Oui,<br />+ de 30 mins
+          </div>
           
-          {/* Text labels */}
-          <text x="178" y="60" textAnchor="middle" fontSize="12" fontWeight="bold">Oui,</text>
-          <text x="178" y="75" textAnchor="middle" fontSize="12" fontWeight="bold">+ de 30 mins</text>
+          <div style={{
+            position: 'absolute',
+            left: '253px',
+            top: '98px',
+            transform: 'translateX(-50%)',
+            width: '92px',
+            fontFamily: 'SF Pro Display, sans-serif',
+            fontSize: '16px',
+            fontWeight: '600',
+            textAlign: 'center',
+            color: value === 'moins_30' ? '#0e7afe' : 'black',
+            transition: 'color 0.2s',
+            pointerEvents: 'none'
+          }}>
+            Oui,<br />- de 30 mins
+          </div>
           
-          <text x="82" y="60" textAnchor="middle" fontSize="12" fontWeight="bold">Oui,</text>
-          <text x="82" y="75" textAnchor="middle" fontSize="12" fontWeight="bold">- de 30 mins</text>
+          <div style={{
+            position: 'absolute',
+            left: '170px',
+            top: '250px',
+            transform: 'translateX(-50%)',
+            width: '92px',
+            fontFamily: 'SF Pro Display, sans-serif',
+            fontSize: '16px',
+            fontWeight: '600',
+            textAlign: 'center',
+            color: value === 'non' ? '#0e7afe' : 'black',
+            transition: 'color 0.2s',
+            pointerEvents: 'none'
+          }}>
+            Non
+          </div>
           
-          <text x="130" y="200" textAnchor="middle" fontSize="12" fontWeight="bold">Non</text>
-          
-          {/* Draggable selector */}
-          <circle
-            cx={selectorX}
-            cy={selectorY}
-            r="16"
-            fill={hasInteracted ? '#007AFF' : '#d9d9d9'}
-            stroke="white"
-            strokeWidth="3"
-            style={{ 
+          {/* Draggable Selector */}
+          <div
+            style={{
+              position: 'absolute',
+              left: `${selectorPosition.x}%`,
+              top: `${selectorPosition.y}%`,
+              transform: 'translate(-50%, -50%)',
+              width: '43px',
+              height: '43px',
+              zIndex: 10,
               cursor: isDragging ? 'grabbing' : 'grab',
-              filter: isDragging ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' : 'none'
+              transition: isDragging ? 'none' : 'all 0.2s ease-out'
             }}
             onMouseDown={handleMouseDown}
             onTouchStart={handleTouchStart}
-          />
-          
-          {/* Center dot */}
-          <circle
-            cx="130"
-            cy="130"
-            r="8"
-            fill="#e0e0e0"
-          />
-        </svg>
+          >
+            <div style={{ position: 'absolute', inset: '-45.12% -35.81% -26.51% -35.81%' }}>
+              <svg width="75" height="75" viewBox="0 0 75 75" style={{ display: 'block', width: '100%', height: '100%' }}>
+                <defs>
+                  <filter id="activity-selector-shadow" x="0.6" y="0.6" width="73.8" height="73.8">
+                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
+                    <feColorMatrix in="SourceAlpha" result="hardAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" />
+                    <feOffset dy="-4" />
+                    <feGaussianBlur stdDeviation="7.7" />
+                    <feComposite in2="hardAlpha" operator="out" />
+                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.06 0" />
+                    <feBlend in2="BackgroundImageFix" mode="normal" result="effect1_dropShadow" />
+                    <feBlend in="SourceGraphic" in2="effect1_dropShadow" mode="normal" result="shape" />
+                  </filter>
+                </defs>
+                <circle 
+                  cx="37.5" 
+                  cy="41.5" 
+                  r="21.5" 
+                  fill={isDragging ? "rgba(14, 122, 254, 0.9)" : "white"}
+                  filter="url(#activity-selector-shadow)"
+                  style={{ transition: 'fill 0.2s' }}
+                />
+                <circle 
+                  cx="37.5" 
+                  cy="41.5" 
+                  r="21" 
+                  stroke={isDragging ? "#0e7afe" : "#DADADA"}
+                  fill="none"
+                  style={{ transition: 'stroke 0.2s' }}
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
       </div>
 
       <BottomActions 
