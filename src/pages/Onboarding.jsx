@@ -337,7 +337,7 @@ export default function Onboarding() {
         
         <BottomActions
           primaryLabel={stepKey === 'widget' ? 'Commencer' : stepKey === 'cguWelcome' ? "J'accepte et je continue" : stepKey === 'login' ? 'Commencer' : 'Continuer'}
-          onPrimary={stepKey === 'widget' ? () => navigate('/app') : stepKey === 'login' ? () => setShowLoginModal(true) : next}
+          onPrimary={stepKey === 'widget' ? () => navigate('/logging') : stepKey === 'login' ? () => setShowLoginModal(true) : next}
           disabled={stepKey === 'cguWelcome' && !data.cguAccepted}
           solidBackground={stepKey === 'cguWelcome'}
         />

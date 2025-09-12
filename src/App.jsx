@@ -3,6 +3,7 @@ import Layout from './components/layout/Layout'
 import Dashboard from './pages/Dashboard'
 import Onboarding from './pages/Onboarding'
 import LoggingModal from './pages/Logging'
+import LoggingFlow from './pages/LoggingFlow'
 import Visualization from './pages/Visualization'
 import Export from './pages/Export'
 import Splash from './pages/Splash'
@@ -25,6 +26,7 @@ function App() {
           <Route path="auth-choice" element={<AuthChoice />} />
           <Route path="welcome-loris" element={<WelcomeLoris />} />
           <Route path="onboarding" element={<Onboarding />} />
+          <Route path="logging" element={<LoggingFlow />} />
           <Route path="app" element={<Layout handleAdd={handleAdd} />}> 
             <Route index element={<Dashboard handleAdd={handleAdd} />} />
             <Route path="logging" element={<div />} />
