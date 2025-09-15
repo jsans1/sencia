@@ -12,6 +12,7 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@supabase/supabase-js": "^2.50.0",
+    "@types/node": "^24.4.0",
     "chart.js": "^4.4.9",
     "clsx": "^2.1.1",
     "jspdf": "^3.0.1",
@@ -20,7 +21,8 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.2",
-    "tailwind-merge": "^3.3.0"
+    "tailwind-merge": "^3.3.0",
+    "typescript": "^5.9.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
