@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/layout/Layout'
 import Dashboard from './pages/Dashboard'
 import Onboarding from './pages/Onboarding'
@@ -17,7 +17,7 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route path="/" element={<Onboarding />} />
+          <Route path="/" element={<Navigate to="/app" replace />} />
           <Route path="onboarding" element={<Onboarding />} />
           <Route path="logging" element={<LoggingFlow />} />
           <Route path="app" element={<Layout handleAdd={handleAdd} />}> 
