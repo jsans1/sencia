@@ -684,11 +684,13 @@ body {
   position: relative;
   display: flex;
   justify-content: space-around;
+  align-items: center;
   pointer-events: auto;
   background: #fff;
   border-top: 1px solid #ececec;
   box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.04);
-  padding: 18px 0 18px 0;
+  padding: 12px 8px 12px 8px;
+  border-radius: 20px 20px 0 0;
 }
 
 .mobile-nav-item {
@@ -703,38 +705,61 @@ body {
   font-size: 1.1rem;
   font-weight: 500;
   cursor: pointer;
-  padding: 0 8px;
+  padding: 8px 4px;
   height: 100%;
-  transition: color 0.2s;
+  transition: all 0.2s ease;
+  border-radius: 12px;
+  min-width: 50px;
+  flex: 1;
+}
+
+.mobile-nav-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
 }
 
 .mobile-nav-item.active {
   color: #111;
+  background: rgba(0, 0, 0, 0.08);
 }
 
 .mobile-nav-icon {
-  font-size: 1.5rem;
-  margin-bottom: 2px;
+  font-size: 1.4rem;
+  margin-bottom: 4px;
+  transition: transform 0.2s ease;
+}
+
+.mobile-nav-item:hover .mobile-nav-icon {
+  transform: scale(1.1);
 }
 
 .mobile-nav-label {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
 }
 
 .add-btn {
   background: #111;
   color: #fff !important;
   border-radius: 50%;
-  width: 54px;
-  height: 54px;
-  margin-top: -24px;
-  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  margin-top: -20px;
+  font-size: 1.8rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
-  border: 4px solid #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 3px solid #fff;
+  transition: all 0.2s ease;
+  flex: 0 0 auto;
+}
+
+.add-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .mobile-nav-wrapper {
@@ -744,11 +769,12 @@ body {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 24px;
+  bottom: 0;
   z-index: 20;
   display: flex;
   justify-content: center;
   pointer-events: none;
+  padding: 0 16px 16px 16px;
 }
 
 .dashboard-overview {
@@ -997,6 +1023,35 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+  }
+  
+  .mobile-nav-wrapper {
+    padding: 0 8px 8px 8px;
+  }
+  
+  .mobile-nav {
+    padding: 8px 4px;
+    border-radius: 16px 16px 0 0;
+  }
+  
+  .mobile-nav-item {
+    padding: 6px 2px;
+    min-width: 40px;
+  }
+  
+  .mobile-nav-label {
+    font-size: 0.7rem;
+  }
+  
+  .mobile-nav-icon {
+    font-size: 1.2rem;
+  }
+  
+  .add-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 1.6rem;
+    margin-top: -16px;
   }
 
   .viz-cards-row {
