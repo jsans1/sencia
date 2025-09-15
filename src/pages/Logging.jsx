@@ -88,6 +88,7 @@ export const LoggingModal = ({ open, onClose, onSubmit }) => {
     if (onClose) onClose()
   }
 
+  const progress = ((currentStep + 1) / LOGGING_STEPS.length) * 100
   return (
     <div className={`logging-modal-bg${open ? ' open' : ''}`} onClick={handleModalClose}>
       <div
@@ -107,47 +108,17 @@ export const LoggingModal = ({ open, onClose, onSubmit }) => {
       >
         <GradientBackground />
         
-        <MobileFrame>
-          {/* Status Bar */}
-          <StatusBar />
+        <MobileFrame showStatusBar={false}>
 
-          {/* Progress Bar */}
-          <div className="progress-bar" style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '20px',
-            marginBottom: '20px'
-          }}>
-            <button onClick={prevStep} disabled={currentStep === 0} style={{
-              background: 'none',
-              border: 'none',
-              fontSize: '18px',
-              cursor: currentStep > 0 ? 'pointer' : 'not-allowed',
-              opacity: currentStep > 0 ? 1 : 0.3
-            }}>
-              ←
-            </button>
-            <div style={{ display: 'flex', gap: '2px', flex: 1, margin: '0 20px' }}>
-              {LOGGING_STEPS.map((_, index) => (
-                <div
-                  key={index}
-                  style={{
-                    flex: 1,
-                    height: '1px',
-                    backgroundColor: index <= currentStep ? '#0e7afe' : '#d9d9d9'
-                  }}
-                />
-              ))}
+          {/* Progress Header */}
+          <div style={{ padding: '16px 20px 8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button onClick={prevStep} disabled={currentStep === 0} style={{ background: 'none', border: 'none', fontSize: '18px', cursor: currentStep > 0 ? 'pointer' : 'not-allowed', opacity: currentStep > 0 ? 1 : 0.3 }}>←</button>
+            <div style={{ flex: 1 }}>
+              <div style={{ width: '100%', height: '4px', background: 'rgba(0,0,0,0.08)', borderRadius: '999px', overflow: 'hidden' }}>
+                <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(90deg, #A69BF8 0%, #0E7AFE 100%)' }} />
+              </div>
             </div>
-            <button onClick={handleModalClose} style={{
-              background: 'none',
-              border: 'none',
-              fontSize: '18px',
-              cursor: 'pointer'
-            }}>
-              ✕
-            </button>
+            <button onClick={handleModalClose} style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer' }}>✕</button>
           </div>
 
           {/* Step Content */}
@@ -295,13 +266,9 @@ const MoodScreen = ({ value, onChange, onContinue }) => {
 
   return (
     <>
-      <div style={{ textAlign: 'center', marginBottom: '50px' }}>
-        <h2 style={{ fontSize: '26px', fontWeight: '500', marginBottom: '12px', lineHeight: '1.1' }}>
-          Comment vous sentez-vous ce matin Alima ?
-        </h2>
-        <p style={{ fontSize: '14px', color: '#7a7a7a', lineHeight: 'normal' }}>
-          Remember to check in regularly to spot patterns.
-        </p>
+      <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+        <h2 className="step-title">Comment vous sentez-vous ce matin Alima ?</h2>
+        <p className="step-subtitle">Remember to check in regularly to spot patterns.</p>
       </div>
 
       {/* Mood Slider */}
@@ -382,33 +349,31 @@ const SymptomsScreen = ({ selectedSymptoms, customSymptoms, onSymptomsChange, on
 
   return (
     <>
-      <div style={{ marginBottom: '40px' }}>
-        <h2 style={{ fontSize: '26px', fontWeight: '500', marginBottom: '12px', lineHeight: '1.1' }}>
-          Avez-vous eu les symptômes suivants aujourd'hui ?
-        </h2>
-        <p style={{ fontSize: '14px', color: '#7a7a7a', lineHeight: 'normal' }}>
-          Sélectionnez les symptômes que vous avez ressenti aujourd'hui. Si vous n'en avez eu aucun, cliquez sur Suivant.
-        </p>
+      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+        <h2 className="step-title">Avez-vous eu les symptômes suivants aujourd'hui ?</h2>
+        <p className="step-subtitle">Sélectionnez les symptômes que vous avez ressenti aujourd'hui. Si vous n'en avez eu aucun, cliquez sur Suivant.</p>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px', alignItems: 'center' }}>
+      <div style={{ display: 'flex', width: '353px', alignItems: 'flex-start', alignContent: 'flex-start', gap: '9px', flexWrap: 'wrap', marginBottom: '20px' }}>
         {symptoms.map((symptom, index) => (
           <button
             key={index}
             onClick={() => toggleSymptom(symptom)}
             style={{
-              padding: '16px 20px',
-              borderRadius: '25px',
+              padding: '12px 16px',
+              borderRadius: '24px',
               border: selectedSymptoms.includes(symptom) ? '2px solid #007AFF' : '1px solid #e0e0e0',
               backgroundColor: selectedSymptoms.includes(symptom) ? 'rgba(0, 122, 255, 0.05)' : 'white',
               color: selectedSymptoms.includes(symptom) ? '#007AFF' : 'black',
-              fontSize: '16px',
+              fontSize: '15px',
               fontWeight: selectedSymptoms.includes(symptom) ? '600' : '400',
               cursor: 'pointer',
               textAlign: 'center',
               transition: 'all 0.2s',
-              width: 'fit-content',
-              minWidth: '250px'
+              width: 'auto',
+              maxWidth: '100%',
+              whiteSpace: 'normal',
+              lineHeight: 1.2
             }}
           >
             {symptom}
@@ -417,7 +382,7 @@ const SymptomsScreen = ({ selectedSymptoms, customSymptoms, onSymptomsChange, on
       </div>
 
       <div style={{ marginBottom: '40px' }}>
-        <label style={{ fontSize: '16px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>
+        <label style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', display: 'block' }}>
           Ajoutez d'autres symptômes ressentis
         </label>
         <input
@@ -493,13 +458,9 @@ const BloodPressureScreen = ({ data, onChange, onContinue }) => {
 
   return (
     <>
-      <div style={{ marginBottom: '50px' }}>
-        <h2 style={{ fontSize: '26px', fontWeight: '500', marginBottom: '12px', lineHeight: '1.1' }}>
-          Quelle est votre dernière mesure de tension artérielle ?
-        </h2>
-        <p style={{ fontSize: '14px', color: '#646464', lineHeight: 'normal' }}>
-          Entrez la dernière mesure que vous avez prise. Une prise actuelle permet des analyses plus exactes.
-        </p>
+      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+        <h2 className="step-title">Quelle est votre dernière mesure de tension artérielle ?</h2>
+        <p className="step-subtitle">Entrez la dernière mesure que vous avez prise. Une prise actuelle permet des analyses plus exactes.</p>
       </div>
 
       <div style={{
@@ -510,7 +471,7 @@ const BloodPressureScreen = ({ data, onChange, onContinue }) => {
         marginBottom: '18px'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '13px' }}>
-          <span style={{ fontSize: '18px', fontWeight: '500' }}>Systolique</span>
+          <span style={{ fontSize: '18px', fontWeight: '600' }}>Systolique</span>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
             <input
               type="tel"
@@ -538,7 +499,7 @@ const BloodPressureScreen = ({ data, onChange, onContinue }) => {
         </div>
         <hr style={{ border: 'none', borderTop: '0.5px solid #BCBCBC', margin: '13px 0' }} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: '18px', fontWeight: '500' }}>Diastolique</span>
+          <span style={{ fontSize: '18px', fontWeight: '600' }}>Diastolique</span>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
             <input
               type="tel"
@@ -689,13 +650,9 @@ const TreatmentScreen = ({ value, onChange, onContinue }) => {
 
   return (
     <>
-      <div style={{ textAlign: 'center', marginBottom: '50px' }}>
-        <h2 style={{ fontSize: '26px', fontWeight: '500', marginBottom: '12px', lineHeight: '1.1' }}>
-          Avez-vous pris votre traitement aujourd'hui ?
-        </h2>
-        <p style={{ fontSize: '14px', color: '#646464', lineHeight: 'normal' }}>
-          Sélectionnez les traitements que vous avez pris jusqu'à présent. Fiez-vous toujours à votre ordonnance.
-        </p>
+      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+        <h2 className="step-title">Avez-vous pris votre traitement aujourd'hui ?</h2>
+        <p className="step-subtitle">Sélectionnez les traitements que vous avez pris jusqu'à présent. Fiez-vous toujours à votre ordonnance.</p>
       </div>
 
       <div style={{ 
@@ -843,33 +800,31 @@ const ConsumptionScreen = ({ selectedItems, customItems, onItemsChange, onCustom
 
   return (
     <>
-      <div style={{ marginBottom: '40px' }}>
-        <h2 style={{ fontSize: '26px', fontWeight: '500', marginBottom: '12px', lineHeight: '1.1' }}>
-          Avez-vous consommé l'un des éléments suivants aujourd'hui ?
-        </h2>
-        <p style={{ fontSize: '14px', color: '#7a7a7a', lineHeight: 'normal' }}>
-          Sélectionnez les symptômes que vous avez ressenti aujourd'hui.
-        </p>
+      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+        <h2 className="step-title">Avez-vous consommé l'un des éléments suivants aujourd'hui ?</h2>
+        <p className="step-subtitle">Sélectionnez les symptômes que vous avez ressenti aujourd'hui.</p>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px', alignItems: 'center' }}>
+      <div style={{ display: 'flex', width: '353px', alignItems: 'flex-start', alignContent: 'flex-start', gap: '9px', flexWrap: 'wrap', marginBottom: '20px' }}>
         {items.map((item, index) => (
           <button
             key={index}
             onClick={() => toggleItem(item)}
             style={{
-              padding: '16px 20px',
-              borderRadius: '25px',
+              padding: '12px 16px',
+              borderRadius: '24px',
               border: selectedItems.includes(item) ? '2px solid #007AFF' : '1px solid #e0e0e0',
               backgroundColor: selectedItems.includes(item) ? 'rgba(0, 122, 255, 0.05)' : 'white',
               color: selectedItems.includes(item) ? '#007AFF' : 'black',
-              fontSize: '16px',
+              fontSize: '15px',
               fontWeight: selectedItems.includes(item) ? '600' : '400',
               cursor: 'pointer',
               textAlign: 'center',
               transition: 'all 0.2s',
-              width: 'fit-content',
-              minWidth: '250px'
+              width: 'auto',
+              maxWidth: '100%',
+              whiteSpace: 'normal',
+              lineHeight: 1.2
             }}
           >
             {item}
@@ -878,7 +833,7 @@ const ConsumptionScreen = ({ selectedItems, customItems, onItemsChange, onCustom
       </div>
 
       <div style={{ marginBottom: '40px' }}>
-        <label style={{ fontSize: '16px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>
+        <label style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', display: 'block' }}>
           D'autres aliments consommés ?
         </label>
         <input
@@ -1015,13 +970,9 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
 
   return (
     <>
-      <div style={{ textAlign: 'center', marginBottom: '50px' }}>
-        <h2 style={{ fontSize: '26px', fontWeight: '500', marginBottom: '12px', lineHeight: '1.1' }}>
-          Avez-vous été physiquement actif(ve) aujourd'hui ?
-        </h2>
-        <p style={{ fontSize: '14px', color: '#7a7a7a', lineHeight: 'normal' }}>
-          Glissez le cercle vers votre réponse et relâchez pour confirmer.
-        </p>
+      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+        <h2 className="step-title">Avez-vous été physiquement actif(ve) aujourd'hui ?</h2>
+        <p className="step-subtitle">Glissez le cercle vers votre réponse et relâchez pour confirmer.</p>
       </div>
 
       {/* Figma-accurate 3-way wheel */}
@@ -1260,13 +1211,9 @@ const StressScreen = ({ value, onChange, onContinue }) => {
 
   return (
     <>
-      <div style={{ textAlign: 'center', marginBottom: '50px' }}>
-        <h2 style={{ fontSize: '26px', fontWeight: '500', marginBottom: '12px', lineHeight: '1.1' }}>
-          Comment évalueriez-vous votre niveau de stress aujourd'hui ?
-        </h2>
-        <p style={{ fontSize: '14px', color: '#7a7a7a', lineHeight: 'normal' }}>
-          Glissez le cercle vers votre réponse et relâchez pour confirmer.
-        </p>
+      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+        <h2 className="step-title">Comment évalueriez-vous votre niveau de stress aujourd'hui ?</h2>
+        <p className="step-subtitle">Glissez le cercle vers votre réponse et relâchez pour confirmer.</p>
       </div>
 
       <div style={{ 

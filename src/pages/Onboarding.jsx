@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useMemo, useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../App.css'
 import logo from '../assets/logo.svg'
@@ -19,6 +19,7 @@ const stepsOrder = [
   'features',
   'login',
   'cguWelcome',
+  'welcomeLoris',
   'genre',
   'age',
   'poids',
@@ -42,6 +43,9 @@ export default function Onboarding() {
   const navigate = useNavigate()
   const [stepIndex, setStepIndex] = useState(0)
   const [showLoginModal, setShowLoginModal] = useState(false)
+  const timeInputsRef = useRef([])
+  const [editingTimeIdx, setEditingTimeIdx] = useState(-1)
+  const [tempTime, setTempTime] = useState('')
   const [data, setData] = useState({
     genre: '',
     age: 35,
@@ -81,12 +85,39 @@ export default function Onboarding() {
   const updateField = (key, value) => setData((prev) => ({ ...prev, [key]: value }))
   
   // Force refresh to clear cache
+  const isStepValid = (key) => {
+    switch (key) {
+      case 'cguWelcome':
+        return !!data.cguAccepted
+      case 'genre':
+        return !!data.genre
+      case 'age':
+        return !!data.age
+      case 'poids':
+        return !!data.poids
+      case 'taille':
+        return !!data.taille
+      case 'infosPerso': {
+        const hasMaladie = !!data.maladie && String(data.maladie).trim().length > 0
+        const hasDiagDate = !!data.diagDate && String(data.diagDate).trim().length > 0
+        return hasMaladie && hasDiagDate
+      }
+      case 'checkinFrequency':
+        return !!data.frequence
+      case 'carePlanV2': {
+        const heures = data.heures || []
+        return heures.length === 3 && heures.every(v => /^(\d{2}):(\d{2})$/.test(v))
+      }
+      default:
+        return true
+    }
+  }
 
 
   return (
     <>
       <GradientBackground />
-      <MobileFrame showStatusBar={!showHeader}>
+      <MobileFrame showStatusBar={false}>
         {showHeader && (
           <OnboardingNavigation
             onBack={back}
@@ -97,24 +128,31 @@ export default function Onboarding() {
           />
         )}
 
+        {stepKey === 'welcomeLoris' && (
+          <div className="step-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center' }}>
+            <img className="onb-logo" src={logo} alt="Sencia" />
+            <h1 className="step-title" style={{ marginTop: 8 }}>Bienvenue <span style={{ color: '#2563eb' }}>Loris</span></h1>
+            <p className="step-subtitle" style={{ maxWidth: 320 }}>Suivez quotidiennement vos symptômes et vos ressentis.</p>
+          </div>
+        )}
+
         {stepKey === 'checkinFrequency' && (
           <div className="step-content">
-            <img className="onb-logo small" src={logo} alt="Sencia" />
-            <h1 className="step-title" style={{ marginTop: 8 }}>How often do you want to <span style={{ color: '#2563eb' }}>check-in</span> ?</h1>
-            <p className="step-subtitle" style={{ maxWidth: 320 }}>
-              By creating repetition with your check-ins, you can uncover more about your emotional self.
+            <h1 className="step-title" style={{ marginTop: 8, marginBottom: 8 }}>Combien de fois souhaitez-vous <span className="brand-gradient-text">check-in</span> ?</h1>
+            <p className="step-subtitle" style={{ maxWidth: 320, marginTop: 0, marginBottom: 28 }}>
+              En créant de la répétition dans les check-ins, vous pourrez obtenir des informations précises sur votre état de santé.
             </p>
-            <div className="selection-grid grid-2x2">
+            <div className="selection-grid grid-2x2" style={{ gap: '14px' }}>
               {[1,2,3,4].map((num) => (
                 <div
                   key={num}
-                  className={`selection-card ${data.frequence === num ? 'selected' : ''}`}
+                  className={`selection-card circle ${data.frequence === num ? 'selected' : ''}`}
                   onClick={() => updateField('frequence', num)}
                 >
-                  <div className="card-text">
+                  <div className="card-text" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     {num} fois par jour{num === 2 ? ' ' : ''}
                     {num === 2 && (
-                      <div style={{ fontSize: 12, color: '#2563eb', marginTop: 4 }}>(recommandé)</div>
+                      <div className="brand-gradient-text" style={{ fontSize: 12, marginTop: 6 }}>(recommandé)</div>
                     )}
                   </div>
                 </div>
@@ -202,7 +240,6 @@ export default function Onboarding() {
 
         {stepKey === 'genre' && (
           <div className="step-content">
-            <img className="onb-logo small" src={logo} alt="Sencia" />
             <h1 className="step-title">Comment vous identifiez-vous ?</h1>
             <CardSelection
               options={genreOptions}
@@ -215,46 +252,39 @@ export default function Onboarding() {
 
         {stepKey === 'age' && (
           <div className="step-content">
-            <img className="onb-logo small" src={logo} alt="Sencia" />
             <h1 className="step-title">Quel âge avez-vous ?</h1>
             <WheelPicker
               options={ageOptions}
               selectedValue={data.age}
               onChange={(value) => updateField('age', value)}
-              unit="ans"
             />
           </div>
         )}
 
         {stepKey === 'poids' && (
           <div className="step-content">
-            <img className="onb-logo small" src={logo} alt="Sencia" />
             <h1 className="step-title">Quel est votre poids ?</h1>
             <WheelPicker
               options={poidsOptions}
               selectedValue={data.poids}
               onChange={(value) => updateField('poids', value)}
-              unit="kg"
             />
           </div>
         )}
 
         {stepKey === 'taille' && (
           <div className="step-content">
-            <img className="onb-logo small" src={logo} alt="Sencia" />
             <h1 className="step-title">Combien mesurez-vous ?</h1>
             <WheelPicker
               options={tailleOptions}
               selectedValue={data.taille}
               onChange={(value) => updateField('taille', value)}
-              unit="cm"
             />
           </div>
         )}
 
         {stepKey === 'infosPerso' && (
           <div className="step-content">
-            <img className="onb-logo small" src={logo} alt="Sencia" />
             <h1 className="step-title">Informations personnelles</h1>
             <label className="onboarding-label">Maladie chronique</label>
             <input type="text" className="onboarding-input" placeholder="Ex: Hypertension" value={data.maladie || ''} onChange={(e) => updateField('maladie', e.target.value)} />
@@ -270,7 +300,6 @@ export default function Onboarding() {
 
         {stepKey === 'carePlanV2' && (
           <div className="step-content">
-            <img className="onb-logo small" src={logo} alt="Sencia" />
             <h1 className="step-title">Set up de votre care plan</h1>
             <div className="care-times">
               {[
@@ -292,10 +321,8 @@ export default function Onboarding() {
                         type="button"
                         className="care-time-edit"
                         onClick={() => {
-                          const next = window.prompt(`Choisir l'heure pour ${label}`, current) || current
-                          const nextHeures = [...(data.heures || ['08:00','12:00','19:00'])]
-                          nextHeures[idx] = next
-                          updateField('heures', nextHeures)
+                          setEditingTimeIdx(idx)
+                          setTempTime(current)
                         }}
                       >
                         Modifier
@@ -305,6 +332,34 @@ export default function Onboarding() {
                 )
               })}
             </div>
+            {editingTimeIdx !== -1 && (
+              <div className="time-popover" role="dialog" aria-modal="true" onClick={() => setEditingTimeIdx(-1)}>
+                <div className="time-popover-card" onClick={(e)=>e.stopPropagation()}>
+                  <input
+                    type="time"
+                    value={tempTime}
+                    step={60}
+                    onChange={(e)=>setTempTime(e.target.value)}
+                    className="time-popover-input"
+                  />
+                  <div className="time-popover-actions">
+                    <button type="button" className="secondary-button" onClick={()=>setEditingTimeIdx(-1)}>Annuler</button>
+                    <button
+                      type="button"
+                      className="primary-button"
+                      onClick={() => {
+                        const nextHeures = [...(data.heures || ['08:00','12:00','19:00'])]
+                        nextHeures[editingTimeIdx] = tempTime || nextHeures[editingTimeIdx]
+                        updateField('heures', nextHeures)
+                        setEditingTimeIdx(-1)
+                      }}
+                    >
+                      Enregistrer
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -312,7 +367,7 @@ export default function Onboarding() {
 
         {stepKey === 'sync' && (
           <div className="step-content">
-            <h1 className="step-title">Synchronisez vos <span style={{color: '#007AFF'}}>appareils</span><br />et données de santé</h1>
+            <h1 className="step-title">Synchronisez vos <span className="brand-gradient-text">appareils</span><br />et données de santé</h1>
             <WearablesGrid
               selectedDevices={data.selectedDevices}
               onToggleDevice={(deviceId) => {
@@ -331,15 +386,18 @@ export default function Onboarding() {
           <div className="step-content">
             <img className="onb-logo" src={logo} alt="Sencia" />
             <h2 className="features-title">Ajoutez le widget</h2>
-            <img src="/widget.png" alt="widget" style={{ width: '220px', borderRadius: '24px', marginBottom: '16px' }} />
+            <img src="/widget.png" alt="widget" style={{ height: '120%',width: '120%', borderRadius: '24px', marginBottom: '16px',rotate:'6deg' }} />
           </div>
         )}
         
         <BottomActions
           primaryLabel={stepKey === 'widget' ? 'Commencer' : stepKey === 'cguWelcome' ? "J'accepte et je continue" : stepKey === 'login' ? 'Commencer' : 'Continuer'}
           onPrimary={stepKey === 'widget' ? () => navigate('/logging') : stepKey === 'login' ? () => setShowLoginModal(true) : next}
-          disabled={stepKey === 'cguWelcome' && !data.cguAccepted}
+          disabled={!isStepValid(stepKey)}
           solidBackground={stepKey === 'cguWelcome'}
+          showSecondary={stepKey === 'checkinFrequency'}
+          secondaryLabel={stepKey === 'checkinFrequency' ? 'Plus tard' : undefined}
+          onSecondary={stepKey === 'checkinFrequency' ? () => navigate('/logging') : undefined}
         />
       </MobileFrame>
       

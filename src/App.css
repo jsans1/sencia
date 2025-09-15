@@ -531,7 +531,10 @@ body {
 .care-time-value {
   font-size: 28px;
   font-weight: 700;
-  color: #2563eb;
+  background: linear-gradient(90deg, #A69BF8 0%, #0E7AFE 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   letter-spacing: 0.5px;
 }
 
