@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import svgPaths from '../utils/svgPaths'
 
 const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
+  const navigate = useNavigate()
   const [state, setState] = useState({
     activeTab: 'home',
     moodEntries: 0,
@@ -48,7 +50,32 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
   }
 
   const handleOpenArticle = (article, category) => {
-    console.log('Opening article:', article, 'Category:', category)
+    // Store article data for potential navigation
+    setState(prev => ({ ...prev, selectedArticle: article }))
+    // In a real app, this would navigate to article detail page
+    alert(`Article "${article.title}" sera disponible dans une future version`)
+  }
+
+  // Navigation handlers for bottom nav
+  const handleNavigation = (section) => {
+    switch(section) {
+      case 'home':
+        // Already on home, do nothing
+        break
+      case 'explore':
+        navigate('/app/visualization')
+        break
+      case 'care':
+        // Navigate to care section when implemented
+        alert('Section Care sera disponible dans une future version')
+        break
+      case 'profile':
+        // Navigate to profile when implemented  
+        alert('Profil sera disponible dans une future version')
+        break
+      default:
+        break
+    }
   }
 
   function BgLinear() {
@@ -640,6 +667,7 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
 
             {/* Explore */}
             <button
+              onClick={() => handleNavigation('explore')}
               className="content-stretch flex flex-col gap-[7px] items-center justify-center relative shrink-0 w-[45px] transition-colors opacity-60 hover:opacity-80"
             >
               <div className="relative shrink-0 size-6">
@@ -678,6 +706,7 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
 
             {/* Care */}
             <button
+              onClick={() => handleNavigation('care')}
               className="content-stretch flex flex-col gap-[7px] items-center justify-center relative shrink-0 w-[45px] transition-colors opacity-60 hover:opacity-80"
             >
               <div className="relative shrink-0 size-6">
@@ -700,6 +729,7 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
 
             {/* Profile */}
             <button
+              onClick={() => handleNavigation('profile')}
               className="content-stretch flex flex-col gap-[7px] items-center justify-center relative shrink-0 w-[45px] transition-colors opacity-60 hover:opacity-80"
             >
               <div className="relative shrink-0 size-6">
