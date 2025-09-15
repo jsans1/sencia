@@ -20,12 +20,12 @@ function App() {
           <Route path="/" element={<Navigate to="/app" replace />} />
           <Route path="onboarding" element={<Onboarding />} />
           <Route path="logging" element={<LoggingFlow />} />
-          <Route path="app" element={<Layout handleAdd={handleAdd} />}> 
-            <Route index element={<Dashboard handleAdd={handleAdd} />} />
-            <Route path="logging" element={<div />} />
-            <Route path="visualization" element={<Visualization handleAdd={handleAdd} />} />
-            <Route path="export" element={<Export handleAdd={handleAdd} />} />
-          </Route>
+                <Route path="app" element={<Layout handleAdd={handleAdd} />}>
+                  <Route index element={<Dashboard handleAdd={handleAdd} />} />
+                  <Route path="logging" element={<div />} />
+                  <Route path="visualization" element={<Visualization handleAdd={handleAdd} />} />
+                  <Route path="export" element={<Export />} />
+                </Route>
         </Routes>
         <LoggingModal open={loggingOpen} onClose={handleClose} />
       </Router>
