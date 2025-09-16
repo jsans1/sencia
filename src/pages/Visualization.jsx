@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import fakeProfile from '../fakeProfile';
 import MobileNav from '../components/MobileNav';
+import TopLogo from '../components/TopLogo';
 import '../App.css';
 
 const formatDateRange = (data) => {
@@ -78,6 +79,7 @@ const Visualization = () => {
 
   return (
     <div className="viz-bg">
+      <TopLogo />
       <div className="viz-gradient-ellipse" />
       <div className="viz-container">
         <div className="viz-filter-bar">

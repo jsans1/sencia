@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import svgPaths from "../utils/svgPaths";
 import GradientBackground from "./mobile/GradientBackground";
 import MobileFrame from "./mobile/MobileFrame";
 import MobileNav from "./MobileNav";
+import TopLogo from "./TopLogo";
 
 const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
+  const navigate = useNavigate();
   const [state, setState] = useState({
     activeTab: "home",
     moodEntries: 0,
@@ -12,7 +15,6 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
     showTooltip: false,
     selectedArticle: null,
     showArticleModal: false,
-    showTestModal: false,
   });
 
   const currentTime = new Date().toLocaleTimeString("en-GB", {
@@ -108,7 +110,6 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
       ...prev,
       selectedArticle: null,
       showArticleModal: false,
-      showTestModal: false,
     }));
   };
 
@@ -282,61 +283,11 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
     );
   }
 
-  function Group7() {
-    return (
-      <div className="[grid-area:1_/_1] h-[20.991px] ml-0 mt-0 relative w-[77px]">
-        <svg
-          className="block size-full"
-          fill="none"
-          preserveAspectRatio="none"
-          viewBox="0 0 77 21"
-        >
-          <g id="Group 7">
-            <path
-              d={svgPaths.p152f4700}
-              fill="var(--fill-0, black)"
-              id="Vector"
-            />
-            <path
-              d={svgPaths.p20339a80}
-              fill="var(--fill-0, black)"
-              id="Vector_2"
-            />
-            <path
-              d={svgPaths.p353d400}
-              fill="var(--fill-0, black)"
-              id="Vector_3"
-            />
-            <path
-              d={svgPaths.p29985900}
-              fill="var(--fill-0, black)"
-              id="Vector_4"
-            />
-            <path
-              d={svgPaths.p66fb400}
-              fill="var(--fill-0, black)"
-              id="Vector_5"
-            />
-            <path
-              d={svgPaths.p273b1100}
-              fill="var(--fill-0, black)"
-              id="Vector_6"
-            />
-            <path
-              d={svgPaths.p1f33adc0}
-              fill="var(--fill-0, black)"
-              id="Vector_7"
-            />
-          </g>
-        </svg>
-      </div>
-    );
-  }
 
   function Group8() {
     return (
       <div className="grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] place-items-start relative shrink-0">
-        <Group7 />
+        {/* Group7 component removed */}
       </div>
     );
   }
@@ -1212,52 +1163,10 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
         </div>
       )}
 
-      {/* Simple Test Modal */}
-      {state.showTestModal && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 9999,
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "20px",
-              borderRadius: "10px",
-              maxWidth: "400px",
-              width: "90%",
-            }}
-          >
-            <h2>Test Modal</h2>
-            <p>This is a simple test modal to check if modals work at all.</p>
-            <button
-              onClick={handleCloseArticle}
-              style={{
-                backgroundColor: "#007bff",
-                color: "white",
-                padding: "10px 20px",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
 
       <GradientBackground />
       <MobileFrame showStatusBar={false}>
+        <TopLogo />
         <div
           className="homepage-content w-full max-w-[393px] mx-auto"
           style={{ padding: "0", minHeight: "100vh" }}
@@ -1273,21 +1182,6 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
             <BloodPressureChart />
             <CarePlanSection />
 
-            {/* Test button for debugging */}
-            <div className="p-4">
-              <button
-                onClick={() => {
-                  console.log("Test button clicked");
-                  setState((prev) => ({
-                    ...prev,
-                    showTestModal: true,
-                  }));
-                }}
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                Test Modal
-              </button>
-            </div>
           </div>
         </div>
 

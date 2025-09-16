@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { TabType } from '../types';
 import MobileNav from '../components/MobileNav';
+import TopLogo from '../components/TopLogo';
 import ExportDashboard from '../components/export/ExportDashboard';
 import ChoixDeLexport from '../components/export/ChoixDeLexport';
 import Export2Specialiste from '../components/export/Export2Specialiste';
@@ -128,6 +129,7 @@ const Export = () => {
   if (currentPage === 'export-choice') {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
+        <TopLogo />
         <div className="w-full max-w-[393px] min-h-screen relative">
           <ChoixDeLexport
             onBack={handleBackToDashboard}
@@ -143,6 +145,7 @@ const Export = () => {
   if (currentPage === 'last-appointment') {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
+        <TopLogo />
         <div className="w-full max-w-[393px] min-h-screen relative">
           <Export2Specialiste
             onBack={handleBackFromLastAppointment}
@@ -158,6 +161,7 @@ const Export = () => {
   if (currentPage === 'next-appointment') {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
+        <TopLogo />
         <div className="w-full max-w-[393px] min-h-screen relative">
           <Export2SpecialisteNext
             onBack={handleBackFromNextAppointment}
@@ -173,6 +177,7 @@ const Export = () => {
   if (currentPage === 'loading') {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
+        <TopLogo />
         <div className="w-full max-w-[393px] min-h-screen relative">
           <LoadingScreen
             onComplete={handleLoadingComplete}
@@ -186,6 +191,7 @@ const Export = () => {
   if (currentPage === 'personal-choice') {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
+        <TopLogo />
         <div className="w-full max-w-[393px] min-h-screen relative">
           <PersonalChoice
             onBack={handleBackFromPersonalChoice}
@@ -201,6 +207,7 @@ const Export = () => {
   if (currentPage === 'personal-setup') {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
+        <TopLogo />
         <div className="w-full max-w-[393px] min-h-screen relative">
           <PersonalSetup
             onBack={handleBackFromPersonalSetup}
@@ -216,6 +223,7 @@ const Export = () => {
   if (currentPage === 'personal-loading') {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
+        <TopLogo />
         <div className="w-full max-w-[393px] min-h-screen relative">
           <LoadingScreen
             onComplete={handlePersonalLoadingComplete}
@@ -229,6 +237,7 @@ const Export = () => {
   // Default dashboard view
   return (
     <div className="min-h-screen bg-[#F8F8F8] flex items-center justify-center">
+      <TopLogo />
       <div className="w-full max-w-[393px] min-h-screen relative">
         <ExportDashboard
           onCreateReport={handleCreateReport}
