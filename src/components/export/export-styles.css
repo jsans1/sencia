@@ -1,11 +1,20 @@
 /* Export Dashboard Styles */
 .export-dashboard {
   min-height: 100vh;
-  background: #F8F8F8;
+  background: transparent;
   display: flex;
   flex-direction: column;
   position: relative;
   padding-bottom: 80px; /* Space for mobile nav */
+}
+
+/* Override sticky positioning for TopLogo in export pages */
+.export-dashboard .top-logo-container,
+.export-choice-container .top-logo-container,
+.export-form-container .top-logo-container,
+.loading-container .top-logo-container {
+  position: static !important;
+  top: auto !important;
 }
 
 .export-dashboard-content {
@@ -248,7 +257,7 @@
 /* Create Report Button */
 .create-report-button {
   position: fixed;
-  bottom: 140px; /* Above mobile nav */
+  bottom: 80px; /* Further reduced space above mobile nav */
   left: 50%;
   transform: translateX(-50%);
   width: 361px;
@@ -324,7 +333,7 @@
 /* Export Choice Styles */
 .export-choice-container {
   min-height: 100vh;
-  background: white;
+  background: transparent;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -510,7 +519,7 @@
 /* Export Form Styles */
 .export-form-container {
   min-height: 100vh;
-  background: white;
+  background: transparent;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -656,7 +665,7 @@
 /* Loading Screen Styles */
 .loading-container {
   min-height: 100vh;
-  background: white;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;

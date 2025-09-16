@@ -25,6 +25,7 @@ const Export2SpecialisteNext: React.FC<Export2SpecialisteNextProps> = ({
 
   return (
     <div className="export-form-container">
+      <div className="export-background" />
       
       <div className="export-header">
         <button className="back-button" onClick={onBack}>

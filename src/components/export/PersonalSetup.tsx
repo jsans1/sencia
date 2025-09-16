@@ -41,6 +41,7 @@ const PersonalSetup: React.FC<PersonalSetupProps> = ({
 
   return (
     <div className="export-form-container">
+      <div className="export-background" />
       <div className="export-header">
         <button className="back-button" onClick={onBack}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">

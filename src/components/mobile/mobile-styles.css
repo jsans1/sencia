@@ -280,6 +280,29 @@
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
+/* Simple Chart Card Styles */
+.homepage-chart-card-simple {
+  background: white;
+  border-radius: 20px;
+  padding: 16px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.homepage-chart-simple {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.homepage-chart-simple img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+
 .homepage-biomarkers-header {
   display: flex;
   align-items: center;
@@ -652,11 +675,16 @@
   right: 0;
   padding: 12px 24px calc(env(safe-area-inset-bottom) + 12px);
   z-index: 10;
+  /* Ensure button is visible above Safari navbar */
+  padding-bottom: max(12px, env(safe-area-inset-bottom) + 12px);
 }
 
 .bottom-actions.solid {
   background: #FFFFFF;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
+  /* Add backdrop blur for better visibility over content */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .primary-button {
@@ -950,26 +978,28 @@
 
 /* Step Content */
 .step-content {
-  padding: 24px;
+  padding: 16px;
   min-height: calc(100vh - 200px);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  /* Add bottom padding to account for fixed button */
+  padding-bottom: calc(80px + env(safe-area-inset-bottom));
 }
 
 .step-title {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 700;
   color: #000;
-  margin: 24px 0;
+  margin: 8px 0 4px 0;
   line-height: 1.2;
 }
 
 .step-subtitle {
-  font-size: 17px;
+  font-size: 15px;
   color: #8E8E93;
-  margin-bottom: 32px;
+  margin-bottom: 8px;
   line-height: 1.4;
 }
 
@@ -1376,10 +1406,24 @@
   
   .bottom-actions {
     padding: 16px 16px calc(env(safe-area-inset-bottom) + 16px);
+    /* Ensure button is visible above Safari navbar on smaller screens */
+    padding-bottom: max(16px, env(safe-area-inset-bottom) + 16px);
   }
   
   .step-content {
-    padding: 16px;
+    padding: 12px;
+    /* Add bottom padding to account for fixed button on smaller screens */
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+  
+  .step-title {
+    font-size: 20px;
+    margin: 6px 0 3px 0;
+  }
+  
+  .step-subtitle {
+    font-size: 14px;
+    margin-bottom: 8px;
   }
   
   /* Homepage Responsive Styles */
@@ -1505,6 +1549,16 @@
     font-size: 18px;
   }
   
+  .step-title {
+    font-size: 18px;
+    margin: 6px 0 4px 0;
+  }
+  
+  .step-subtitle {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+  
   .homepage-daily-checkin {
     padding: 14px;
     margin: 0 12px 14px 12px;
@@ -1521,6 +1575,11 @@
     margin-right: -12px;
     border-radius: 14px;
     padding: 10px;
+  }
+  
+  .homepage-chart-card-simple {
+    padding: 12px;
+    border-radius: 16px;
   }
   
   .homepage-status-card {
@@ -1611,6 +1670,16 @@
     font-size: 16px;
   }
   
+  .step-title {
+    font-size: 16px;
+    margin: 4px 0 2px 0;
+  }
+  
+  .step-subtitle {
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+  
   .homepage-daily-checkin {
     padding: 12px;
     margin: 0 10px 12px 10px;
@@ -1627,6 +1696,11 @@
     margin-right: -10px;
     border-radius: 12px;
     padding: 8px;
+  }
+  
+  .homepage-chart-card-simple {
+    padding: 10px;
+    border-radius: 14px;
   }
   
   .homepage-status-card {
@@ -1680,6 +1754,11 @@
     margin-right: -16px;
     border-radius: 16px;
     padding: 12px;
+  }
+  
+  .homepage-chart-card-simple {
+    padding: 8px;
+    border-radius: 12px;
   }
   
   /* Insight cards responsive */

@@ -128,8 +128,7 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
         navigate("/app/export");
         break;
       case "profile":
-        // Navigate to profile when implemented
-        alert("Profil sera disponible dans une future version");
+        navigate("/app/profile");
         break;
       default:
         break;
@@ -576,7 +575,7 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
           <div className="homepage-section-title">Vos biomarqueurs</div>
           <button className="homepage-see-more-button">Voir plus</button>
         </div>
-        <div className="homepage-chart-card w-full">
+        <div className="homepage-chart-card-simple w-full">
           <div className="flex gap-3 items-center justify-start w-full mb-4">
             <div className="font-['SF_Pro_Display:Medium',_sans-serif] text-[16px] text-black flex-1">
               <p className="leading-[1.2]">Pression artérielle</p>
@@ -600,56 +599,12 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
               </svg>
             </div>
           </div>
-          <div className="homepage-chart-inner w-full">
-            <div className="flex h-[120px] items-start w-full">
-              <div className="flex flex-col font-['SF_Pro_Display:Regular',_sans-serif] h-[100px] items-start justify-between text-[#45413e] text-[10px] w-[40px] flex-shrink-0">
-                <div className="w-full">
-                  <p className="leading-[1.2]">160/100</p>
-                </div>
-                <div className="w-full">
-                  <p className="leading-[1.2]">140/90</p>
-                </div>
-                <div className="w-full">
-                  <p className="leading-[1.2]">120/80</p>
-                </div>
-                <div className="w-full">
-                  <p className="leading-[1.2]">90/60</p>
-                </div>
-              </div>
-              <div className="flex flex-col gap-2 flex-1 h-[120px] items-end justify-end relative ml-2">
-                <div className="flex items-start justify-between text-[#45413e] text-[11px] w-full">
-                  <div className="font-['SF_Pro_Display:Light',_sans-serif]">
-                    <p className="leading-[1.2]">Tue 27</p>
-                  </div>
-                  <div className="font-['SF_Pro_Display:Light',_sans-serif]">
-                    <p className="leading-[1.2]">Tue 3</p>
-                  </div>
-                  <div className="font-['SF_Pro_Display:Light',_sans-serif]">
-                    <p className="leading-[1.2]">Tue 10</p>
-                  </div>
-                  <div className="font-['SF_Pro_Display:Medium',_sans-serif]">
-                    <p className="leading-[1.2]">Tue 17</p>
-                  </div>
-                </div>
-                <div className="homepage-chart-svg-container w-full h-[60px] relative">
-                  <svg
-                    className="w-full h-full"
-                    fill="none"
-                    preserveAspectRatio="none"
-                    viewBox="0 0 200 60"
-                  >
-                    <path
-                      d="M10,50 Q50,20 90,35 T170,25"
-                      stroke="#0E7AFE"
-                      strokeWidth="2.5"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
+          <div className="homepage-chart-simple w-full">
+            <img 
+              src="/src/assets/chart.svg" 
+              alt="Blood pressure chart" 
+              className="w-full h-auto"
+            />
           </div>
         </div>
       </div>

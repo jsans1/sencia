@@ -35,6 +35,7 @@ const Export2Specialiste: React.FC<Export2SpecialisteProps> = ({
 
   return (
     <div className="export-form-container">
+      <div className="export-background" />
       
       <div className="export-header">
         <button className="back-button" onClick={onBack}>

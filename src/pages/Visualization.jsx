@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import fakeProfile from '../fakeProfile';
 import MobileNav from '../components/MobileNav';
 import GradientBackground from '../components/mobile/GradientBackground';
+import TopLogo from '../components/TopLogo';
+import { getDataForPeriod, getAvailableDateRanges } from '../services/dataService';
 import '../App.css';
 
 const formatDateRange = (tab, data, dateRangeIndex = 0) => {
@@ -140,33 +142,41 @@ const Visualization = () => {
   const { handleAdd } = useOutletContext() || {};
   const [tab, setTab] = useState('Mois');
   const [dateRangeIndex, setDateRangeIndex] = useState(0);
-  const allData = fakeProfile.monthData || [];
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [bounds, setBounds] = useState({ minIndex: 0, maxIndex: 0 });
   
-  // Compute navigation bounds and clamp the index
-  const bounds = getNavigationBounds(allData.length, tab);
+  // User ID - in a real app, this would come from authentication
+  const userId = "1e8e1b2c-1234-4a5b-8cde-123456789abc";
+  
+  // Load data when tab or dateRangeIndex changes
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const newData = await getDataForPeriod(tab, dateRangeIndex, userId);
+        setData(newData);
+        
+        // Update bounds based on available data ranges
+        const availableRanges = getAvailableDateRanges(tab, userId);
+        setBounds({
+          minIndex: availableRanges.min,
+          maxIndex: availableRanges.max
+        });
+      } catch (error) {
+        console.error('Error loading data:', error);
+        // Fallback to fake data
+        setData(fakeProfile.monthData || []);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [tab, dateRangeIndex, userId]);
+  
+  // Clamp the date range index to valid bounds
   const clampedDateRangeIndex = clampDateRangeIndex(dateRangeIndex, bounds);
-  
-  // Get filtered data based on current tab and clamped date range
-  let data = allData;
-  switch(tab) {
-    case 'Jour':
-      data = getDayData(allData, clampedDateRangeIndex);
-      break;
-    case 'Semaine':
-      data = getWeekData(allData, clampedDateRangeIndex);
-      break;
-    case 'Mois':
-      data = getMonthData(allData, clampedDateRangeIndex);
-      break;
-    case 'Trimestre':
-      data = getQuarterData(allData, clampedDateRangeIndex);
-      break;
-    case 'Année':
-      data = getYearData(allData, clampedDateRangeIndex);
-      break;
-    default:
-      data = allData;
-  }
 
   // Calculate dynamic metrics based on filtered data
   const adherence = data.length > 0 ? percent(countBy(data, 'traitement_suivi', true), data.length) : 88;
@@ -177,6 +187,15 @@ const Visualization = () => {
   // Health score calculation based on filtered data metrics
   const baseHealthScore = Math.round(85 + (adherence - 80) * 0.5 - (stressEvents * 2));
   const healthScore = Math.min(100, Math.max(0, baseHealthScore));
+  
+  // Determine card state based on health score
+  const getCardState = (score) => {
+    if (score >= 75) return 'good';
+    if (score >= 40) return 'warning';
+    return 'danger';
+  };
+  
+  const cardState = getCardState(healthScore);
   
   // Blood pressure simulation based on filtered data characteristics
   const avgActivityLevel = data.length > 0 ? sumBy(data, 'activite_physique') / data.length : 2;
@@ -225,21 +244,20 @@ const Visualization = () => {
   };
 
   const handlePrevDateRange = () => {
-    setDateRangeIndex(prev => Math.max(bounds.minIndex, prev - 1));
+    const newIndex = Math.max(bounds.minIndex, dateRangeIndex - 1);
+    setDateRangeIndex(newIndex);
   };
 
   const handleNextDateRange = () => {
-    setDateRangeIndex(prev => Math.min(bounds.maxIndex, prev + 1));
+    const newIndex = Math.min(bounds.maxIndex, dateRangeIndex + 1);
+    setDateRangeIndex(newIndex);
   };
 
   return (
     <div className="new-viz-container">
       <GradientBackground />
       
-      {/* Header with Logo */}
-      <div className="new-viz-header">
-        <div className="new-viz-logo">sencia</div>
-      </div>
+      <TopLogo />
 
       {/* Time Period Filter Chips */}
       <div className="new-viz-filter-bar">
@@ -279,17 +297,26 @@ const Visualization = () => {
 
       {/* Main Content */}
       <div className="new-viz-content">
-        {/* Main Health Score */}
-        <div className="new-viz-main-card">
-          <h2 className="new-viz-main-title">Évolution de votre état général</h2>
-          <div className="new-viz-score">
-            <span className="new-viz-score-number">{healthScore}</span>
-            <span className="new-viz-score-total">/100</span>
+        {loading && (
+          <div className="new-viz-loading">
+            <div className="new-viz-loading-spinner"></div>
+            <p>Chargement des données...</p>
           </div>
-          <p className="new-viz-description">
-            {getPeriodDescription(tab, adherence, clampedDateRangeIndex)}
-          </p>
-        </div>
+        )}
+        
+        {!loading && (
+          <>
+            {/* Main Health Score */}
+            <div className={`new-viz-main-card new-viz-main-card--${cardState}`}>
+              <h2 className="new-viz-main-title">Évolution de votre état général</h2>
+              <div className="new-viz-score">
+                <span className="new-viz-score-number">{healthScore}</span>
+                <span className="new-viz-score-total">/100</span>
+              </div>
+              <p className="new-viz-description">
+                {getPeriodDescription(tab, adherence, clampedDateRangeIndex)}
+              </p>
+            </div>
 
         {/* Health Metrics Row */}
         <div className="new-viz-metrics-row">
@@ -324,20 +351,20 @@ const Visualization = () => {
               <div className="new-viz-data-value">env. {sommeilHeures}h</div>
             </div>
           </div>
-        </div>
-
-        {/* Status Indicators */}
-        <div className="new-viz-status-row">
-          <div className="new-viz-status-item">
-            <div className="new-viz-status-label">ALERTES</div>
-            <div className="new-viz-status-value good">
-              <span className="new-viz-status-icon">✓</span>
-              Aucune
+          
+          {/* Status Indicators */}
+          <div className="new-viz-status-row">
+            <div className="new-viz-status-item">
+              <div className="new-viz-status-label">ALERTES</div>
+              <div className="new-viz-status-value good">
+                <span className="new-viz-status-icon">✓</span>
+                Aucune
+              </div>
             </div>
-          </div>
-          <div className="new-viz-status-item">
-            <div className="new-viz-status-label">PROGRESSION</div>
-            <div className="new-viz-status-value stable">Stable</div>
+            <div className="new-viz-status-item">
+              <div className="new-viz-status-label">PROGRESSION</div>
+              <div className="new-viz-status-value stable">Stable</div>
+            </div>
           </div>
         </div>
 
@@ -361,6 +388,8 @@ const Visualization = () => {
             </div>
           </div>
         </div>
+          </>
+        )}
       </div>
 
       <MobileNav active="Explore" onNav={handleNav} onAdd={handleAdd} />

@@ -78,7 +78,7 @@ export default function LoggingFlow() {
                 />
               </div>
             </div>
-            <button className="nav-close" onClick={() => navigate('/onboarding')}>
+            <button className="nav-close" onClick={() => navigate('/app')}>
               ✕
             </button>
           </div>
@@ -228,7 +228,7 @@ const MoodScreen = ({ value, onChange, onContinue }) => {
 
   return (
     <>
-      <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+      <div style={{ textAlign: 'center', marginBottom: '16px' }}>
         <h2 className="step-title">
           Comment vous sentez-vous ce matin Alima ?
         </h2>
@@ -240,10 +240,10 @@ const MoodScreen = ({ value, onChange, onContinue }) => {
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center', 
-        height: '450px',
+        height: '320px',
         justifyContent: 'center',
         position: 'relative',
-        marginBottom: '80px'
+        marginBottom: '40px'
       }}>
         <div style={{ fontSize: '14px', marginBottom: '20px', color: 'black' }}>Très bien</div>
         
@@ -251,7 +251,7 @@ const MoodScreen = ({ value, onChange, onContinue }) => {
           ref={sliderRef}
           style={{ 
             width: '38px', 
-            height: '327px', 
+            height: '240px', 
             background: 'linear-gradient(to bottom, #62ffa4, #ffb48b, #ff5d5d)', 
             borderRadius: '19px',
             position: 'relative',
@@ -314,14 +314,14 @@ const SymptomsScreen = ({ selectedSymptoms, customSymptoms, onSymptomsChange, on
 
   return (
     <>
-      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+      <div style={{ textAlign: 'center', marginBottom: '8px' }}>
         <h2 className="step-title">
           Avez-vous eu les symptômes suivants aujourd'hui ?
         </h2>
         <p className="step-subtitle">Sélectionnez les symptômes que vous avez ressenti aujourd'hui. Si vous n'en avez eu aucun, cliquez sur Suivant.</p>
       </div>
 
-      <div style={{ display: 'flex', width: '353px', alignItems: 'flex-start', alignContent: 'flex-start', gap: '9px', flexWrap: 'wrap', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', width: '100%', maxWidth: '353px', alignItems: 'center', justifyContent: 'center', gap: '9px', flexWrap: 'wrap', marginBottom: '8px' }}>
         {symptoms.map((symptom, index) => (
           <button
             key={index}
@@ -348,8 +348,8 @@ const SymptomsScreen = ({ selectedSymptoms, customSymptoms, onSymptomsChange, on
         ))}
       </div>
 
-      <div style={{ marginBottom: '40px' }}>
-        <label style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', display: 'block' }}>
+      <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+        <label style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', display: 'block', textAlign: 'center' }}>
           Ajoutez d'autres symptômes ressentis
         </label>
         <input
@@ -359,31 +359,22 @@ const SymptomsScreen = ({ selectedSymptoms, customSymptoms, onSymptomsChange, on
           onChange={(e) => onCustomChange(e.target.value)}
           style={{
             width: '100%',
+            maxWidth: '353px',
             padding: '12px 16px',
             borderRadius: '20px',
             border: '1px solid #e0e0e0',
             fontSize: '16px',
-            backgroundColor: 'white'
+            backgroundColor: 'white',
+            textAlign: 'center'
           }}
         />
       </div>
 
-      <button 
-        onClick={onContinue}
-        style={{
-          width: '100%',
-          height: '52px',
-          borderRadius: '20px',
-          border: '1px solid #ececec',
-          backgroundColor: '#212121',
-          color: 'white',
-          fontSize: '16px',
-          fontWeight: '500',
-          cursor: 'pointer'
-        }}
-      >
-        Continuer
-      </button>
+      <BottomActions 
+        primaryLabel="Continuer"
+        onPrimary={onContinue}
+        solidBackground={true}
+      />
     </>
   )
 }
@@ -532,23 +523,12 @@ const BloodPressureScreen = ({ data, onChange, onContinue }) => {
         </div>
       </div>
 
-      <button 
-        onClick={onContinue}
-        disabled={!hasRequiredData}
-        style={{
-          width: '100%',
-          height: '52px',
-          borderRadius: '20px',
-          border: '1px solid #ececec',
-          backgroundColor: hasRequiredData ? '#212121' : '#d9d9d9',
-          color: hasRequiredData ? 'white' : '#a0a0a0',
-          fontSize: '16px',
-          fontWeight: '500',
-          cursor: hasRequiredData ? 'pointer' : 'not-allowed'
-        }}
-      >
-        Continuer
-      </button>
+      <BottomActions 
+        primaryLabel="Continuer"
+        onPrimary={onContinue}
+        primaryDisabled={!hasRequiredData}
+        solidBackground={true}
+      />
     </>
   )
 }
@@ -805,14 +785,14 @@ const ConsumptionScreen = ({ selectedItems, customItems, onItemsChange, onCustom
 
   return (
     <>
-      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+      <div style={{ textAlign: 'center', marginBottom: '8px' }}>
         <h2 className="step-title">
           Avez-vous consommé l'un des éléments suivants aujourd'hui ?
         </h2>
         <p className="step-subtitle">Sélectionnez les symptômes que vous avez ressenti aujourd'hui.</p>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px', alignItems: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px', alignItems: 'center', width: '100%' }}>
         {items.map((item, index) => (
           <button
             key={index}
@@ -837,8 +817,8 @@ const ConsumptionScreen = ({ selectedItems, customItems, onItemsChange, onCustom
         ))}
       </div>
 
-      <div style={{ marginBottom: '40px' }}>
-        <label style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', display: 'block' }}>
+      <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+        <label style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', display: 'block', textAlign: 'center' }}>
           D'autres aliments consommés ?
         </label>
         <input
@@ -848,31 +828,22 @@ const ConsumptionScreen = ({ selectedItems, customItems, onItemsChange, onCustom
           onChange={(e) => onCustomChange(e.target.value)}
           style={{
             width: '100%',
+            maxWidth: '353px',
             padding: '12px 16px',
             borderRadius: '20px',
             border: '1px solid #e0e0e0',
             fontSize: '16px',
-            backgroundColor: 'white'
+            backgroundColor: 'white',
+            textAlign: 'center'
           }}
         />
       </div>
 
-      <button 
-        onClick={onContinue}
-        style={{
-          width: '100%',
-          height: '52px',
-          borderRadius: '20px',
-          border: '1px solid #ececec',
-          backgroundColor: '#212121',
-          color: 'white',
-          fontSize: '16px',
-          fontWeight: '500',
-          cursor: 'pointer'
-        }}
-      >
-        Continuer
-      </button>
+      <BottomActions 
+        primaryLabel="Continuer"
+        onPrimary={onContinue}
+        solidBackground={true}
+      />
     </>
   )
 }
@@ -1286,26 +1257,12 @@ const StressScreen = ({ value, onChange, onContinue }) => {
       </div>
 
       {/* Final button says "Terminer" */}
-      <div style={{ padding: '16px 0' }}>
-        <button 
-          onClick={onContinue}
-          disabled={!hasInteracted}
-          style={{
-            width: '100%',
-            height: '52px',
-            borderRadius: '20px',
-            border: '1px solid #ececec',
-            backgroundColor: hasInteracted ? '#212121' : '#d9d9d9',
-            color: hasInteracted ? 'white' : '#a0a0a0',
-            fontSize: '16px',
-            fontWeight: '500',
-            cursor: hasInteracted ? 'pointer' : 'not-allowed',
-            transition: 'all 0.2s'
-          }}
-        >
-          Terminer
-        </button>
-      </div>
+      <BottomActions 
+        primaryLabel="Terminer"
+        onPrimary={onContinue}
+        primaryDisabled={!hasInteracted}
+        solidBackground={true}
+      />
     </>
   )
 }

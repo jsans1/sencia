@@ -16,6 +16,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
 
   return (
     <div className="loading-container">
+      <div className="export-background" />
       
       <div className="loading-content">
         <div className="loading-spinner">

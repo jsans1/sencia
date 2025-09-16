@@ -22,6 +22,7 @@ const PersonalChoice: React.FC<PersonalChoiceProps> = ({
 
   return (
     <div className="export-choice-container">
+      <div className="export-background" />
       <div className="export-header">
         <button className="back-button" onClick={onBack}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">

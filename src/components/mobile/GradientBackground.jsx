@@ -8,12 +8,12 @@ export default function GradientBackground() {
         pointerEvents: 'none'
       }}
     >
-      {/* Base background */}
+      {/* Base background - white */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          background: '#FFFFFF'
+          background: '#ffffff'
         }}
       />
 

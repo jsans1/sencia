@@ -1564,17 +1564,33 @@ body {
   letter-spacing: -0.5px;
 }
 
+.new-viz-logo-img {
+  height: 32px;
+  width: auto;
+}
+
 .new-viz-filter-bar {
   display: flex;
   gap: 8px;
   margin: 0 24px 32px 24px;
-  justify-content: center;
+  justify-content: flex-start;
   position: relative;
   z-index: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch; /* Scroll fluide sur mobile */
+  scrollbar-width: none; /* Cache la scrollbar sur Firefox */
+  -ms-overflow-style: none; /* Cache la scrollbar sur IE */
+}
+
+/* Cache la scrollbar sur Chrome/Safari */
+.new-viz-filter-bar::-webkit-scrollbar {
+  display: none;
 }
 
 .new-viz-filter-chip {
-  background: #F3F4F6;
+  background: transparent;
   border: none;
   border-radius: 20px;
   padding: 8px 16px;
@@ -1583,7 +1599,7 @@ body {
   color: #6B7280;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 60px;
+  width: fit-content;
 }
 
 .new-viz-filter-chip.active {
@@ -1634,11 +1650,11 @@ body {
 }
 
 .new-viz-main-card {
-  background: #fff;
+  background: linear-gradient(90deg, #DEF5E9 0%, #FFF 57.21%);
+  border: 0.5px solid rgba(7, 146, 75, 0.20);
   border-radius: 20px;
   padding: 24px;
   margin-bottom: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -1734,25 +1750,40 @@ body {
 
 .new-viz-data-row {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  flex-direction: row;
+  gap: 0;
+  position: relative;
 }
 
 .new-viz-data-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  flex: 1;
+  padding: 0 16px;
+}
+
+.new-viz-data-item:first-child::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 20px;
+  bottom: 20px;
+  width: 1px;
+  background-color: #D1D1D1;
 }
 
 .new-viz-data-label {
   font-size: 14px;
   color: #6B7280;
-  min-width: 80px;
   font-weight: 500;
+  text-align: center;
 }
 
 .new-viz-progress-bar {
-  flex: 1;
+  width: 100%;
+  max-width: 120px;
   height: 8px;
   background: #E5E7EB;
   border-radius: 4px;
@@ -1770,14 +1801,15 @@ body {
   font-size: 14px;
   font-weight: 600;
   color: #111;
-  min-width: 60px;
-  text-align: right;
+  text-align: center;
 }
 
 .new-viz-status-row {
   display: flex;
   gap: 16px;
-  margin-bottom: 32px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #D1D1D1;
 }
 
 .new-viz-status-item {
@@ -1822,7 +1854,11 @@ body {
 }
 
 .new-viz-variability-section {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
   margin-bottom: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .new-viz-variability-title {

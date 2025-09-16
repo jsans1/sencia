@@ -19,6 +19,12 @@ const Export = () => {
   const { handleAdd } = useOutletContext() || {};
   const [currentPage, setCurrentPage] = useState<CurrentPage>('dashboard');
 
+  // Helper function to open PDF report in new tab
+  const openReportPDF = () => {
+    const pdfPath = '/src/assets/Rapport-Loris-Duchamp.pdf';
+    window.open(pdfPath, '_blank');
+  };
+
   const handleNav = (page: string) => {
     switch (page) {
       case 'Home':
@@ -70,6 +76,7 @@ const Export = () => {
 
   const handleLoadingComplete = () => {
     setCurrentPage('dashboard');
+    openReportPDF();
   };
 
   const handleBackFromLastAppointment = () => {
@@ -101,6 +108,7 @@ const Export = () => {
   const handleReportClick = (reportTitle: string) => {
     // Handle report click
     console.log('Report clicked:', reportTitle);
+    openReportPDF();
   };
 
   const handlePersonalChoiceContinue = (type: 'health-summary' | 'detailed-report') => {
@@ -123,6 +131,7 @@ const Export = () => {
 
   const handlePersonalLoadingComplete = () => {
     setCurrentPage('dashboard');
+    openReportPDF();
   };
 
   // Render different pages based on current state

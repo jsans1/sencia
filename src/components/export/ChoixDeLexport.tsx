@@ -22,6 +22,7 @@ const ChoixDeLexport: React.FC<ChoixDeLexportProps> = ({
 
   return (
     <div className="export-choice-container">
+      <div className="export-background" />
       
       {/* Header */}
       <div className="export-header">
