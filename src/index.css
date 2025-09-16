@@ -12,21 +12,21 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
 
-  @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  /* Minimal base reset to let Tailwind styles drive the UI */
-  html,
-  body,
-  #root {
-    height: 100%;
+/* Minimal base reset to let Tailwind styles drive the UI */
+html,
+body,
+#root {
+  height: 100%;
+}
 
-  }
-
-  body {
-    margin: 0;
-    background: transparent;
-    font-family: "SF Pro Display", -apple-system, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  }
+body {
+  margin: 0;
+  background: transparent;
+  font-family: "SF Pro Display", -apple-system, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
