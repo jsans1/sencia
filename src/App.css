@@ -1553,6 +1553,8 @@ body {
   justify-content: center;
   align-items: center;
   padding: 24px 0 32px 0;
+  position: relative;
+  z-index: 1;
 }
 
 .new-viz-logo {
@@ -1567,6 +1569,8 @@ body {
   gap: 8px;
   margin: 0 24px 32px 24px;
   justify-content: center;
+  position: relative;
+  z-index: 1;
 }
 
 .new-viz-filter-chip {
@@ -1592,6 +1596,8 @@ body {
   align-items: center;
   justify-content: center;
   margin: 0 24px 32px 24px;
+  position: relative;
+  z-index: 1;
   gap: 16px;
 }
 
@@ -1623,6 +1629,8 @@ body {
 
 .new-viz-content {
   padding: 0 24px;
+  position: relative;
+  z-index: 1;
 }
 
 .new-viz-main-card {
