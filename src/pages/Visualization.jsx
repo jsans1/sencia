@@ -5,37 +5,32 @@ import MobileNav from '../components/MobileNav';
 import GradientBackground from '../components/mobile/GradientBackground';
 import '../App.css';
 
-const formatDateRange = (tab, dateRangeIndex = 0) => {
+const formatDateRange = (tab, data, dateRangeIndex = 0) => {
   const months = [
     'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
     'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
   ];
   
-  const baseDate = new Date(2024, 0, 20); // January 20, 2024
-  const startDate = new Date(baseDate);
-  const endDate = new Date(baseDate);
+  if (!data || data.length === 0) {
+    return 'Aucune donnée';
+  }
   
-  // Adjust date range based on period and index
+  // Use actual data dates for accurate labeling
+  const startDateStr = data[0].date;
+  const endDateStr = data[data.length - 1].date;
+  const startDate = new Date(startDateStr);
+  const endDate = new Date(endDateStr);
+  
   switch(tab) {
     case 'Jour':
-      startDate.setDate(baseDate.getDate() + dateRangeIndex);
       return `${startDate.getDate()} ${months[startDate.getMonth()]}`;
     case 'Semaine':
-      startDate.setDate(baseDate.getDate() + (dateRangeIndex * 7));
-      endDate.setDate(baseDate.getDate() + (dateRangeIndex * 7) + 6);
-      return `${startDate.getDate()} ${months[startDate.getMonth()]} — ${endDate.getDate()} ${months[endDate.getMonth()]}`;  
+      return `${startDate.getDate()} ${months[startDate.getMonth()]} — ${endDate.getDate()} ${months[endDate.getMonth()]}`;
     case 'Trimestre':
-      startDate.setMonth(baseDate.getMonth() + (dateRangeIndex * 3));
-      endDate.setMonth(startDate.getMonth() + 2);
-      endDate.setDate(new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate());
       return `${startDate.getDate()} ${months[startDate.getMonth()]} — ${endDate.getDate()} ${months[endDate.getMonth()]}`;
     case 'Année':
-      startDate.setFullYear(baseDate.getFullYear() + dateRangeIndex);
       return `${startDate.getFullYear()}`;
     default: // Mois
-      startDate.setMonth(baseDate.getMonth() + dateRangeIndex);
-      endDate.setMonth(startDate.getMonth());
-      endDate.setDate(new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate());
       return `${startDate.getDate()} ${months[startDate.getMonth()]} — ${endDate.getDate()} ${months[endDate.getMonth()]}`;
   }
 };
@@ -43,6 +38,38 @@ const formatDateRange = (tab, dateRangeIndex = 0) => {
 const countBy = (arr, key, value) => arr.filter((d) => d[key] === value).length;
 const sumBy = (arr, key) => arr.reduce((acc, d) => acc + (Number(d[key]) || 0), 0);
 const percent = (num, denom) => denom === 0 ? 0 : Math.round((num / denom) * 100);
+
+// Navigation bounds computation functions
+const getNavigationBounds = (dataLength, tab) => {
+  let minIndex, maxIndex = 0;
+  
+  switch(tab) {
+    case 'Jour':
+      minIndex = -(dataLength - 1);
+      break;
+    case 'Semaine':
+      minIndex = dataLength >= 7 ? -(Math.ceil(dataLength / 7) - 1) : 0;
+      break;
+    case 'Mois':
+      minIndex = dataLength >= 30 ? -(Math.ceil(dataLength / 30) - 1) : 0;
+      break;
+    case 'Trimestre':
+      minIndex = dataLength >= 90 ? -(Math.ceil(dataLength / 90) - 1) : 0;
+      break;
+    case 'Année':
+      minIndex = dataLength >= 365 ? -(Math.ceil(dataLength / 365) - 1) : 0;
+      break;
+    default:
+      minIndex = 0;
+  }
+  
+  return { minIndex, maxIndex };
+};
+
+// Clamp dateRangeIndex to valid bounds
+const clampDateRangeIndex = (index, bounds) => {
+  return Math.max(bounds.minIndex, Math.min(bounds.maxIndex, index));
+};
 
 // Data filtering functions
 const getDayData = (data, dateRangeIndex = 0) => {
@@ -115,23 +142,27 @@ const Visualization = () => {
   const [dateRangeIndex, setDateRangeIndex] = useState(0);
   const allData = fakeProfile.monthData || [];
   
-  // Get filtered data based on current tab and date range
+  // Compute navigation bounds and clamp the index
+  const bounds = getNavigationBounds(allData.length, tab);
+  const clampedDateRangeIndex = clampDateRangeIndex(dateRangeIndex, bounds);
+  
+  // Get filtered data based on current tab and clamped date range
   let data = allData;
   switch(tab) {
     case 'Jour':
-      data = getDayData(allData, dateRangeIndex);
+      data = getDayData(allData, clampedDateRangeIndex);
       break;
     case 'Semaine':
-      data = getWeekData(allData, dateRangeIndex);
+      data = getWeekData(allData, clampedDateRangeIndex);
       break;
     case 'Mois':
-      data = getMonthData(allData, dateRangeIndex);
+      data = getMonthData(allData, clampedDateRangeIndex);
       break;
     case 'Trimestre':
-      data = getQuarterData(allData, dateRangeIndex);
+      data = getQuarterData(allData, clampedDateRangeIndex);
       break;
     case 'Année':
-      data = getYearData(allData, dateRangeIndex);
+      data = getYearData(allData, clampedDateRangeIndex);
       break;
     default:
       data = allData;
@@ -141,21 +172,35 @@ const Visualization = () => {
   const adherence = data.length > 0 ? percent(countBy(data, 'traitement_suivi', true), data.length) : 88;
   const stressEvents = countBy(data, 'stress_event', true);
   const qualiteSommeil = data.filter(d => d.sommeil === 'bon').length > data.length / 2 ? 'Bonne' : 'Moyenne';
-  const sommeilHeures = data.length > 0 ? Math.round(sumBy(data, 'sommeil_heures') / data.length * 10) / 10 : 6.5;
+  const sommeilHeures = data.length > 0 ? Math.round(sumBy(data, 'activite_physique') / data.length * 2.5 + 4.5) / 10 * 10 : 6.5;
   
-  // Health score calculation (simplified)
-  const healthScore = Math.min(100, Math.max(0, 
-    Math.round(85 + (adherence - 80) * 0.5 + (dateRangeIndex * -2))
-  ));
+  // Health score calculation based on filtered data metrics
+  const baseHealthScore = Math.round(85 + (adherence - 80) * 0.5 - (stressEvents * 2));
+  const healthScore = Math.min(100, Math.max(0, baseHealthScore));
   
-  // Blood pressure simulation
-  const systolic = 134 + (dateRangeIndex * 2) + (tab === 'Jour' ? Math.random() * 10 - 5 : 0);
-  const diastolic = 110 + (dateRangeIndex * 1) + (tab === 'Jour' ? Math.random() * 5 - 2.5 : 0);
-  const heartRate = 119 + (dateRangeIndex * 1) + (tab === 'Jour' ? Math.random() * 8 - 4 : 0);
+  // Blood pressure simulation based on filtered data characteristics
+  const avgActivityLevel = data.length > 0 ? sumBy(data, 'activite_physique') / data.length : 2;
+  const stressImpact = stressEvents > 0 ? stressEvents * 3 : 0;
+  const adherenceImpact = (adherence - 80) * -0.3;
   
-  // BP variability percentage
-  const bpVariability = Math.min(100, Math.max(0, 47 + (dateRangeIndex * 3)));
+  const baseSystolic = 134 + stressImpact + adherenceImpact - (avgActivityLevel * 2);
+  const baseDiastolic = 110 + (stressImpact * 0.6) + (adherenceImpact * 0.5) - avgActivityLevel;
+  const baseHeartRate = 119 + (stressImpact * 0.8) + (adherenceImpact * 0.4) - (avgActivityLevel * 1.5);
+  
+  const systolic = Math.round(baseSystolic + (tab === 'Jour' ? Math.random() * 10 - 5 : 0));
+  const diastolic = Math.round(baseDiastolic + (tab === 'Jour' ? Math.random() * 5 - 2.5 : 0));
+  const heartRate = Math.round(baseHeartRate + (tab === 'Jour' ? Math.random() * 8 - 4 : 0));
+  
+  // BP variability based on stress events and adherence
+  const baseVariability = 47 + (stressEvents * 8) + (adherence < 80 ? 15 : 0) - (avgActivityLevel * 3);
+  const bpVariability = Math.min(100, Math.max(0, Math.round(baseVariability)));
 
+  // Reset dateRangeIndex when tab changes to prevent invalid bounds
+  const handleTabChange = (newTab) => {
+    setTab(newTab);
+    setDateRangeIndex(0); // Reset to current period when switching tabs
+  };
+  
   // Nav handler
   const handleNav = (page) => {
     switch (page) {
@@ -180,11 +225,11 @@ const Visualization = () => {
   };
 
   const handlePrevDateRange = () => {
-    setDateRangeIndex(prev => Math.max(0, prev - 1));
+    setDateRangeIndex(prev => Math.max(bounds.minIndex, prev - 1));
   };
 
   const handleNextDateRange = () => {
-    setDateRangeIndex(prev => prev + 1);
+    setDateRangeIndex(prev => Math.min(bounds.maxIndex, prev + 1));
   };
 
   return (
@@ -202,7 +247,7 @@ const Visualization = () => {
           <button
             key={label}
             className={`new-viz-filter-chip ${tab === label ? 'active' : ''}`}
-            onClick={() => setTab(label)}
+            onClick={() => handleTabChange(label)}
           >
             {label}
           </button>
@@ -211,13 +256,23 @@ const Visualization = () => {
 
       {/* Date Range Selector */}
       <div className="new-viz-date-selector">
-        <button className="new-viz-date-arrow" onClick={handlePrevDateRange}>
+        <button 
+          className="new-viz-date-arrow" 
+          onClick={handlePrevDateRange}
+          disabled={clampedDateRangeIndex <= bounds.minIndex}
+          style={{opacity: clampedDateRangeIndex <= bounds.minIndex ? 0.5 : 1}}
+        >
           ‹
         </button>
         <div className="new-viz-date-range">
-          {formatDateRange(tab, dateRangeIndex)}
+          {formatDateRange(tab, data, clampedDateRangeIndex)}
         </div>
-        <button className="new-viz-date-arrow" onClick={handleNextDateRange}>
+        <button 
+          className="new-viz-date-arrow" 
+          onClick={handleNextDateRange}
+          disabled={clampedDateRangeIndex >= bounds.maxIndex}
+          style={{opacity: clampedDateRangeIndex >= bounds.maxIndex ? 0.5 : 1}}
+        >
           ›
         </button>
       </div>
@@ -232,7 +287,7 @@ const Visualization = () => {
             <span className="new-viz-score-total">/100</span>
           </div>
           <p className="new-viz-description">
-            {getPeriodDescription(tab, adherence, dateRangeIndex)}
+            {getPeriodDescription(tab, adherence, clampedDateRangeIndex)}
           </p>
         </div>
 
