@@ -318,8 +318,17 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
 
   // Health Status Card Component
   function HealthStatusCard({ icon, title, description, status, onClick }) {
+    const getStatusClass = (status) => {
+      switch(status) {
+        case 'good': return 'homepage-status-card-good';
+        case 'warning': return 'homepage-status-card-warning';
+        case 'error': return 'homepage-status-card-error';
+        default: return '';
+      }
+    };
+
     return (
-      <button onClick={onClick} className="homepage-status-card">
+      <button onClick={onClick} className={`homepage-status-card ${getStatusClass(status)}`}>
         <div className="homepage-status-icon">
               {icon}
                   </div>
@@ -421,63 +430,58 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
             Voir plus
               </button>
             </div>
-        <div className="bg-white rounded-[20px] p-4 w-full">
-              <div className="content-stretch flex gap-3 items-center justify-start relative shrink-0 w-full">
-                <div className="basis-0 font-['SF_Pro_Display:Medium',_sans-serif] grow leading-[0] min-h-px min-w-px not-italic relative shrink-0 text-[16px] text-black">
+        <div className="homepage-chart-card w-full">
+              <div className="flex gap-3 items-center justify-start w-full mb-4">
+                <div className="font-['SF_Pro_Display:Medium',_sans-serif] text-[16px] text-black flex-1">
                   <p className="leading-[1.2]">Pression artérielle</p>
                 </div>
-            <div className="relative shrink-0 w-4 h-4" data-name="icons_utilitary_leftsm">
-              <svg width="16" height="16" className="block" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
+                <div className="w-4 h-4 flex-shrink-0">
+                  <svg width="16" height="16" className="block" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
                     <g id="icons_utilitary_leftsm">
                       <path d={svgPaths.p1fc81300} fill="var(--fill-0, #0F0F0F)" id="Vector" />
                     </g>
                   </svg>
                 </div>
               </div>
-              <div className="content-stretch flex h-[152px] items-start justify-center relative shrink-0 w-full">
-                <div className="content-stretch flex flex-col font-['SF_Pro_Display:Regular',_sans-serif] h-[121px] items-start justify-between leading-[0] not-italic relative shrink-0 text-[#45413e] text-[10px] w-[42px]">
-                  <div className="relative shrink-0 w-full">
-                    <p className="leading-[1.2]">160/100</p>
-                  </div>
-                  <div className="relative shrink-0 w-full">
-                    <p className="leading-[1.2]">140/90</p>
-                  </div>
-                  <div className="relative shrink-0 w-full">
-                    <p className="leading-[1.2]">120/80</p>
-                  </div>
-                  <div className="relative shrink-0 w-full">
-                    <p className="leading-[1.2]">90/60</p>
-                  </div>
-                </div>
-                <div className="basis-0 content-stretch flex flex-col gap-3 grow h-[152px] items-end justify-end min-h-px min-w-px relative shrink-0">
-                  <div className="content-stretch flex items-start justify-between leading-[0] not-italic relative shrink-0 text-[#45413e] text-[11px] text-nowrap w-full">
-                    <div className="font-['SF_Pro_Display:Light',_sans-serif] relative shrink-0">
-                      <p className="leading-[1.2] text-nowrap whitespace-pre">Tue 27</p>
+              <div className="homepage-chart-inner w-full">
+                <div className="flex h-[120px] items-start w-full">
+                  <div className="flex flex-col font-['SF_Pro_Display:Regular',_sans-serif] h-[100px] items-start justify-between text-[#45413e] text-[10px] w-[40px] flex-shrink-0">
+                    <div className="w-full">
+                      <p className="leading-[1.2]">160/100</p>
                     </div>
-                    <div className="font-['SF_Pro_Display:Light',_sans-serif] relative shrink-0">
-                      <p className="leading-[1.2] text-nowrap whitespace-pre">Tue 3</p>
+                    <div className="w-full">
+                      <p className="leading-[1.2]">140/90</p>
                     </div>
-                    <div className="font-['SF_Pro_Display:Light',_sans-serif] relative shrink-0">
-                      <p className="leading-[1.2] text-nowrap whitespace-pre">Tue 10</p>
+                    <div className="w-full">
+                      <p className="leading-[1.2]">120/80</p>
                     </div>
-                    <div className="font-['SF_Pro_Display:Medium',_sans-serif] relative shrink-0">
-                      <p className="leading-[1.2] text-nowrap whitespace-pre">Tue 17</p>
+                    <div className="w-full">
+                      <p className="leading-[1.2]">90/60</p>
                     </div>
                   </div>
-                  <div className="absolute h-[61.267px] left-0 top-[18.37px] w-[266px]">
-                    <div className="absolute inset-[-1.63%_-0.31%_-1.63%_-0.28%]">
-                      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 268 64">
-                        <path d={svgPaths.p1b77c900} id="Vector 14" stroke="var(--stroke-0, black)" strokeWidth="2" />
+                  <div className="flex flex-col gap-2 flex-1 h-[120px] items-end justify-end relative ml-2">
+                    <div className="flex items-start justify-between text-[#45413e] text-[11px] w-full">
+                      <div className="font-['SF_Pro_Display:Light',_sans-serif]">
+                        <p className="leading-[1.2]">Tue 27</p>
+                      </div>
+                      <div className="font-['SF_Pro_Display:Light',_sans-serif]">
+                        <p className="leading-[1.2]">Tue 3</p>
+                      </div>
+                      <div className="font-['SF_Pro_Display:Light',_sans-serif]">
+                        <p className="leading-[1.2]">Tue 10</p>
+                      </div>
+                      <div className="font-['SF_Pro_Display:Medium',_sans-serif]">
+                        <p className="leading-[1.2]">Tue 17</p>
+                      </div>
+                    </div>
+                    <div className="homepage-chart-svg-container w-full h-[60px] relative">
+                      <svg className="w-full h-full" fill="none" preserveAspectRatio="none" viewBox="0 0 200 60">
+                        <path d="M10,50 Q50,20 90,35 T170,25" stroke="#0E7AFE" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
                   </div>
                 </div>
               </div>
-              <button className="absolute left-[319px] size-[9px] top-[97px] transition-transform hover:scale-125">
-                <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 9 9">
-                  <circle cx="4.5" cy="4.5" fill="var(--fill-0, black)" id="Ellipse 1496" r="4.5" />
-                </svg>
-              </button>
         </div>
       </div>
     )
@@ -485,94 +489,67 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
 
   function CarePlanInsight({ insightNumber, title, description, articles, category }) {
     return (
-      <div 
-        className="shrink-0 w-full max-w-[353px]" 
-        data-name="insights care plan"
-        style={{
-          display: 'flex',
-          padding: '16px',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'flex-start',
-          gap: '16px',
-          borderRadius: '20px',
-          border: '1px solid #A69BF8',
-          background: '#FFF'
-        }}
-      >
-        <>
-          <div className="content-stretch flex flex-col gap-4 items-start justify-center relative w-full">
-          <div className="content-stretch flex gap-1 items-center justify-start relative shrink-0">
-            <div className="relative shrink-0 size-3" data-name="Icons">
-              <svg width="12" height="12" className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 12 12">
-                <g clipPath="url(#clip0_1_1086)" id="Icons">
-                  <path d={svgPaths.pd74a700} id="Vector" stroke="url(#paint0_linear_1_1086)" strokeLinecap="round" strokeLinejoin="round" />
-                </g>
-                <defs>
-                  <linearGradient gradientUnits="userSpaceOnUse" id="paint0_linear_1_1086" x1="1.00049" x2="11.0008" y1="6.00006" y2="6.00006">
-                    <stop stopColor="#A69BF8" />
-                    <stop offset="1" stopColor="#0E7AFE" />
-                  </linearGradient>
-                  <clipPath id="clip0_1_1086">
-                    <rect fill="white" height="12" width="12" />
-                  </clipPath>
-                </defs>
-              </svg>
-            </div>
-            <div className="bg-clip-text bg-gradient-to-r font-['SF_Pro_Display:Medium',_sans-serif] from-[#a69bf8] leading-[0] not-italic relative shrink-0 text-[12px] text-nowrap to-[#0e7afe]" style={{ WebkitTextFillColor: "transparent" }}>
-              <p className="leading-[1.2] whitespace-pre">Insight {insightNumber}</p>
-            </div>
+      <div className="homepage-insight-card w-full">
+        <div className="homepage-insight-header">
+          <div className="homepage-insight-icon">
+            <svg width="12" height="12" className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 12 12">
+              <g clipPath="url(#clip0_1_1086)" id="Icons">
+                <path d={svgPaths.pd74a700} id="Vector" stroke="url(#paint0_linear_1_1086)" strokeLinecap="round" strokeLinejoin="round" />
+              </g>
+              <defs>
+                <linearGradient gradientUnits="userSpaceOnUse" id="paint0_linear_1_1086" x1="1.00049" x2="11.0008" y1="6.00006" y2="6.00006">
+                  <stop stopColor="#A69BF8" />
+                  <stop offset="1" stopColor="#0E7AFE" />
+                </linearGradient>
+                <clipPath id="clip0_1_1086">
+                  <rect fill="white" height="12" width="12" />
+                </clipPath>
+              </defs>
+            </svg>
           </div>
-          <div className="content-stretch flex gap-4 items-start justify-start relative shrink-0 w-full">
-            <div className="basis-0 content-stretch flex flex-col gap-0.5 grow items-start justify-start min-h-px min-w-px relative shrink-0">
-              <div className="content-stretch flex gap-3 items-center justify-start relative shrink-0 w-full">
-                <div className="basis-0 font-['SF_Pro_Display:Semibold',_sans-serif] grow leading-[0] min-h-px min-w-px not-italic relative shrink-0 text-[16px] text-black">
-                  <p className="leading-[1.2]">{title}</p>
-                </div>
-              </div>
-              <div className="content-stretch flex gap-3 items-center justify-start relative shrink-0 w-full">
-                <div className="basis-0 font-['SF_Pro_Display:Regular',_sans-serif] grow leading-[0] min-h-px min-w-px not-italic relative shrink-0 text-[#45413e] text-[12px]">
-                  <p className="leading-[1.2]">{description}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="relative shrink-0 w-full">
-            <div className="article-cards-scroll">
-              <div className="article-cards-container" data-name="List">
-                    {articles.map((article, index) => (
-                      <button 
-                        key={index}
-                        onClick={() => handleOpenArticle(article, category)}
-                        className="article-card bg-[#f6f6f6] flex flex-col h-[248.503px] items-start justify-start overflow-clip relative rounded-[12px] transition-transform hover:scale-105 cursor-pointer" 
-                        data-name="Mini Card"
-                        style={{ pointerEvents: 'auto' }}
-                      >
-                        <div className="bg-center bg-cover bg-no-repeat h-[112.503px] overflow-clip relative shrink-0 w-full" data-name="image" style={{ backgroundImage: `url('${article.image}')` }} />
-                        <div className="basis-0 bg-[#f6f6f6] grow min-h-px min-w-px relative shrink-0 w-full" data-name="Text">
-                          <div className="relative size-full">
-                        <div className="box-border flex flex-col items-start justify-between leading-[0] not-italic p-[16px] relative size-full">
-                          <div className="flex flex-col gap-1.5 items-start justify-start relative shrink-0" data-name="Title">
-                            <div className="font-['SF_Pro_Display:Medium',_sans-serif] relative shrink-0 text-[#0f0f0f] text-[16px] w-full">
-                                  <p className="leading-[1.2]">{article.title}</p>
-                                </div>
-                            <div className="font-['SF_Pro_Display:Regular',_sans-serif] relative shrink-0 text-[12px] text-[rgba(0,0,0,0.7)] w-full">
-                                  <p className="leading-[1.2]">{article.source}</p>
-                                </div>
-                              </div>
-                          <div className="flex flex-col font-['SF_Pro_Display:Medium',_sans-serif] justify-center relative shrink-0 text-[#0f0f0f] text-[12px]">
-                                <p className="[text-underline-position:from-font] decoration-solid leading-[1.2] underline">Lire l'article</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </button>
-                    ))}
-              </div>
-            </div>
+          <div className="homepage-insight-badge">
+            Insight {insightNumber}
           </div>
         </div>
-        </>
+        
+        <div className="homepage-insight-title-container">
+          <div className="homepage-insight-title">
+            {title}
+          </div>
+          
+          <div className="homepage-insight-description">
+            {description}
+          </div>
+        </div>
+        
+        <div className="article-cards-scroll">
+          <div className="article-cards-container">
+            {articles.map((article, index) => (
+              <button 
+                key={index}
+                onClick={() => handleOpenArticle(article, category)}
+                className="article-card" 
+                style={{ pointerEvents: 'auto' }}
+              >
+                <div 
+                  className="article-card-image" 
+                  style={{ backgroundImage: `url('${article.image}')` }} 
+                />
+                <div className="article-card-content">
+                  <div className="article-card-title">
+                    {article.title}
+                  </div>
+                  <div className="article-card-source">
+                    {article.source}
+                  </div>
+                  <div className="article-card-link">
+                    Lire l'article
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     )
   }
@@ -582,22 +559,22 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
       <div className="homepage-section">
         <div className="homepage-section-title">
           Votre Care Plan
-            </div>
+        </div>
         <div>
-            <CarePlanInsight
-              insightNumber={1}
-              title="Parce que vous avez mangé salé"
-              description="You're improving this month, Loris! Your symptoms were overall less painful as February this year."
-              articles={fakeArticles.nutrition}
-              category="nutrition"
-            />
-            <CarePlanInsight
-              insightNumber={2}
-              title="Parce que vous étiez modérément stressé"
-              description="You're improving this month, Loris! Your symptoms were overall less painful as February this year."
-              articles={fakeArticles.stress}
-              category="stress"
-            />
+          <CarePlanInsight
+            insightNumber={1}
+            title="Parce que vous avez mangé salé"
+            description="You're improving this month, Loris! Your symptoms were overall less painful as February this year."
+            articles={fakeArticles.nutrition}
+            category="nutrition"
+          />
+          <CarePlanInsight
+            insightNumber={2}
+            title="Parce que vous étiez modérément stressé"
+            description="You're improving this month, Loris! Your symptoms were overall less painful as February this year."
+            articles={fakeArticles.stress}
+            category="stress"
+          />
         </div>
       </div>
     )
@@ -847,16 +824,15 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
     const articleData = getArticleContent(article.title)
 
     return (
-      <div className="w-full h-full overflow-hidden">
-        {/* Header */}
-        <div className="relative">
-          <div 
-            className="h-48 bg-cover bg-center"
-            style={{ backgroundImage: `url('${article.image}')` }}
-          />
+      <div className="article-modal-container">
+        {/* Header with Image */}
+        <div 
+          className="article-modal-header"
+          style={{ backgroundImage: `url('${article.image}')` }}
+        >
           <button 
             onClick={onClose}
-            className="absolute top-4 right-4 bg-white bg-opacity-90 rounded-full p-2 hover:bg-opacity-100 transition-all"
+            className="article-modal-close"
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
               <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -865,40 +841,59 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
         </div>
         
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-12rem)]">
-          <div className="mb-4">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">{article.title}</h1>
-            <div className="flex items-center gap-4 text-sm text-gray-600">
+        <div className="article-modal-content">
+          <h1 className="article-modal-title">{article.title}</h1>
+          
+          <div className="article-modal-meta">
+            <div className="article-modal-meta-item">
               <span>{article.source}</span>
+            </div>
+            <div className="article-modal-meta-item">
               <span>•</span>
+            </div>
+            <div className="article-modal-meta-item">
               <span>{articleData.readTime}</span>
+            </div>
+            <div className="article-modal-meta-item">
               <span>•</span>
+            </div>
+            <div className="article-modal-meta-item">
               <span>{articleData.author}</span>
             </div>
           </div>
           
           <div 
-            className="prose prose-sm max-w-none"
+            className="article-modal-body"
             dangerouslySetInnerHTML={{ __html: articleData.content }}
           />
         </div>
         
         {/* Footer */}
-        <div className="border-t p-4 bg-gray-50">
-          <div className="flex gap-3">
-            <button 
-              onClick={onClose}
-              className="flex-1 bg-gray-200 text-gray-800 py-3 px-4 rounded-lg font-medium hover:bg-gray-300 transition-colors"
-            >
-              Fermer
-            </button>
-            <button 
-              onClick={() => window.open(article.image, '_blank')}
-              className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-            >
-              Partager
-            </button>
-          </div>
+        <div className="article-modal-footer">
+          <button 
+            onClick={onClose}
+            className="article-modal-button article-modal-button-secondary"
+          >
+            Fermer
+          </button>
+          <button 
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: article.title,
+                  text: article.excerpt,
+                  url: window.location.href
+                })
+              } else {
+                // Fallback for browsers that don't support Web Share API
+                navigator.clipboard.writeText(window.location.href)
+                alert('Lien copié dans le presse-papiers')
+              }
+            }}
+            className="article-modal-button article-modal-button-primary"
+          >
+            Partager
+          </button>
         </div>
       </div>
     )
@@ -908,33 +903,11 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
     <>
       {/* Article Modal - Rendered at top level like logging modal */}
       {state.showArticleModal && state.selectedArticle && (
-        <div className="article-modal-bg" style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-          padding: '16px'
-        }} onClick={handleCloseArticle}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '16px',
-            maxWidth: '400px',
-            width: '100%',
-            maxHeight: '90vh',
-            overflow: 'hidden',
-            transform: 'translateY(0)'
-          }} onClick={e => e.stopPropagation()}>
-            <ArticleModal 
-              article={state.selectedArticle} 
-              onClose={handleCloseArticle} 
-            />
-          </div>
+        <div className="article-modal-overlay" onClick={handleCloseArticle}>
+          <ArticleModal 
+            article={state.selectedArticle} 
+            onClose={handleCloseArticle} 
+          />
         </div>
       )}
 
@@ -983,7 +956,7 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
         <div className="homepage-content w-full max-w-[393px] mx-auto" style={{ padding: '0', minHeight: '100vh' }}>
           <Group8 />
           <Frame6174 />
-          <div className="content-sections w-full" style={{ paddingBottom: '80px' }}>
+          <div className="content-sections w-full text-left" style={{ paddingBottom: '80px' }}>
             <SenciaWidget />
         <HealthStatusSection />
         <BloodPressureChart />
