@@ -4,6 +4,14 @@ import '../App.css'
 import GradientBackground from '../components/mobile/GradientBackground'
 import MobileFrame from '../components/mobile/MobileFrame'
 import BottomActions from '../components/mobile/BottomActions'
+import { 
+  LoggingScreenHeader, 
+  LoggingSlider, 
+  LoggingSelectionButtons, 
+  LoggingCustomInput,
+  LoggingBloodPressureInput 
+} from '../components/logging/LoggingScreen'
+import { LoggingWheelPicker } from '../components/logging/LoggingWheelPicker'
 import '../components/mobile/mobile-styles.css'
 
 // Define the steps for the logging flow based on Figma designs
@@ -60,7 +68,7 @@ export default function LoggingFlow() {
       <GradientBackground />
       <MobileFrame showStatusBar={false}>
         {/* Navigation Header */}
-        <div className="onboarding-nav">
+        <div className="onboarding-nav" style={{ paddingTop: '16px' }}>
           <div className="nav-top">
             <button 
               className="nav-back" 
@@ -209,7 +217,6 @@ const MoodScreen = ({ value, onChange, onContinue }) => {
     setIsDragging(false)
   }, [])
 
-  // Add global event listeners for drag operations
   useEffect(() => {
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove)
@@ -228,62 +235,23 @@ const MoodScreen = ({ value, onChange, onContinue }) => {
 
   return (
     <>
-      <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-        <h2 className="step-title">
-          Comment vous sentez-vous ce matin Alima ?
-        </h2>
-        <p className="step-subtitle">Remember to check in regularly to spot patterns.</p>
-      </div>
+      <LoggingScreenHeader 
+        title="Comment vous sentez-vous ce matin Loris ?"
+        subtitle="Remember to check in regularly to spot patterns."
+      />
 
-      {/* Mood Slider */}
-      <div style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        height: '320px',
-        justifyContent: 'center',
-        position: 'relative',
-        marginBottom: '40px'
-      }}>
-        <div style={{ fontSize: '14px', marginBottom: '20px', color: 'black' }}>Très bien</div>
-        
-        <div 
-          ref={sliderRef}
-          style={{ 
-            width: '38px', 
-            height: '240px', 
-            background: 'linear-gradient(to bottom, #62ffa4, #ffb48b, #ff5d5d)', 
-            borderRadius: '19px',
-            position: 'relative',
-            cursor: 'pointer'
-          }}
+      <LoggingSlider
+        value={value}
+        onChange={onChange}
           onMouseDown={handleMouseDown}
           onTouchStart={handleTouchStart}
-        >
-          <div 
-            style={{
-              position: 'absolute',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              top: `${(100 - value)}%`,
-              width: '32px',
-              height: '32px',
-              backgroundColor: 'white',
-              borderRadius: '50%',
-              boxShadow: isDragging ? '0 4px 16px rgba(0,0,0,0.25)' : '0 2px 8px rgba(0,0,0,0.15)',
-              border: '1px solid #e0e0e0',
-              cursor: isDragging ? 'grabbing' : 'grab',
-              transition: isDragging ? 'none' : 'box-shadow 0.2s ease'
-            }}
-            onMouseDown={handleMouseDown}
-            onTouchStart={handleTouchStart}
-          />
-        </div>
-        
-        <div style={{ fontSize: '14px', marginTop: '20px', color: 'black' }}>Très mal</div>
-      </div>
+        sliderRef={sliderRef}
+        isDragging={isDragging}
+        topLabel="Très bien"
+        bottomLabel="Très mal"
+        height="250px"
+      />
 
-      {/* Continue Button */}
       <BottomActions 
         primaryLabel="Continuer"
         onPrimary={onContinue}
@@ -314,61 +282,23 @@ const SymptomsScreen = ({ selectedSymptoms, customSymptoms, onSymptomsChange, on
 
   return (
     <>
-      <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-        <h2 className="step-title">
-          Avez-vous eu les symptômes suivants aujourd'hui ?
-        </h2>
-        <p className="step-subtitle">Sélectionnez les symptômes que vous avez ressenti aujourd'hui. Si vous n'en avez eu aucun, cliquez sur Suivant.</p>
-      </div>
+      <LoggingScreenHeader 
+        title="Avez-vous eu les symptômes suivants aujourd'hui ?"
+        subtitle="Sélectionnez les symptômes que vous avez ressenti aujourd'hui. Si vous n'en avez eu aucun, cliquez sur Suivant."
+      />
 
-      <div style={{ display: 'flex', width: '100%', maxWidth: '353px', alignItems: 'center', justifyContent: 'center', gap: '9px', flexWrap: 'wrap', marginBottom: '8px' }}>
-        {symptoms.map((symptom, index) => (
-          <button
-            key={index}
-            onClick={() => toggleSymptom(symptom)}
-            style={{
-              padding: '12px 16px',
-              borderRadius: '24px',
-              border: selectedSymptoms.includes(symptom) ? '2px solid #007AFF' : '1px solid #e0e0e0',
-              backgroundColor: selectedSymptoms.includes(symptom) ? 'rgba(0, 122, 255, 0.05)' : 'white',
-              color: selectedSymptoms.includes(symptom) ? '#007AFF' : 'black',
-              fontSize: '15px',
-              fontWeight: selectedSymptoms.includes(symptom) ? '600' : '400',
-              cursor: 'pointer',
-              textAlign: 'center',
-              transition: 'all 0.2s',
-              width: 'auto',
-              maxWidth: '100%',
-              whiteSpace: 'normal',
-              lineHeight: 1.2
-            }}
-          >
-            {symptom}
-          </button>
-        ))}
-      </div>
+      <LoggingSelectionButtons
+        items={symptoms}
+        selectedItems={selectedSymptoms}
+        onToggle={toggleSymptom}
+      />
 
-      <div style={{ marginBottom: '20px', textAlign: 'center' }}>
-        <label style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', display: 'block', textAlign: 'center' }}>
-          Ajoutez d'autres symptômes ressentis
-        </label>
-        <input
-          type="text"
+      <LoggingCustomInput
+        label="Ajoutez d'autres symptômes ressentis"
           placeholder="Stress, changements d'humeur..."
           value={customSymptoms}
-          onChange={(e) => onCustomChange(e.target.value)}
-          style={{
-            width: '100%',
-            maxWidth: '353px',
-            padding: '12px 16px',
-            borderRadius: '20px',
-            border: '1px solid #e0e0e0',
-            fontSize: '16px',
-            backgroundColor: 'white',
-            textAlign: 'center'
-          }}
-        />
-      </div>
+        onChange={onCustomChange}
+      />
 
       <BottomActions 
         primaryLabel="Continuer"
@@ -401,6 +331,11 @@ const BloodPressureScreen = ({ data, onChange, onContinue }) => {
   }
 
   const updateField = (field, value) => {
+    if (field === 'notes') {
+      onChange({ ...data, [field]: value })
+      return
+    }
+    
     // Only allow numbers and limit to 3 digits
     const numericValue = value.replace(/[^\d]/g, '').slice(0, 3)
     
@@ -410,10 +345,6 @@ const BloodPressureScreen = ({ data, onChange, onContinue }) => {
     // Validate and set errors
     const error = validateBloodPressure(field, numericValue)
     setErrors(prev => ({ ...prev, [field]: error }))
-  }
-
-  const formatDisplayValue = (value) => {
-    return value ? `${value} mmHg` : ''
   }
 
   const isValidData = () => {
@@ -426,102 +357,16 @@ const BloodPressureScreen = ({ data, onChange, onContinue }) => {
 
   return (
     <>
-      <div style={{ marginBottom: '50px' }}>
-        <h2 className="step-title">
-          Quelle est votre dernière mesure de tension artérielle ?
-        </h2>
-        <p className="step-subtitle">Entrez la dernière mesure que vous avez prise. Une prise actuelle permet des analyses plus exactes.</p>
-      </div>
+      <LoggingScreenHeader 
+        title="Quelle est votre dernière mesure de tension artérielle ?"
+        subtitle="Entrez la dernière mesure que vous avez prise. Une prise actuelle permet des analyses plus exactes."
+      />
 
-      <div style={{
-        backgroundColor: '#fffffe',
-        borderRadius: '20px',
-        border: '1px solid #f0f0f0',
-        padding: '20px',
-        marginBottom: '18px'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '13px' }}>
-          <span style={{ fontSize: '18px', fontWeight: '600' }}>Systolique</span>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-            <input
-              type="tel"
-              inputMode="numeric"
-              placeholder="140"
-              value={data.systolic}
-              onChange={(e) => updateField('systolic', e.target.value)}
-              style={{
-                width: '80px',
-                padding: '8px 12px',
-                borderRadius: '84px',
-                border: errors.systolic ? '1px solid #ff5d5d' : '1px solid rgba(228,228,228,0.55)',
-                fontSize: '14px',
-                textAlign: 'center',
-                outline: 'none'
-              }}
-            />
-            <span style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>mmHg</span>
-            {errors.systolic && (
-              <span style={{ fontSize: '11px', color: '#ff5d5d', marginTop: '2px' }}>
-                {errors.systolic}
-              </span>
-            )}
-          </div>
-        </div>
-        <hr style={{ border: 'none', borderTop: '0.5px solid #BCBCBC', margin: '13px 0' }} />
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: '18px', fontWeight: '600' }}>Diastolique</span>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-            <input
-              type="tel"
-              inputMode="numeric"
-              placeholder="90"
-              value={data.diastolic}
-              onChange={(e) => updateField('diastolic', e.target.value)}
-              style={{
-                width: '80px',
-                padding: '8px 12px',
-                borderRadius: '84px',
-                border: errors.diastolic ? '1px solid #ff5d5d' : '1px solid rgba(228,228,228,0.55)',
-                fontSize: '14px',
-                textAlign: 'center',
-                outline: 'none'
-              }}
-            />
-            <span style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>mmHg</span>
-            {errors.diastolic && (
-              <span style={{ fontSize: '11px', color: '#ff5d5d', marginTop: '2px' }}>
-                {errors.diastolic}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div style={{
-        backgroundColor: '#fffffe',
-        borderRadius: '20px',
-        border: '1px solid #f0f0f0',
-        padding: '20px',
-        marginBottom: '40px'
-      }}>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-          <div style={{ fontSize: '18px', color: '#A0A0A0', marginTop: '4px' }}>📄</div>
-          <textarea
-            placeholder="Notes..."
-            value={data.notes}
-            onChange={(e) => updateField('notes', e.target.value)}
-            style={{
-              flex: 1,
-              border: 'none',
-              outline: 'none',
-              fontSize: '16px',
-              resize: 'none',
-              minHeight: '100px',
-              backgroundColor: 'transparent'
-            }}
-          />
-        </div>
-      </div>
+      <LoggingBloodPressureInput 
+        data={data}
+        onChange={updateField}
+        errors={errors}
+      />
 
       <BottomActions 
         primaryLabel="Continuer"
@@ -536,225 +381,44 @@ const BloodPressureScreen = ({ data, onChange, onContinue }) => {
 // Screen 4: Treatment (Figma-accurate wheel selector)
 const TreatmentScreen = ({ value, onChange, onContinue }) => {
   const [hasInteracted, setHasInteracted] = useState(false)
-  const [isDragging, setIsDragging] = useState(false)
-  const [selectorPosition, setSelectorPosition] = useState({ x: 50, y: 50 }) // Center position as percentage
-  const wheelRef = useRef(null)
 
-  const updatePositionAndValue = useCallback((clientX, clientY) => {
-    if (!wheelRef.current) return
-    
-    const rect = wheelRef.current.getBoundingClientRect()
-    const centerX = rect.left + rect.width / 2
-    const centerY = rect.top + rect.height / 2
-    
-    // Calculate position relative to wheel center
-    const deltaX = clientX - centerX
-    const deltaY = clientY - centerY
-    
-    // Convert to percentage within wheel bounds
-    const wheelRadius = rect.width / 2 * 0.8 // 80% of wheel radius to keep selector inside
-    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
-    
-    if (distance <= wheelRadius) {
-      const newX = ((deltaX / rect.width) * 100) + 50
-      const newY = ((deltaY / rect.height) * 100) + 50
-      setSelectorPosition({ x: newX, y: newY })
-      
-      // Determine selection based on position (left half = oui, right half = non)
-      const newValue = deltaX < 0 ? true : false // left = oui (true), right = non (false)
-      if (newValue !== value) {
-        onChange(newValue)
-        setHasInteracted(true)
-      }
+  const treatmentSectors = {
+    true: [90, 270], // Left side (Oui)
+    false: [270, 90] // Right side (Non) - wraps around
+  }
+
+  const treatmentLabels = [
+    {
+      value: true,
+      text: 'Oui',
+      position: { x: 25, y: 50 },
+      width: '50px'
+    },
+    {
+      value: false,
+      text: 'Non',
+      position: { x: 75, y: 50 },
+      width: '50px'
     }
-  }, [value, onChange])
-
-  const handleMouseDown = useCallback((e) => {
-    e.preventDefault()
-    setIsDragging(true)
-    updatePositionAndValue(e.clientX, e.clientY)
-  }, [updatePositionAndValue])
-
-  const handleMouseMove = useCallback((e) => {
-    if (isDragging) {
-      e.preventDefault()
-      updatePositionAndValue(e.clientX, e.clientY)
-    }
-  }, [isDragging, updatePositionAndValue])
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false)
-  }, [])
-
-  const handleTouchStart = useCallback((e) => {
-    e.preventDefault()
-    setIsDragging(true)
-    const touch = e.touches[0]
-    updatePositionAndValue(touch.clientX, touch.clientY)
-  }, [updatePositionAndValue])
-
-  const handleTouchMove = useCallback((e) => {
-    if (isDragging) {
-      e.preventDefault()
-      const touch = e.touches[0]
-      updatePositionAndValue(touch.clientX, touch.clientY)
-    }
-  }, [isDragging, updatePositionAndValue])
-
-  const handleTouchEnd = useCallback(() => {
-    setIsDragging(false)
-  }, [])
-
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove)
-      document.addEventListener('mouseup', handleMouseUp)
-      document.addEventListener('touchmove', handleTouchMove, { passive: false })
-      document.addEventListener('touchend', handleTouchEnd)
-    }
-    
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
-      document.removeEventListener('touchmove', handleTouchMove)
-      document.removeEventListener('touchend', handleTouchEnd)
-    }
-  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
+  ]
 
   return (
     <>
-      <div style={{ textAlign: 'center', marginBottom: '50px' }}>
-        <h2 className="step-title">
-          Avez-vous pris votre traitement aujourd'hui ?
-        </h2>
-        <p className="step-subtitle">Sélectionnez les traitements que vous avez pris jusqu'à présent. Fiez-vous toujours à votre ordonnance.</p>
-      </div>
+      <LoggingScreenHeader 
+        title="Avez-vous pris votre traitement aujourd'hui ?"
+        subtitle="Sélectionnez les traitements que vous avez pris jusqu'à présent. Fiez-vous toujours à votre ordonnance."
+      />
 
-      {/* Figma-accurate Wheel */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        flex: 1,
-        position: 'relative'
-      }}>
-        <div 
-          ref={wheelRef}
-          style={{
-            position: 'relative',
-            width: '340px',
-            height: '340px',
-            cursor: 'pointer',
-            userSelect: 'none'
-          }}
-        >
-          {/* Main wheel SVG */}
-          <div style={{ position: 'absolute', inset: '-0.441%' }}>
-            <svg width="344" height="344" viewBox="0 0 344 344" style={{ display: 'block', width: '100%', height: '100%' }}>
-              {/* Center circle */}
-              <circle cx="172" cy="172" r="20" fill="white" />
-              
-              {/* Outer circle */}
-              <circle cx="172" cy="172" r="170" fill="white" stroke="#DADADA" strokeWidth="3" />
-              
-              {/* Vertical divider line */}
-              <line x1="172" y1="3" x2="172" y2="151" stroke="#DADADA" strokeWidth="3" />
-              <line x1="172" y1="193" x2="172" y2="341" stroke="#DADADA" strokeWidth="3" />
-              
-              {/* Visual feedback for selection */}
-              {value === true && (
-                <path 
-                  d="M172 2C78.1116 2 2 78.1116 2 172C2 265.888 78.1116 342 172 342L172 2Z" 
-                  fill="rgba(14, 122, 254, 0.1)" 
-                />
-              )}
-              {value === false && (
-                <path 
-                  d="M172 2C265.888 2 342 78.1116 342 172C342 265.888 265.888 342 172 342L172 2Z" 
-                  fill="rgba(14, 122, 254, 0.1)" 
-                />
-              )}
-            </svg>
-          </div>
-          
-          {/* Labels positioned exactly as in Figma */}
-          <div style={{
-            position: 'absolute',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            width: '213px',
-            height: '15px',
-            left: '64px', // 16px margin from Figma
-            top: '162px',
-            fontFamily: 'SF Pro Display, sans-serif',
-            fontSize: '16px',
-            fontWeight: '600',
-            textAlign: 'center',
-            color: 'black',
-            pointerEvents: 'none'
-          }}>
-            <div style={{
-              color: value === true ? '#0e7afe' : 'black',
-              transition: 'color 0.2s'
-            }}>Oui</div>
-            <div style={{
-              color: value === false ? '#0e7afe' : 'black',
-              transition: 'color 0.2s'
-            }}>Non</div>
-          </div>
-          
-          {/* Draggable Selector */}
-          <div
-            style={{
-              position: 'absolute',
-              left: `${selectorPosition.x}%`,
-              top: `${selectorPosition.y}%`,
-              transform: 'translate(-50%, -50%)',
-              width: '43px',
-              height: '43px',
-              zIndex: 10,
-              cursor: isDragging ? 'grabbing' : 'grab',
-              transition: isDragging ? 'none' : 'all 0.2s ease-out'
-            }}
-            onMouseDown={handleMouseDown}
-            onTouchStart={handleTouchStart}
-          >
-            <div style={{ position: 'absolute', inset: '-45.12% -35.81% -26.51% -35.81%' }}>
-              <svg width="75" height="75" viewBox="0 0 75 75" style={{ display: 'block', width: '100%', height: '100%' }}>
-                <defs>
-                  <filter id="selector-shadow" x="0.6" y="0.6" width="73.8" height="73.8">
-                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                    <feColorMatrix in="SourceAlpha" result="hardAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" />
-                    <feOffset dy="-4" />
-                    <feGaussianBlur stdDeviation="7.7" />
-                    <feComposite in2="hardAlpha" operator="out" />
-                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.06 0" />
-                    <feBlend in2="BackgroundImageFix" mode="normal" result="effect1_dropShadow" />
-                    <feBlend in="SourceGraphic" in2="effect1_dropShadow" mode="normal" result="shape" />
-                  </filter>
-                </defs>
-                <circle 
-                  cx="37.5" 
-                  cy="41.5" 
-                  r="21.5" 
-                  fill={isDragging ? "rgba(14, 122, 254, 0.9)" : "white"}
-                  filter="url(#selector-shadow)"
-                  style={{ transition: 'fill 0.2s' }}
-                />
-                <circle 
-                  cx="37.5" 
-                  cy="41.5" 
-                  r="21" 
-                  stroke={isDragging ? "#0e7afe" : "#DADADA"}
-                  fill="none"
-                  style={{ transition: 'stroke 0.2s' }}
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
+      <LoggingWheelPicker
+        value={value}
+        onChange={(newValue) => {
+          onChange(newValue)
+          setHasInteracted(true)
+        }}
+        labels={treatmentLabels}
+        sectors={treatmentSectors}
+        onInteraction={() => setHasInteracted(true)}
+      />
 
       <BottomActions 
         primaryLabel="Continuer"
@@ -785,59 +449,23 @@ const ConsumptionScreen = ({ selectedItems, customItems, onItemsChange, onCustom
 
   return (
     <>
-      <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-        <h2 className="step-title">
-          Avez-vous consommé l'un des éléments suivants aujourd'hui ?
-        </h2>
-        <p className="step-subtitle">Sélectionnez les symptômes que vous avez ressenti aujourd'hui.</p>
-      </div>
+      <LoggingScreenHeader 
+        title="Avez-vous consommé l'un des éléments suivants aujourd'hui ?"
+        subtitle="Sélectionnez les symptômes que vous avez ressenti aujourd'hui."
+      />
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px', alignItems: 'center', width: '100%' }}>
-        {items.map((item, index) => (
-          <button
-            key={index}
-            onClick={() => toggleItem(item)}
-            style={{
-              padding: '16px 20px',
-              borderRadius: '25px',
-              border: selectedItems.includes(item) ? '2px solid #007AFF' : '1px solid #e0e0e0',
-              backgroundColor: selectedItems.includes(item) ? 'rgba(0, 122, 255, 0.05)' : 'white',
-              color: selectedItems.includes(item) ? '#007AFF' : 'black',
-              fontSize: '16px',
-              fontWeight: selectedItems.includes(item) ? '600' : '400',
-              cursor: 'pointer',
-              textAlign: 'center',
-              transition: 'all 0.2s',
-              width: 'fit-content',
-              minWidth: '250px'
-            }}
-          >
-            {item}
-          </button>
-        ))}
-      </div>
+      <LoggingSelectionButtons
+        items={items}
+        selectedItems={selectedItems}
+        onToggle={toggleItem}
+      />
 
-      <div style={{ marginBottom: '20px', textAlign: 'center' }}>
-        <label style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', display: 'block', textAlign: 'center' }}>
-          D'autres aliments consommés ?
-        </label>
-        <input
-          type="text"
+      <LoggingCustomInput
+        label="D'autres aliments consommés ?"
           placeholder="Stress, changements d'humeur..."
           value={customItems}
-          onChange={(e) => onCustomChange(e.target.value)}
-          style={{
-            width: '100%',
-            maxWidth: '353px',
-            padding: '12px 16px',
-            borderRadius: '20px',
-            border: '1px solid #e0e0e0',
-            fontSize: '16px',
-            backgroundColor: 'white',
-            textAlign: 'center'
-          }}
-        />
-      </div>
+        onChange={onCustomChange}
+      />
 
       <BottomActions 
         primaryLabel="Continuer"
@@ -854,6 +482,7 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
   const [isDragging, setIsDragging] = useState(false)
   const [selectorPosition, setSelectorPosition] = useState({ x: 50, y: 50 })
   const wheelRef = useRef(null)
+  const selectorRef = useRef(null)
 
   const getSelectionFromAngle = (angle) => {
     // Convert angle to degrees and normalize to 0-360
@@ -874,17 +503,24 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
     }
   }
 
-  const updatePositionAndValue = useCallback((clientX, clientY) => {
-    if (!wheelRef.current) return
-    
+  const handleMouseDown = useCallback((e) => {
+    setIsDragging(true)
+    e.preventDefault()
+  }, [])
+
+  const handleMouseMove = useCallback((e) => {
+    if (!isDragging || !wheelRef.current) return
+
     const rect = wheelRef.current.getBoundingClientRect()
     const centerX = rect.left + rect.width / 2
     const centerY = rect.top + rect.height / 2
     
-    const deltaX = clientX - centerX
-    const deltaY = clientY - centerY
+    // Calculate position relative to wheel center
+    const deltaX = e.clientX - centerX
+    const deltaY = e.clientY - centerY
     
-    const wheelRadius = rect.width / 2 * 0.8
+    // Convert to percentage within wheel bounds
+    const wheelRadius = rect.width / 2 * 0.8 // 80% of wheel radius to keep selector inside
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
     
     if (distance <= wheelRadius) {
@@ -894,48 +530,16 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
       
       // Calculate angle for sector detection
       const angle = Math.atan2(-deltaY, deltaX) // Negative deltaY because screen coordinates are flipped
-      const newValue = getSelectionFromAngle(angle)
+      const newSelection = getSelectionFromAngle(angle)
       
-      if (newValue !== value) {
-        onChange(newValue)
+      if (newSelection !== value) {
+        onChange(newSelection)
         setHasInteracted(true)
       }
     }
-  }, [value, onChange])
-
-  const handleMouseDown = useCallback((e) => {
-    e.preventDefault()
-    setIsDragging(true)
-    updatePositionAndValue(e.clientX, e.clientY)
-  }, [updatePositionAndValue])
-
-  const handleMouseMove = useCallback((e) => {
-    if (isDragging) {
-      e.preventDefault()
-      updatePositionAndValue(e.clientX, e.clientY)
-    }
-  }, [isDragging, updatePositionAndValue])
+  }, [isDragging, value, onChange])
 
   const handleMouseUp = useCallback(() => {
-    setIsDragging(false)
-  }, [])
-
-  const handleTouchStart = useCallback((e) => {
-    e.preventDefault()
-    setIsDragging(true)
-    const touch = e.touches[0]
-    updatePositionAndValue(touch.clientX, touch.clientY)
-  }, [updatePositionAndValue])
-
-  const handleTouchMove = useCallback((e) => {
-    if (isDragging) {
-      e.preventDefault()
-      const touch = e.touches[0]
-      updatePositionAndValue(touch.clientX, touch.clientY)
-    }
-  }, [isDragging, updatePositionAndValue])
-
-  const handleTouchEnd = useCallback(() => {
     setIsDragging(false)
   }, [])
 
@@ -943,93 +547,74 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove)
       document.addEventListener('mouseup', handleMouseUp)
-      document.addEventListener('touchmove', handleTouchMove, { passive: false })
-      document.addEventListener('touchend', handleTouchEnd)
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+      }
     }
-    
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
-      document.removeEventListener('touchmove', handleTouchMove)
-      document.removeEventListener('touchend', handleTouchEnd)
-    }
-  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
+  }, [isDragging, handleMouseMove, handleMouseUp])
 
   return (
     <>
-      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-        <h2 className="step-title">
-          Avez-vous été physiquement actif(ve) aujourd'hui ?
-        </h2>
-        <p className="step-subtitle">Glissez le cercle vers votre réponse et relâchez pour confirmer.</p>
-      </div>
-
-      {/* Figma-accurate 3-way wheel */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        flex: 1,
-        position: 'relative'
-      }}>
-        <div 
-          ref={wheelRef}
-          style={{
-            position: 'relative',
-            width: '340px',
-            height: '340px',
-            cursor: 'pointer',
-            userSelect: 'none'
-          }}
-        >
-          {/* Main wheel SVG */}
-          <div style={{ position: 'absolute', inset: '-0.441%' }}>
-            <svg width="344" height="344" viewBox="0 0 344 344" style={{ display: 'block', width: '100%', height: '100%' }}>
-              {/* Center circle */}
-              <circle cx="172" cy="172" r="20" fill="white" />
-              
-              {/* Outer circle */}
-              <circle cx="172" cy="172" r="170" fill="white" stroke="#DADADA" strokeWidth="3" />
-              
-              {/* Figma-accurate divider lines */}
-              <path d="M327 241.923L190.5 175.587M17.0348 242L153.5 175.724M172.28 3L172.033 153" stroke="#DADADA" strokeWidth="3" />
-              
-              {/* Visual feedback for selection */}
-              {value === 'plus_30' && (
-                <path 
-                  d="M172 2C78.1116 2 2 78.1116 2 172L172 172L172 2Z" 
-                  fill="rgba(14, 122, 254, 0.1)" 
-                />
-              )}
-              {value === 'moins_30' && (
-                <path 
-                  d="M172 2C265.888 2 342 78.1116 342 172L172 172L172 2Z" 
-                  fill="rgba(14, 122, 254, 0.1)" 
-                />
-              )}
-              {value === 'non' && (
-                <path 
-                  d="M2 172C2 265.888 78.1116 342 172 342C265.888 342 342 265.888 342 172L172 172L2 172Z" 
-                  fill="rgba(14, 122, 254, 0.1)" 
-                />
-              )}
+      <LoggingScreenHeader 
+        title="Avez-vous été physiquement actif(ve) aujourd'hui ?"
+        subtitle="Glissez le cercle vers votre réponse et relâchez pour confirmer."
+      />
+      
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '32px' }}>
+        <div style={{ position: 'relative', width: '340px', height: '340px' }}>
+          {/* Wheel SVG */}
+          <div 
+            ref={wheelRef}
+            style={{ 
+              position: 'relative', 
+              width: '340px', 
+              height: '340px', 
+              cursor: 'pointer', 
+              userSelect: 'none' 
+            }}
+          >
+            <svg width="340" height="340" viewBox="0 0 344 344" style={{ display: 'block', width: '100%', height: '100%' }}>
+              <g>
+                {/* Top-left sector */}
+                <path d="M172 2C78.1116 2 2 78.1116 2 172L172 172L172 2Z" fill="white" />
+                {/* Top-right sector */}
+                <path d="M172 2C265.888 2 342 78.1116 342 172L172 172L172 2Z" fill="white" />
+                {/* Bottom sector */}
+                <path d="M2 172C2 265.888 78.1116 342 172 342C265.888 342 342 265.888 342 172L172 172L2 172Z" fill="white" />
+                {/* Outer border */}
+                <circle cx="172" cy="172" r="170" fill="none" stroke="#DADADA" strokeWidth="1" />
+                {/* Divider lines */}
+                <line x1="172" y1="2" x2="172" y2="342" stroke="#DADADA" strokeWidth="1" />
+                <line x1="2" y1="172" x2="342" y2="172" stroke="#DADADA" strokeWidth="1" />
+                
+                {/* Visual feedback for selection */}
+                {value === 'plus_30' && (
+                  <path d="M172 2C78.1116 2 2 78.1116 2 172L172 172L172 2Z" fill="rgba(14, 122, 254, 0.1)" />
+                )}
+                {value === 'moins_30' && (
+                  <path d="M172 2C265.888 2 342 78.1116 342 172L172 172L172 2Z" fill="rgba(14, 122, 254, 0.1)" />
+                )}
+                {value === 'non' && (
+                  <path d="M2 172C2 265.888 78.1116 342 172 342C265.888 342 342 265.888 342 172L172 172L2 172Z" fill="rgba(14, 122, 254, 0.1)" />
+                )}
+              </g>
             </svg>
           </div>
           
-          {/* Labels positioned exactly as in Figma */}
+          {/* Labels */}
           <div style={{
             position: 'absolute',
             left: '87px',
             top: '98px',
             transform: 'translateX(-50%)',
             width: '92px',
-            fontFamily: 'SF Pro Display, sans-serif',
             fontSize: '16px',
             fontWeight: '600',
             textAlign: 'center',
+            pointerEvents: 'none',
             color: value === 'plus_30' ? '#0e7afe' : 'black',
-            transition: 'color 0.2s',
-            pointerEvents: 'none'
+            transition: 'color 0.2s ease'
           }}>
             Oui,<br />+ de 30 mins
           </div>
@@ -1040,13 +625,12 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
             top: '98px',
             transform: 'translateX(-50%)',
             width: '92px',
-            fontFamily: 'SF Pro Display, sans-serif',
             fontSize: '16px',
             fontWeight: '600',
             textAlign: 'center',
+            pointerEvents: 'none',
             color: value === 'moins_30' ? '#0e7afe' : 'black',
-            transition: 'color 0.2s',
-            pointerEvents: 'none'
+            transition: 'color 0.2s ease'
           }}>
             Oui,<br />- de 30 mins
           </div>
@@ -1057,19 +641,19 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
             top: '250px',
             transform: 'translateX(-50%)',
             width: '92px',
-            fontFamily: 'SF Pro Display, sans-serif',
             fontSize: '16px',
             fontWeight: '600',
             textAlign: 'center',
+            pointerEvents: 'none',
             color: value === 'non' ? '#0e7afe' : 'black',
-            transition: 'color 0.2s',
-            pointerEvents: 'none'
+            transition: 'color 0.2s ease'
           }}>
             Non
           </div>
           
           {/* Draggable Selector */}
-          <div
+          <div 
+            ref={selectorRef}
             style={{
               position: 'absolute',
               left: `${selectorPosition.x}%`,
@@ -1078,44 +662,20 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
               width: '43px',
               height: '43px',
               zIndex: 10,
-              cursor: isDragging ? 'grabbing' : 'grab',
-              transition: isDragging ? 'none' : 'all 0.2s ease-out'
+              transition: 'all 0.2s ease-out',
+              cursor: 'grab'
             }}
             onMouseDown={handleMouseDown}
-            onTouchStart={handleTouchStart}
           >
-            <div style={{ position: 'absolute', inset: '-45.12% -35.81% -26.51% -35.81%' }}>
-              <svg width="75" height="75" viewBox="0 0 75 75" style={{ display: 'block', width: '100%', height: '100%' }}>
-                <defs>
-                  <filter id="activity-selector-shadow" x="0.6" y="0.6" width="73.8" height="73.8">
-                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                    <feColorMatrix in="SourceAlpha" result="hardAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" />
-                    <feOffset dy="-4" />
-                    <feGaussianBlur stdDeviation="7.7" />
-                    <feComposite in2="hardAlpha" operator="out" />
-                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.06 0" />
-                    <feBlend in2="BackgroundImageFix" mode="normal" result="effect1_dropShadow" />
-                    <feBlend in="SourceGraphic" in2="effect1_dropShadow" mode="normal" result="shape" />
-                  </filter>
-                </defs>
-                <circle 
-                  cx="37.5" 
-                  cy="41.5" 
-                  r="21.5" 
-                  fill={isDragging ? "rgba(14, 122, 254, 0.9)" : "white"}
-                  filter="url(#activity-selector-shadow)"
-                  style={{ transition: 'fill 0.2s' }}
-                />
-                <circle 
-                  cx="37.5" 
-                  cy="41.5" 
-                  r="21" 
-                  stroke={isDragging ? "#0e7afe" : "#DADADA"}
-                  fill="none"
-                  style={{ transition: 'stroke 0.2s' }}
-                />
-              </svg>
-            </div>
+            <div style={{
+              width: '100%',
+              height: '100%',
+              borderRadius: '50%',
+              backgroundColor: isDragging ? 'rgba(14, 122, 254, 0.9)' : 'white',
+              border: `2px solid ${isDragging ? '#0e7afe' : '#DADADA'}`,
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              transition: 'all 0.2s ease'
+            }} />
           </div>
         </div>
       </div>
@@ -1143,7 +703,6 @@ const StressScreen = ({ value, onChange, onContinue }) => {
     const y = clientY - rect.top
     const percentage = Math.max(0, Math.min(100, (y / rect.height) * 100))
     
-    // Invert because top = 100% (no stress), bottom = 0% (extreme stress)
     const newValue = 100 - percentage
     onChange(newValue)
     setHasInteracted(true)
@@ -1183,7 +742,6 @@ const StressScreen = ({ value, onChange, onContinue }) => {
     setIsDragging(false)
   }, [])
 
-  // Add global event listeners for drag operations
   useEffect(() => {
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove)
@@ -1202,61 +760,23 @@ const StressScreen = ({ value, onChange, onContinue }) => {
 
   return (
     <>
-      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-        <h2 className="step-title">
-          Comment évalueriez-vous votre niveau de stress aujourd'hui ?
-        </h2>
-        <p className="step-subtitle">Glissez le cercle vers votre réponse et relâchez pour confirmer.</p>
-      </div>
+      <LoggingScreenHeader 
+        title="Comment évalueriez-vous votre niveau de stress aujourd'hui ?"
+        subtitle="Glissez le cercle vers votre réponse et relâchez pour confirmer."
+      />
 
-      {/* Stress Slider */}
-      <div style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        flex: 1, 
-        justifyContent: 'center',
-        position: 'relative'
-      }}>
-        <div style={{ fontSize: '14px', marginBottom: '20px', color: 'black' }}>Aucun stress</div>
-        
-        <div 
-          ref={sliderRef}
-          style={{ 
-            width: '38px', 
-            height: '327px', 
-            background: 'linear-gradient(to bottom, #62ffa4, #ffb48b, #ff5d5d)', 
-            borderRadius: '19px',
-            position: 'relative',
-            cursor: 'pointer'
-          }}
+      <LoggingSlider
+        value={value}
+        onChange={onChange}
           onMouseDown={handleMouseDown}
           onTouchStart={handleTouchStart}
-        >
-          <div 
-            style={{
-              position: 'absolute',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              top: `${(100 - value)}%`,
-              width: '32px',
-              height: '32px',
-              backgroundColor: 'white',
-              borderRadius: '50%',
-              boxShadow: isDragging ? '0 4px 16px rgba(0,0,0,0.25)' : '0 2px 8px rgba(0,0,0,0.15)',
-              border: '1px solid #e0e0e0',
-              cursor: isDragging ? 'grabbing' : 'grab',
-              transition: isDragging ? 'none' : 'box-shadow 0.2s ease'
-            }}
-            onMouseDown={handleMouseDown}
-            onTouchStart={handleTouchStart}
-          />
-        </div>
-        
-        <div style={{ fontSize: '14px', marginTop: '20px', color: 'black' }}>Stress extrême</div>
-      </div>
+        sliderRef={sliderRef}
+        isDragging={isDragging}
+        topLabel="Aucun stress"
+        bottomLabel="Stress extrême"
+        height="250px"
+      />
 
-      {/* Final button says "Terminer" */}
       <BottomActions 
         primaryLabel="Terminer"
         onPrimary={onContinue}
