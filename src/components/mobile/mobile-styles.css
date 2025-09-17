@@ -542,8 +542,9 @@
 .nav-top {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
+  align-items: end;
+  margin-bottom: 2px;
+  margin-top: 20px;
 }
 
 .nav-back, .nav-close {

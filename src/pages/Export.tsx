@@ -16,8 +16,12 @@ type CurrentPage = 'dashboard' | 'export-choice' | 'last-appointment' | 'next-ap
 
 const Export = () => {
   const navigate = useNavigate();
-  const { handleAdd } = useOutletContext() || {};
+  const outletCtx = useOutletContext() as { handleAdd?: () => void } | undefined;
+  const handleAdd = outletCtx?.handleAdd;
   const [currentPage, setCurrentPage] = useState<CurrentPage>('dashboard');
+  // Persistent progress across questions
+  const [progressStep, setProgressStep] = useState<number>(0);
+  const [progressTotal, setProgressTotal] = useState<number>(0);
 
   // Helper function to open PDF report in new tab
   const openReportPDF = () => {
@@ -50,28 +54,43 @@ const Export = () => {
 
   const handleNavigateToExportChoice = () => {
     setCurrentPage('export-choice');
+    // Entering the flow at first question
+    setProgressTotal(3);
+    setProgressStep(1);
   };
 
   const handleBackToDashboard = () => {
     setCurrentPage('dashboard');
+    // Reset progress when leaving flow
+    setProgressStep(0);
+    setProgressTotal(0);
   };
 
   const handleExportContinue = (type: 'practitioner' | 'personal') => {
     if (type === 'practitioner') {
       setCurrentPage('last-appointment');
+      // Moving to next question in practitioner flow
+      setProgressTotal(3);
+      setProgressStep(2);
     } else {
       setCurrentPage('personal-choice');
+      // Moving to next question in personal flow
+      setProgressTotal(3);
+      setProgressStep(2);
     }
   };
 
   const handleLastAppointmentContinue = (data: { doctor: string; date: string }) => {
     console.log('Last appointment data:', data);
     setCurrentPage('next-appointment');
+    // Next question in practitioner flow
+    setProgressStep(3);
   };
 
   const handleNextAppointmentContinue = (data: { date: string }) => {
     console.log('Next appointment data:', data);
     setCurrentPage('loading');
+    // Loading is not a question; do not increment
   };
 
   const handleLoadingComplete = () => {
@@ -81,18 +100,24 @@ const Export = () => {
 
   const handleBackFromLastAppointment = () => {
     setCurrentPage('export-choice');
+    setProgressStep(1);
   };
 
   const handleBackFromNextAppointment = () => {
     setCurrentPage('last-appointment');
+    setProgressStep(2);
   };
 
   const handleCloseExport = () => {
     setCurrentPage('dashboard');
+    setProgressStep(0);
+    setProgressTotal(0);
   };
 
   const handleCreateReport = () => {
     setCurrentPage('export-choice');
+    setProgressTotal(3);
+    setProgressStep(1);
   };
 
   const handleModifyAppointment = () => {
@@ -114,31 +139,80 @@ const Export = () => {
   const handlePersonalChoiceContinue = (type: 'health-summary' | 'detailed-report') => {
     console.log('Personal choice type:', type);
     setCurrentPage('personal-setup');
+    // Next question in personal flow
+    setProgressStep(3);
   };
 
   const handlePersonalSetupContinue = (data: { startDate: string; endDate: string; period?: string }) => {
     console.log('Personal setup data:', data);
     setCurrentPage('personal-loading');
+    // Loading is not a question; do not increment
   };
 
   const handleBackFromPersonalChoice = () => {
     setCurrentPage('export-choice');
+    setProgressStep(1);
   };
 
   const handleBackFromPersonalSetup = () => {
     setCurrentPage('personal-choice');
+    setProgressStep(2);
   };
 
   const handlePersonalLoadingComplete = () => {
     setCurrentPage('dashboard');
     openReportPDF();
+    setProgressStep(0);
+    setProgressTotal(0);
   };
+
+  const getBackHandler = () => {
+    switch (currentPage) {
+      case 'export-choice':
+        return handleBackToDashboard;
+      case 'last-appointment':
+        return handleBackFromLastAppointment;
+      case 'next-appointment':
+        return handleBackFromNextAppointment;
+      case 'personal-choice':
+        return handleBackFromPersonalChoice;
+      case 'personal-setup':
+        return handleBackFromPersonalSetup;
+      default:
+        return undefined;
+    }
+  };
+
+  const ProgressHeader = () => (
+    progressTotal > 0 ? (
+      <div className="onboarding-nav" style={{ paddingTop: '8px' }}>
+        <div className="nav-top">
+          <button
+            className="nav-back"
+            onClick={getBackHandler()}
+            disabled={!getBackHandler()}
+            style={{ opacity: getBackHandler() ? 1 : 0.3 }}
+          >
+            ←
+          </button>
+          <div className="progress-indicator">
+            <div className="progress-bar">
+              <div className="progress-fill" style={{ width: `${Math.min(100, Math.max(0, (progressStep / progressTotal) * 100))}%` }} />
+            </div>
+          </div>
+          <button className="nav-close" onClick={handleCloseExport}>✕</button>
+        </div>
+        <div className="step-indicator">{progressStep} sur {progressTotal}</div>
+      </div>
+    ) : null
+  );
 
   // Render different pages based on current state
   if (currentPage === 'export-choice') {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <TopLogo />
+        <ProgressHeader />
         <div className="w-full max-w-[393px] min-h-screen relative">
           <ChoixDeLexport
             onBack={handleBackToDashboard}
@@ -155,6 +229,7 @@ const Export = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <TopLogo />
+        <ProgressHeader />
         <div className="w-full max-w-[393px] min-h-screen relative">
           <Export2Specialiste
             onBack={handleBackFromLastAppointment}
@@ -171,6 +246,7 @@ const Export = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <TopLogo />
+        <ProgressHeader />
         <div className="w-full max-w-[393px] min-h-screen relative">
           <Export2SpecialisteNext
             onBack={handleBackFromNextAppointment}
@@ -187,6 +263,7 @@ const Export = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <TopLogo />
+        <ProgressHeader />
         <div className="w-full max-w-[393px] min-h-screen relative">
           <LoadingScreen
             onComplete={handleLoadingComplete}
@@ -201,6 +278,7 @@ const Export = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <TopLogo />
+        <ProgressHeader />
         <div className="w-full max-w-[393px] min-h-screen relative">
           <PersonalChoice
             onBack={handleBackFromPersonalChoice}
@@ -217,6 +295,7 @@ const Export = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <TopLogo />
+        <ProgressHeader />
         <div className="w-full max-w-[393px] min-h-screen relative">
           <PersonalSetup
             onBack={handleBackFromPersonalSetup}
@@ -233,6 +312,7 @@ const Export = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <TopLogo />
+        <ProgressHeader />
         <div className="w-full max-w-[393px] min-h-screen relative">
           <LoadingScreen
             onComplete={handlePersonalLoadingComplete}

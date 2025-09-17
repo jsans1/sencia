@@ -24,19 +24,6 @@ const ChoixDeLexport: React.FC<ChoixDeLexportProps> = ({
     <div className="export-choice-container">
       <div className="export-background" />
       
-      {/* Header */}
-      <div className="export-header">
-        <button className="back-button" onClick={onBack}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-        <button className="close-button" onClick={onClose}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-      </div>
 
       {/* Content */}
       <div className="export-content">
@@ -49,10 +36,10 @@ const ChoixDeLexport: React.FC<ChoixDeLexportProps> = ({
             onClick={() => setSelectedType('practitioner')}
           >
             <div className="export-option-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
-              </svg>
+            <svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9.00024 0.5C10.1763 0.49964 11.3216 0.876291 12.2679 1.57467C13.2142 2.27305 13.9117 3.25638 14.258 4.38032C14.6044 5.50427 14.5813 6.70964 14.1922 7.81952C13.8032 8.92939 13.0686 9.88532 12.0962 10.547C13.7839 11.166 15.2477 12.2759 16.2992 13.7339C17.3506 15.1919 17.9417 16.9312 17.9962 18.728C18.0013 18.8277 17.9865 18.9275 17.9525 19.0214C17.9185 19.1153 17.8662 19.2015 17.7984 19.2749C17.7307 19.3483 17.649 19.4074 17.5582 19.4488C17.4673 19.4902 17.369 19.513 17.2692 19.516C17.1694 19.5189 17.07 19.5019 16.9769 19.4659C16.8837 19.4299 16.7987 19.3756 16.7268 19.3063C16.6549 19.237 16.5975 19.1541 16.5581 19.0623C16.5187 18.9706 16.498 18.8719 16.4972 18.772C16.4377 16.8235 15.6218 14.9747 14.2224 13.6174C12.8231 12.2602 10.9502 11.5011 9.00074 11.5011C7.05129 11.5011 5.17844 12.2602 3.77907 13.6174C2.3797 14.9747 1.56379 16.8235 1.50424 18.772C1.49828 18.9709 1.41354 19.1593 1.26866 19.2957C1.12379 19.4322 0.930656 19.5055 0.731744 19.4995C0.532832 19.4935 0.344437 19.4088 0.208004 19.2639C0.0715715 19.119 -0.00172331 18.9259 0.00424406 18.727C0.0589922 16.9304 0.650139 15.1913 1.7016 13.7335C2.75307 12.2757 4.21674 11.1659 5.90424 10.547C4.93193 9.88532 4.19732 8.92939 3.80825 7.81952C3.41917 6.70964 3.39611 5.50427 3.74245 4.38032C4.0888 3.25638 4.78631 2.27305 5.7326 1.57467C6.6789 0.876291 7.82414 0.49964 9.00024 0.5ZM5.00024 6C5.00024 7.06087 5.42167 8.07828 6.17182 8.82843C6.92196 9.57857 7.93938 10 9.00024 10C10.0611 10 11.0785 9.57857 11.8287 8.82843C12.5788 8.07828 13.0002 7.06087 13.0002 6C13.0002 4.93913 12.5788 3.92172 11.8287 3.17157C11.0785 2.42143 10.0611 2 9.00024 2C7.93938 2 6.92196 2.42143 6.17182 3.17157C5.42167 3.92172 5.00024 4.93913 5.00024 6Z" fill="white"/>
+            </svg>
+
             </div>
             <div className="export-option-content">
               <h3 className="export-option-title">Communication avec un praticien</h3>
@@ -65,9 +52,11 @@ const ChoixDeLexport: React.FC<ChoixDeLexportProps> = ({
             onClick={() => setSelectedType('personal')}
           >
             <div className="export-option-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0.5 5L3 7.5L7.5 0.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+
+
             </div>
             <div className="export-option-content">
               <h3 className="export-option-title">Utilisation personnelle</h3>
