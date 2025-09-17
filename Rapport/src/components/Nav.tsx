@@ -1,3 +1,4 @@
+import React from "react";
 import svgPaths from "../imports/svg-qrcykgf9gb";
 
 type TabType = 'home' | 'explore' | 'care' | 'profile';

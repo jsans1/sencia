@@ -324,7 +324,7 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
 
   function Plus() {
     return (
-      <div className="relative shrink-0 size-[26px]" data-name="plus">
+      <div className="relative shrink-0 size-[26px]" style={{width: '100%'}} data-name="plus">
         <svg
           className="block size-full"
           fill="none"
@@ -335,7 +335,8 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
             <path
               d="M13 5.41669V20.5834"
               id="Vector"
-              stroke="var(--stroke-0, white)"
+              fill="#ffffff"
+              stroke="#ffffff"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth="2.13115"
@@ -343,7 +344,7 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
             <path
               d="M5.41703 13H20.5837"
               id="Vector_2"
-              stroke="var(--stroke-0, white)"
+              stroke="#ffffff"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth="2.13115"
@@ -358,8 +359,8 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
     return (
       <button
         onClick={onPlusClick}
-        className="absolute bg-black box-border content-stretch flex gap-[5.2px] items-center justify-center left-[283px] p-[19.76px] rounded-[255.738px] size-[52px] top-[42px] hover:bg-gray-800 transition-colors cursor-pointer"
-      >
+        className="absolute bg-black box-border content-stretch flex gap-[5.2px] items-center justify-center left-[283px] p-[19.76px] rounded-[255.738px] size-[52px] top-[42px] transition-transform hover:scale-105 active:scale-95"
+        >
         <Plus />
       </button>
     );
@@ -619,7 +620,7 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
     category,
   }) {
     return (
-      <div className="homepage-insight-card w-full">
+      <div className="homepage-insight-card w-full" style={{boxSizing: 'border-box'}}>
         <div className="homepage-insight-header">
           <div className="homepage-insight-icon">
             <svg
@@ -696,7 +697,6 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
     return (
       <div className="homepage-section">
         <div className="homepage-section-title">Votre Care Plan</div>
-        <div>
           <CarePlanInsight
             insightNumber={1}
             title="Parce que vous avez mangé salé"
@@ -711,7 +711,6 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
             articles={fakeArticles.stress}
             category="stress"
           />
-        </div>
       </div>
     );
   }

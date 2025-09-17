@@ -16,11 +16,7 @@ function ProfileMain({
   return (
     <div className="profile-page">
       <TopLogo />
-      
-      {/* Header */}
-      <div className="profile-header">
-        <h1 className="profile-title">sencia</h1>
-      </div>
+    
 
       {/* Profile Info Section */}
       <ProfileInfo />
