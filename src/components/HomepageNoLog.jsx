@@ -23,6 +23,7 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
     hour12: false,
   });
 
+
   // Fake article data with realistic content
   const fakeArticles = {
     nutrition: [
@@ -1107,6 +1108,7 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
 
   return (
     <>
+
       {/* Article Modal - Rendered at top level like logging modal */}
       {state.showArticleModal && state.selectedArticle && (
         <div className="article-modal-overlay" onClick={handleCloseArticle}>

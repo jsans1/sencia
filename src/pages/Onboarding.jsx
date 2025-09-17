@@ -138,10 +138,12 @@ export default function Onboarding() {
 
         {stepKey === 'checkinFrequency' && (
           <div className="step-content">
-            <h1 className="step-title" style={{ marginTop: 8, marginBottom: 8 }}>Combien de fois souhaitez-vous <span className="brand-gradient-text">check-in</span> ?</h1>
-            <p className="step-subtitle" style={{ maxWidth: 320, marginTop: 0, marginBottom: 28 }}>
-              En créant de la répétition dans les check-ins, vous pourrez obtenir des informations précises sur votre état de santé.
-            </p>
+            <div style={{ marginBottom: 4, textAlign: 'center', width: '100%' }}>
+              <h1 className="step-title" style={{ marginTop: 8, marginBottom: 4 }}>Combien de fois souhaitez-vous <span className="brand-gradient-text">check-in</span> ?</h1>
+              <p className="step-subtitle" style={{ maxWidth: 320, marginTop: 0, marginBottom: 0, margin: '0 auto' }}>
+                En créant de la répétition dans les check-ins, vous pourrez obtenir des informations précises sur votre état de santé.
+              </p>
+            </div>
             <div className="selection-grid grid-2x2" style={{ gap: '14px' }}>
               {[1,2,3,4].map((num) => (
                 <div
@@ -287,7 +289,20 @@ export default function Onboarding() {
           <div className="step-content">
             <h1 className="step-title">Informations personnelles</h1>
             <label className="onboarding-label">Maladie chronique</label>
-            <input type="text" className="onboarding-input" placeholder="Ex: Hypertension" value={data.maladie || ''} onChange={(e) => updateField('maladie', e.target.value)} />
+            <select className="onboarding-input" value={data.maladie || ''} onChange={(e) => updateField('maladie', e.target.value)}>
+              <option value="">Sélectionnez une maladie</option>
+              <option value="Hypertension">Hypertension</option>
+              <option value="Diabète">Diabète</option>
+              <option value="Asthme">Asthme</option>
+              <option value="Maladie cardiovasculaire">Maladie cardiovasculaire</option>
+              <option value="Arthrite">Arthrite</option>
+              <option value="Maladie de Crohn">Maladie de Crohn</option>
+              <option value="Fibromyalgie">Fibromyalgie</option>
+              <option value="Autre">Autre</option>
+            </select>
+            {data.maladie === 'Autre' && (
+              <input type="text" className="onboarding-input" placeholder="Précisez votre maladie" value={data.maladieAutre || ''} onChange={(e) => updateField('maladieAutre', e.target.value)} />
+            )}
             <label className="onboarding-label">Date de diagnostic</label>
             <input type="date" className="onboarding-input" value={data.diagDate || ''} onChange={(e)=>updateField('diagDate', e.target.value)} />
             <label className="onboarding-label">Médicaments</label>
@@ -300,7 +315,7 @@ export default function Onboarding() {
 
         {stepKey === 'carePlanV2' && (
           <div className="step-content">
-            <h1 className="step-title">Set up de votre care plan</h1>
+            <h1 className="step-title" style={{ marginBottom: '32px' }}>Set up de votre care plan</h1>
             <div className="care-times">
               {[
                 { label: 'Matin', idx: 0, defaultTime: '08:00' },

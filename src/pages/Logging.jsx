@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
 import '../App.css'
-import GradientBackground from '../components/mobile/GradientBackground'
+import { LoggingGradientBackground } from '../components/mobile/LoggingGradientBackground'
 import MobileFrame from '../components/mobile/MobileFrame'
 import BottomActions from '../components/mobile/BottomActions'
 import StatusBar from '../components/mobile/StatusBar'
@@ -44,24 +44,8 @@ export const LoggingModal = ({ open, onClose, onSubmit }) => {
     if (currentStep < LOGGING_STEPS.length - 1) {
       setCurrentStep(currentStep + 1)
     } else {
-      // Complete logging flow
-      if (onSubmit) onSubmit({
-        mood: loggingData.mood / 100, // Convert to 0-1 range for compatibility
-        symptoms: loggingData.symptoms,
-        customSymptoms: loggingData.customSymptoms,
-        tension: loggingData.treatment === true ? 'oui' : loggingData.treatment === false ? 'non' : null,
-        tensionValue: `${loggingData.bloodPressure.systolic}/${loggingData.bloodPressure.diastolic}`,
-        treatments: [], // Keep empty for now
-        customTreatments: '',
-        foods: loggingData.consumption,
-        customFoods: loggingData.customConsumption,
-        physicalActivity: loggingData.activity,
-        stress: loggingData.stress / 100, // Convert to 0-1 range for compatibility
-      })
-      
-      // Reset and close
-      resetModal()
-      if (onClose) onClose()
+      // Complete logging flow - only show success modal if completing all steps
+      handleCompleteLogging()
     }
   }
 
@@ -95,6 +79,29 @@ export const LoggingModal = ({ open, onClose, onSubmit }) => {
     if (onClose) onClose()
   }
 
+  const handleCompleteLogging = () => {
+    // Only call onSubmit if we're on the last step (stress screen)
+    if (currentStep === LOGGING_STEPS.length - 1) {
+      if (onSubmit) onSubmit({
+        mood: loggingData.mood / 100, // Convert to 0-1 range for compatibility
+        symptoms: loggingData.symptoms,
+        customSymptoms: loggingData.customSymptoms,
+        tension: loggingData.treatment === true ? 'oui' : loggingData.treatment === false ? 'non' : null,
+        tensionValue: `${loggingData.bloodPressure.systolic}/${loggingData.bloodPressure.diastolic}`,
+        treatments: [], // Keep empty for now
+        customTreatments: '',
+        foods: loggingData.consumption,
+        customFoods: loggingData.customConsumption,
+        physicalActivity: loggingData.activity,
+        stress: loggingData.stress / 100, // Convert to 0-1 range for compatibility
+      })
+    }
+    
+    // Reset and close
+    resetModal()
+    if (onClose) onClose()
+  }
+
   const progress = ((currentStep + 1) / LOGGING_STEPS.length) * 100
   return (
     <div className={`logging-modal-bg${open ? ' open' : ''}`} onClick={handleModalClose}>
@@ -113,7 +120,7 @@ export const LoggingModal = ({ open, onClose, onSubmit }) => {
         }}
         onClick={e => e.stopPropagation()}
       >
-        <GradientBackground />
+        <LoggingGradientBackground />
         
         <MobileFrame showStatusBar={false}>
 
@@ -131,6 +138,8 @@ export const LoggingModal = ({ open, onClose, onSubmit }) => {
           {/* Step Content */}
           <div className="step-content" style={{ 
             padding: '0 30px', 
+            margin: '0 20px',
+            marginTop: '32px',
             height: 'calc(100vh - 200px)',
             display: 'flex',
             flexDirection: 'column'
@@ -500,7 +509,7 @@ const ConsumptionScreen = ({ selectedItems, customItems, onItemsChange, onCustom
 
       <LoggingCustomInput
         label="D'autres aliments consommés ?"
-          placeholder="Stress, changements d'humeur..."
+          placeholder="Pâtisseries industrielles, viandes rouges..."
           value={customItems}
         onChange={onCustomChange}
       />
@@ -644,7 +653,7 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
           <div style={{
             position: 'absolute',
             left: '87px',
-            top: '98px',
+            top: '70px',
             transform: 'translateX(-50%)',
             width: '92px',
             fontSize: '16px',
@@ -660,7 +669,7 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
           <div style={{
             position: 'absolute',
             left: '253px',
-            top: '98px',
+            top: '70px',
             transform: 'translateX(-50%)',
             width: '92px',
             fontSize: '16px',

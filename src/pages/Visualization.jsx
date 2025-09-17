@@ -253,11 +253,20 @@ const Visualization = () => {
     setDateRangeIndex(newIndex);
   };
 
+  // Check if next date range would be in the future
+  const isNextDateInFuture = () => {
+    const nextIndex = dateRangeIndex + 1;
+    if (nextIndex > bounds.maxIndex) return true;
+    
+    // Simple check: if we're at index 0 (current period) and trying to go forward, it's future
+    return dateRangeIndex >= 0;
+  };
+
   return (
     <div className="new-viz-container">
       <GradientBackground />
       
-      <TopLogo />
+      <TopLogo sticky={false} />
 
       {/* Time Period Filter Chips */}
       <div className="new-viz-filter-bar">
@@ -288,8 +297,8 @@ const Visualization = () => {
         <button 
           className="new-viz-date-arrow" 
           onClick={handleNextDateRange}
-          disabled={clampedDateRangeIndex >= bounds.maxIndex}
-          style={{opacity: clampedDateRangeIndex >= bounds.maxIndex ? 0.5 : 1}}
+          disabled={clampedDateRangeIndex >= bounds.maxIndex || isNextDateInFuture()}
+          style={{opacity: (clampedDateRangeIndex >= bounds.maxIndex || isNextDateInFuture()) ? 0.5 : 1}}
         >
           ›
         </button>

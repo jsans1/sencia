@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../App.css'
-import GradientBackground from '../components/mobile/GradientBackground'
+import { LoggingGradientBackground } from '../components/mobile/LoggingGradientBackground'
 import MobileFrame from '../components/mobile/MobileFrame'
 import BottomActions from '../components/mobile/BottomActions'
 import { 
@@ -47,8 +47,10 @@ export default function LoggingFlow() {
     if (currentStep < LOGGING_STEPS.length - 1) {
       setCurrentStep(currentStep + 1)
     } else {
-      // Complete logging flow
+      // Complete logging flow - only show success modal if completing all steps
       console.log('Logging completed:', loggingData)
+      // Set flag to show success modal on homepage
+      sessionStorage.setItem('loggingCompleted', 'true')
       navigate('/app')
     }
   }
@@ -65,7 +67,7 @@ export default function LoggingFlow() {
 
   return (
     <>
-      <GradientBackground />
+      <LoggingGradientBackground />
       <MobileFrame showStatusBar={false}>
         {/* Navigation Header */}
         <div className="onboarding-nav" style={{ paddingTop: '16px' }}>
@@ -86,7 +88,10 @@ export default function LoggingFlow() {
                 />
               </div>
             </div>
-            <button className="nav-close" onClick={() => navigate('/app')}>
+            <button className="nav-close" onClick={() => {
+              // Don't set loggingCompleted flag when closing early
+              navigate('/app')
+            }}>
               ✕
             </button>
           </div>
@@ -96,7 +101,7 @@ export default function LoggingFlow() {
         </div>
 
         {/* Step Content */}
-        <div className="step-content">
+        <div className="step-content" style={{ margin: '0 20px', marginTop: '32px' }}>
           {stepKey === 'mood' && (
             <MoodScreen 
               value={loggingData.mood} 
@@ -462,7 +467,7 @@ const ConsumptionScreen = ({ selectedItems, customItems, onItemsChange, onCustom
 
       <LoggingCustomInput
         label="D'autres aliments consommés ?"
-          placeholder="Stress, changements d'humeur..."
+          placeholder="Pâtisseries industrielles, viandes rouges..."
           value={customItems}
         onChange={onCustomChange}
       />
@@ -606,7 +611,7 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
           <div style={{
             position: 'absolute',
             left: '87px',
-            top: '98px',
+            top: '70px',
             transform: 'translateX(-50%)',
             width: '92px',
             fontSize: '16px',
@@ -622,7 +627,7 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
           <div style={{
             position: 'absolute',
             left: '253px',
-            top: '98px',
+            top: '70px',
             transform: 'translateX(-50%)',
             width: '92px',
             fontSize: '16px',

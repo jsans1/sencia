@@ -1058,7 +1058,7 @@
 
 .add-medication-pill {
   background: transparent;
-  border: 2px dashed #C7C7CC;
+  border: 1px dashed #C7C7CC;
   border-radius: 20px;
   padding: 8px 16px;
   font-size: 14px;

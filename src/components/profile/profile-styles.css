@@ -97,22 +97,30 @@
 
 .profile-tag {
   padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  border: 1px solid #e2e8f0;
+  border-radius: 90px;
+  border: 0.8px solid #808080;
+  background: #FFF;
+  color: #606060;
+  leading-trim: both;
+  text-edge: cap;
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-family: "SF Pro Display";
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 120%;
 }
 
 .health-tag {
-  background: #fef2f2;
-  color: #dc2626;
-  border-color: #fecaca;
+  background: #FFF;
+  color: #606060;
+  border-color: #808080;
 }
 
 .device-tag {
-  background: #f0f9ff;
-  color: #2563eb;
-  border-color: #bfdbfe;
+  background: #FFF;
+  color: #606060;
+  border-color: #808080;
 }
 
 /* Profile Sections */
@@ -135,7 +143,7 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
-  background: #f1f5f9;
+  background: #;
   border-radius: 12px;
   overflow: hidden;
 }
@@ -143,8 +151,8 @@
 .section-item {
   display: flex;
   align-items: center;
-  padding: 16px 20px;
-  background: rgba(255, 255, 255, 0.9);
+  padding: 16px 0;
+  background: none;
   border: none;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -157,21 +165,23 @@
 }
 
 .section-item:hover {
-  background: #f8fafc;
+  background: none;
 }
 
 .section-item:active {
-  background: #f1f5f9;
+  background: none;
 }
 
 .item-icon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   margin-right: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
+}
+
+.section-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .item-text {
@@ -190,41 +200,48 @@
 /* Confidentiality Text */
 .confidentiality-text {
   font-size: 14px;
-  color: #64748b;
+  color: #000000;
   line-height: 1.5;
   margin: 0 0 16px 0;
-  padding: 16px;
-  background: #f8fafc;
-  border-radius: 8px;
-  border-left: 3px solid #3b82f6;
 }
 
 /* Back Button */
 .back-button {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   background: none;
   border: none;
   cursor: pointer;
   padding: 8px 0;
-  color: #111;
-  font-size: 18px;
+  color: #495057;
+  font-size: 14px;
   font-weight: 500;
-  transition: opacity 0.2s ease;
+  margin-bottom: 20px;
+  box-shadow: none;
+  outline: none;
+  text-shadow: none;
 }
 
-.back-button:hover {
-  opacity: 0.7;
+.back-button:hover,
+.back-button:active,
+.back-button:focus {
+  box-shadow: none;
+  outline: none;
+  text-shadow: none;
+  background: none;
+  border: none;
 }
 
 .back-arrow {
-  font-size: 20px;
-  font-weight: 300;
+  font-size: 16px;
+  font-weight: 600;
+  color: #6c757d;
 }
 
 .back-text {
   font-weight: 500;
+  color: #495057;
 }
 
 /* Profile Content */
@@ -239,7 +256,6 @@
   display: flex;
   align-items: center;
   padding: 16px 20px;
-  background: rgba(255, 255, 255, 0.9);
   border-bottom: 1px solid #f1f5f9;
   position: relative;
   z-index: 3;
@@ -309,28 +325,28 @@
 
 .save-button {
   width: 100%;
-  padding: 14px 20px;
-  background: #3b82f6;
-  color: #ffffff;
+  padding: 16px 24px;
+  background: #000;
+  color: #FFFFFF;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: 12px;
+  font-size: 17px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
   margin-top: 8px;
 }
 
 .save-button:hover {
-  background: #2563eb;
+  background: #333;
 }
 
 .save-button:active {
-  background: #1d4ed8;
+  background: #1a1a1a;
 }
 
 .save-button:disabled {
-  background: #cbd5e1;
+  background: #C7C7CC;
   cursor: not-allowed;
 }
 
@@ -463,6 +479,12 @@
     width: 100vw;
   }
   
+  .back-button {
+    padding: 8px 12px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  
   .profile-header,
   .profile-info-section,
   .profile-section {
@@ -483,7 +505,7 @@
   }
   
   .section-item {
-    padding: 14px 16px;
+    padding: 14px 0;
     font-size: 15px;
   }
 }
@@ -496,6 +518,12 @@
     padding-right: 16px;
   }
   
+  .back-button {
+    padding: 6px 10px;
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+  
   .profile-name {
     font-size: 22px;
   }
@@ -506,7 +534,7 @@
   }
   
   .section-item {
-    padding: 12px 14px;
+    padding: 12px 0;
   }
   
   .item-icon {
@@ -524,7 +552,7 @@
   }
   
   .profile-tag {
-    font-size: 13px;
+    font-size: 12px;
     padding: 5px 10px;
   }
 }
