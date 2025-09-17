@@ -128,7 +128,7 @@ export const LoggingModal = ({ open, onClose, onSubmit }) => {
           <div style={{ padding: '32px 20px 8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button onClick={prevStep} disabled={currentStep === 0} style={{ background: 'none', border: 'none', fontSize: '18px', cursor: currentStep > 0 ? 'pointer' : 'not-allowed', opacity: currentStep > 0 ? 1 : 0.3 }}>←</button>
             <div style={{ flex: 1 }}>
-              <div style={{ width: '100%', height: '4px', background: 'rgba(0,0,0,0.08)', borderRadius: '999px', overflow: 'hidden' }}>
+              <div style={{ width: '100%', height: '4px', borderRadius: '999px', overflow: 'hidden' }}>
                 <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(90deg, #A69BF8 0%, #0E7AFE 100%)' }} />
               </div>
             </div>
@@ -590,16 +590,91 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
     setIsDragging(false)
   }, [])
 
+  const handleTouchStart = useCallback((e) => {
+    e.preventDefault()
+    setIsDragging(true)
+    const touch = e.touches[0]
+    if (!isDragging || !wheelRef.current) return
+
+    const rect = wheelRef.current.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    
+    // Calculate position relative to wheel center
+    const deltaX = touch.clientX - centerX
+    const deltaY = touch.clientY - centerY
+    
+    // Convert to percentage within wheel bounds
+    const wheelRadius = rect.width / 2 * 0.8 // 80% of wheel radius to keep selector inside
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
+    
+    if (distance <= wheelRadius) {
+      const newX = ((deltaX / rect.width) * 100) + 50
+      const newY = ((deltaY / rect.height) * 100) + 50
+      setSelectorPosition({ x: newX, y: newY })
+      
+      // Calculate angle for sector detection
+      const angle = Math.atan2(-deltaY, deltaX) // Negative deltaY because screen coordinates are flipped
+      const newSelection = getSelectionFromAngle(angle)
+      
+      if (newSelection !== value) {
+        onChange(newSelection)
+        setHasInteracted(true)
+      }
+    }
+  }, [isDragging, value, onChange])
+
+  const handleTouchMove = useCallback((e) => {
+    if (!isDragging || !wheelRef.current) return
+    e.preventDefault()
+
+    const touch = e.touches[0]
+    const rect = wheelRef.current.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    
+    // Calculate position relative to wheel center
+    const deltaX = touch.clientX - centerX
+    const deltaY = touch.clientY - centerY
+    
+    // Convert to percentage within wheel bounds
+    const wheelRadius = rect.width / 2 * 0.8 // 80% of wheel radius to keep selector inside
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
+    
+    if (distance <= wheelRadius) {
+      const newX = ((deltaX / rect.width) * 100) + 50
+      const newY = ((deltaY / rect.height) * 100) + 50
+      setSelectorPosition({ x: newX, y: newY })
+      
+      // Calculate angle for sector detection
+      const angle = Math.atan2(-deltaY, deltaX) // Negative deltaY because screen coordinates are flipped
+      const newSelection = getSelectionFromAngle(angle)
+      
+      if (newSelection !== value) {
+        onChange(newSelection)
+        setHasInteracted(true)
+      }
+    }
+  }, [isDragging, value, onChange])
+
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
   useEffect(() => {
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove)
       document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('touchmove', handleTouchMove, { passive: false })
+      document.addEventListener('touchend', handleTouchEnd)
       return () => {
         document.removeEventListener('mousemove', handleMouseMove)
         document.removeEventListener('mouseup', handleMouseUp)
+        document.removeEventListener('touchmove', handleTouchMove)
+        document.removeEventListener('touchend', handleTouchEnd)
       }
     }
-  }, [isDragging, handleMouseMove, handleMouseUp])
+  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
 
   return (
     <>
@@ -620,6 +695,7 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
               cursor: 'pointer', 
               userSelect: 'none' 
             }}
+            onTouchStart={handleTouchStart}
           >
             <svg width="340" height="340" viewBox="0 0 344 344" style={{ display: 'block', width: '100%', height: '100%' }}>
               <g>
@@ -713,6 +789,7 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
               cursor: 'grab'
             }}
             onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
           >
             <div style={{
               width: '100%',
