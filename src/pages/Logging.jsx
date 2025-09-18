@@ -593,36 +593,7 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
   const handleTouchStart = useCallback((e) => {
     e.preventDefault()
     setIsDragging(true)
-    const touch = e.touches[0]
-    if (!isDragging || !wheelRef.current) return
-
-    const rect = wheelRef.current.getBoundingClientRect()
-    const centerX = rect.left + rect.width / 2
-    const centerY = rect.top + rect.height / 2
-    
-    // Calculate position relative to wheel center
-    const deltaX = touch.clientX - centerX
-    const deltaY = touch.clientY - centerY
-    
-    // Convert to percentage within wheel bounds
-    const wheelRadius = rect.width / 2 * 0.8 // 80% of wheel radius to keep selector inside
-    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
-    
-    if (distance <= wheelRadius) {
-      const newX = ((deltaX / rect.width) * 100) + 50
-      const newY = ((deltaY / rect.height) * 100) + 50
-      setSelectorPosition({ x: newX, y: newY })
-      
-      // Calculate angle for sector detection
-      const angle = Math.atan2(-deltaY, deltaX) // Negative deltaY because screen coordinates are flipped
-      const newSelection = getSelectionFromAngle(angle)
-      
-      if (newSelection !== value) {
-        onChange(newSelection)
-        setHasInteracted(true)
-      }
-    }
-  }, [isDragging, value, onChange])
+  }, [])
 
   const handleTouchMove = useCallback((e) => {
     if (!isDragging || !wheelRef.current) return
@@ -667,12 +638,13 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
       document.addEventListener('mouseup', handleMouseUp)
       document.addEventListener('touchmove', handleTouchMove, { passive: false })
       document.addEventListener('touchend', handleTouchEnd)
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove)
-        document.removeEventListener('mouseup', handleMouseUp)
-        document.removeEventListener('touchmove', handleTouchMove)
-        document.removeEventListener('touchend', handleTouchEnd)
-      }
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleTouchEnd)
     }
   }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
 
