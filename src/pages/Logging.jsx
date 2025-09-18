@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
 import '../App.css'
-import GradientBackground from '../components/mobile/GradientBackground'
+import { LoggingGradientBackground } from '../components/mobile/LoggingGradientBackground'
 import MobileFrame from '../components/mobile/MobileFrame'
 import BottomActions from '../components/mobile/BottomActions'
 import StatusBar from '../components/mobile/StatusBar'
@@ -44,24 +44,8 @@ export const LoggingModal = ({ open, onClose, onSubmit }) => {
     if (currentStep < LOGGING_STEPS.length - 1) {
       setCurrentStep(currentStep + 1)
     } else {
-      // Complete logging flow
-      if (onSubmit) onSubmit({
-        mood: loggingData.mood / 100, // Convert to 0-1 range for compatibility
-        symptoms: loggingData.symptoms,
-        customSymptoms: loggingData.customSymptoms,
-        tension: loggingData.treatment === true ? 'oui' : loggingData.treatment === false ? 'non' : null,
-        tensionValue: `${loggingData.bloodPressure.systolic}/${loggingData.bloodPressure.diastolic}`,
-        treatments: [], // Keep empty for now
-        customTreatments: '',
-        foods: loggingData.consumption,
-        customFoods: loggingData.customConsumption,
-        physicalActivity: loggingData.activity,
-        stress: loggingData.stress / 100, // Convert to 0-1 range for compatibility
-      })
-      
-      // Reset and close
-      resetModal()
-      if (onClose) onClose()
+      // Complete logging flow - only show success modal if completing all steps
+      handleCompleteLogging()
     }
   }
 
@@ -95,6 +79,29 @@ export const LoggingModal = ({ open, onClose, onSubmit }) => {
     if (onClose) onClose()
   }
 
+  const handleCompleteLogging = () => {
+    // Only call onSubmit if we're on the last step (stress screen)
+    if (currentStep === LOGGING_STEPS.length - 1) {
+      if (onSubmit) onSubmit({
+        mood: loggingData.mood / 100, // Convert to 0-1 range for compatibility
+        symptoms: loggingData.symptoms,
+        customSymptoms: loggingData.customSymptoms,
+        tension: loggingData.treatment === true ? 'oui' : loggingData.treatment === false ? 'non' : null,
+        tensionValue: `${loggingData.bloodPressure.systolic}/${loggingData.bloodPressure.diastolic}`,
+        treatments: [], // Keep empty for now
+        customTreatments: '',
+        foods: loggingData.consumption,
+        customFoods: loggingData.customConsumption,
+        physicalActivity: loggingData.activity,
+        stress: loggingData.stress / 100, // Convert to 0-1 range for compatibility
+      })
+    }
+    
+    // Reset and close
+    resetModal()
+    if (onClose) onClose()
+  }
+
   const progress = ((currentStep + 1) / LOGGING_STEPS.length) * 100
   return (
     <div className={`logging-modal-bg${open ? ' open' : ''}`} onClick={handleModalClose}>
@@ -113,7 +120,7 @@ export const LoggingModal = ({ open, onClose, onSubmit }) => {
         }}
         onClick={e => e.stopPropagation()}
       >
-        <GradientBackground />
+        <LoggingGradientBackground />
         
         <MobileFrame showStatusBar={false}>
 
@@ -121,7 +128,7 @@ export const LoggingModal = ({ open, onClose, onSubmit }) => {
           <div style={{ padding: '32px 20px 8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button onClick={prevStep} disabled={currentStep === 0} style={{ background: 'none', border: 'none', fontSize: '18px', cursor: currentStep > 0 ? 'pointer' : 'not-allowed', opacity: currentStep > 0 ? 1 : 0.3 }}>←</button>
             <div style={{ flex: 1 }}>
-              <div style={{ width: '100%', height: '4px', background: 'rgba(0,0,0,0.08)', borderRadius: '999px', overflow: 'hidden' }}>
+              <div style={{ width: '100%', height: '4px', borderRadius: '999px', overflow: 'hidden' }}>
                 <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(90deg, #A69BF8 0%, #0E7AFE 100%)' }} />
               </div>
             </div>
@@ -131,6 +138,8 @@ export const LoggingModal = ({ open, onClose, onSubmit }) => {
           {/* Step Content */}
           <div className="step-content" style={{ 
             padding: '0 30px', 
+            margin: '0 20px',
+            marginTop: '32px',
             height: 'calc(100vh - 200px)',
             display: 'flex',
             flexDirection: 'column'
@@ -500,7 +509,7 @@ const ConsumptionScreen = ({ selectedItems, customItems, onItemsChange, onCustom
 
       <LoggingCustomInput
         label="D'autres aliments consommés ?"
-          placeholder="Stress, changements d'humeur..."
+          placeholder="Pâtisseries industrielles, viandes rouges..."
           value={customItems}
         onChange={onCustomChange}
       />
@@ -581,16 +590,63 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
     setIsDragging(false)
   }, [])
 
+  const handleTouchStart = useCallback((e) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }, [])
+
+  const handleTouchMove = useCallback((e) => {
+    if (!isDragging || !wheelRef.current) return
+    e.preventDefault()
+
+    const touch = e.touches[0]
+    const rect = wheelRef.current.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    
+    // Calculate position relative to wheel center
+    const deltaX = touch.clientX - centerX
+    const deltaY = touch.clientY - centerY
+    
+    // Convert to percentage within wheel bounds
+    const wheelRadius = rect.width / 2 * 0.8 // 80% of wheel radius to keep selector inside
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
+    
+    if (distance <= wheelRadius) {
+      const newX = ((deltaX / rect.width) * 100) + 50
+      const newY = ((deltaY / rect.height) * 100) + 50
+      setSelectorPosition({ x: newX, y: newY })
+      
+      // Calculate angle for sector detection
+      const angle = Math.atan2(-deltaY, deltaX) // Negative deltaY because screen coordinates are flipped
+      const newSelection = getSelectionFromAngle(angle)
+      
+      if (newSelection !== value) {
+        onChange(newSelection)
+        setHasInteracted(true)
+      }
+    }
+  }, [isDragging, value, onChange])
+
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
   useEffect(() => {
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove)
       document.addEventListener('mouseup', handleMouseUp)
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove)
-        document.removeEventListener('mouseup', handleMouseUp)
-      }
+      document.addEventListener('touchmove', handleTouchMove, { passive: false })
+      document.addEventListener('touchend', handleTouchEnd)
     }
-  }, [isDragging, handleMouseMove, handleMouseUp])
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd])
 
   return (
     <>
@@ -611,6 +667,7 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
               cursor: 'pointer', 
               userSelect: 'none' 
             }}
+            onTouchStart={handleTouchStart}
           >
             <svg width="340" height="340" viewBox="0 0 344 344" style={{ display: 'block', width: '100%', height: '100%' }}>
               <g>
@@ -644,7 +701,7 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
           <div style={{
             position: 'absolute',
             left: '87px',
-            top: '98px',
+            top: '70px',
             transform: 'translateX(-50%)',
             width: '92px',
             fontSize: '16px',
@@ -660,7 +717,7 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
           <div style={{
             position: 'absolute',
             left: '253px',
-            top: '98px',
+            top: '70px',
             transform: 'translateX(-50%)',
             width: '92px',
             fontSize: '16px',
@@ -704,6 +761,7 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
               cursor: 'grab'
             }}
             onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
           >
             <div style={{
               width: '100%',

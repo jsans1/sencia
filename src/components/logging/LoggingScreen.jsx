@@ -2,9 +2,11 @@ import React from 'react';
 
 // Reusable screen header component
 export const LoggingScreenHeader = ({ title, subtitle }) => (
-  <div style={{ textAlign: 'left', marginBottom: '24px' }}>
-    <h2 className="step-title">{title}</h2>
-    <p className="step-subtitle">{subtitle}</p>
+  <div style={{ textAlign: 'left', marginBottom: '20px' }}>
+    <div style={{ marginBottom: '8px' }}>
+      <h2 className="step-title">{title}</h2>
+      <p className="step-subtitle">{subtitle}</p>
+    </div>
   </div>
 );
 
@@ -27,9 +29,16 @@ export const LoggingSlider = ({
     height: '350px',
     justifyContent: 'center',
     position: 'relative',
-    marginBottom: '80px'
+    marginBottom: '80px',
+    width: '100%'
   }}>
-    <div style={{ fontSize: '14px', marginBottom: '20px', color: 'black' }}>{topLabel}</div>
+    <div style={{ 
+      fontSize: '14px', 
+      marginBottom: '20px', 
+      color: 'black',
+      textAlign: 'center',
+      width: '100%'
+    }}>{topLabel}</div>
     
     <div 
       ref={sliderRef}
@@ -39,7 +48,8 @@ export const LoggingSlider = ({
         background: 'linear-gradient(to bottom, #62ffa4, #ffb48b, #ff5d5d)', 
         borderRadius: '19px',
         position: 'relative',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        margin: '0 auto'
       }}
       onMouseDown={onMouseDown}
       onTouchStart={onTouchStart}
@@ -49,7 +59,7 @@ export const LoggingSlider = ({
           position: 'absolute',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          top: `${(100 - value)}%`,
+          top: `${Math.max(7.92, Math.min(91.92, 100 - value))}%`,
           width: '32px',
           height: '32px',
           backgroundColor: 'white',
@@ -64,7 +74,13 @@ export const LoggingSlider = ({
       />
     </div>
     
-    <div style={{ fontSize: '14px', marginTop: '20px', color: 'black' }}>{bottomLabel}</div>
+    <div style={{ 
+      fontSize: '14px', 
+      marginTop: '20px', 
+      color: 'black',
+      textAlign: 'center',
+      width: '100%'
+    }}>{bottomLabel}</div>
   </div>
 );
 

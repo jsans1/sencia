@@ -14,7 +14,7 @@ function AccountPasswordPage({ onBack }) {
 
   return (
     <div className="profile-page">
-      <TopLogo />
+      <TopLogo sticky={false} />
       
       {/* Header */}
       <div className="profile-header">

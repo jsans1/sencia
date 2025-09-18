@@ -7,13 +7,31 @@ import LoggingFlow from './pages/LoggingFlow'
 import Visualization from './pages/Visualization'
 import Export from './pages/Export'
 import Profile from './pages/Profile'
+import LoggingSuccessModal from './components/LoggingSuccessModal'
 // Removed unused pages: Splash, Features, AuthChoice, WelcomeLoris
 import React, { useState } from 'react';
 
 function App() {
   const [loggingOpen, setLoggingOpen] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  
   const handleAdd = () => setLoggingOpen(true);
   const handleClose = () => setLoggingOpen(false);
+  
+  const handleLoggingComplete = () => {
+    setLoggingOpen(false);
+    setShowSuccessModal(true);
+  };
+  
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false);
+  };
+  
+  const handleViewData = () => {
+    setShowSuccessModal(false);
+    // Navigate to visualization page
+    window.location.href = '/app/visualization';
+  };
   return (
     <>
       <Router>
@@ -29,7 +47,12 @@ function App() {
                   <Route path="profile" element={<Profile />} />
                 </Route>
         </Routes>
-        <LoggingModal open={loggingOpen} onClose={handleClose} />
+        <LoggingModal open={loggingOpen} onClose={handleClose} onSubmit={handleLoggingComplete} />
+        <LoggingSuccessModal 
+          isOpen={showSuccessModal} 
+          onClose={handleSuccessModalClose} 
+          onViewData={handleViewData} 
+        />
       </Router>
     </>
   )
