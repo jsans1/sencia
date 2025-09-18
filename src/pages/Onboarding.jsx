@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../App.css'
-import logo from '../assets/logo.svg'
+// Logo is now in public directory, using direct path
 import MobileFrame from '../components/mobile/MobileFrame'
 import OnboardingNavigation from '../components/mobile/OnboardingNavigation'
 import CardSelection from '../components/mobile/CardSelection'
@@ -13,6 +13,188 @@ import TermsAndConditions from '../components/mobile/TermsAndConditions'
 import MedicationPills from '../components/mobile/MedicationPills'
 import GradientBackground from '../components/mobile/GradientBackground'
 import MultiSelectChips from '../components/onboarding/MultiSelectChips'
+
+// Medication Reminder Modal Component
+const MedicationReminderModal = ({ isOpen, onClose, onConfirm }) => {
+  const [reminderTimes, setReminderTimes] = useState({
+    midi: '12:00',
+    soir: '18:30'
+  })
+
+  const handleTimeChange = (period, time) => {
+    setReminderTimes(prev => ({
+      ...prev,
+      [period]: time
+    }))
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <div 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999,
+        padding: '20px'
+      }}
+      onClick={(e) => {
+        e.stopPropagation()
+        onClose()
+      }}
+    >
+      <div 
+        style={{
+          backgroundColor: 'white',
+          borderRadius: '20px',
+          padding: '24px',
+          width: '100%',
+          maxWidth: '400px',
+          maxHeight: '90vh',
+          overflow: 'auto'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: '20px'
+        }}>
+          <h2 style={{
+            fontSize: '20px',
+            fontWeight: '700',
+            color: '#000',
+            margin: 0,
+            lineHeight: '1.3'
+          }}>
+            Souhaitez-vous que l'on vous rappelle ?
+          </h2>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '20px',
+              color: '#8E8E93',
+              cursor: 'pointer',
+              padding: '4px'
+            }}
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Description */}
+        <p style={{
+          fontSize: '14px',
+          color: '#333',
+          lineHeight: '1.4',
+          marginBottom: '24px'
+        }}>
+          Le respect de la prise de médicaments à des heures constantes est essentielle à votre suivi.
+        </p>
+
+        {/* Time Selection Cards */}
+        <div style={{ marginBottom: '32px' }}>
+          {/* Midi Card */}
+          <div className="care-time-card" style={{ marginBottom: '12px' }}>
+            <div>
+              <div className="care-time-title">Midi</div>
+              <div className="care-time-value">{reminderTimes.midi}</div>
+            </div>
+            <button
+              onClick={() => {
+                const newTime = prompt('Entrez l\'heure (HH:MM):', reminderTimes.midi)
+                if (newTime && /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(newTime)) {
+                  handleTimeChange('midi', newTime)
+                }
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#666',
+                cursor: 'pointer',
+                fontSize: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              Modifier
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
+            </button>
+          </div>
+
+          {/* Soir Card */}
+          <div className="care-time-card">
+            <div>
+              <div className="care-time-title">Soir</div>
+              <div className="care-time-value">{reminderTimes.soir}</div>
+            </div>
+            <button
+              onClick={() => {
+                const newTime = prompt('Entrez l\'heure (HH:MM):', reminderTimes.soir)
+                if (newTime && /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(newTime)) {
+                  handleTimeChange('soir', newTime)
+                }
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#666',
+                cursor: 'pointer',
+                fontSize: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              Modifier
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Action Button */}
+        <button
+          onClick={() => {
+            onConfirm(reminderTimes)
+            onClose()
+          }}
+          style={{
+            width: '100%',
+            padding: '16px 24px',
+            backgroundColor: '#000',
+            color: 'white',
+            border: 'none',
+            borderRadius: '12px',
+            fontSize: '16px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseOver={(e) => e.target.style.backgroundColor = '#333'}
+          onMouseOut={(e) => e.target.style.backgroundColor = '#000'}
+        >
+          Enregistrer mes rappels
+        </button>
+      </div>
+    </div>
+  )
+}
 
 const stepsOrder = [
   'welcome',
@@ -43,6 +225,7 @@ export default function Onboarding() {
   const navigate = useNavigate()
   const [stepIndex, setStepIndex] = useState(0)
   const [showLoginModal, setShowLoginModal] = useState(false)
+  const [showMedicationReminderModal, setShowMedicationReminderModal] = useState(false)
   const timeInputsRef = useRef([])
   const [editingTimeIdx, setEditingTimeIdx] = useState(-1)
   const [tempTime, setTempTime] = useState('')
@@ -70,8 +253,32 @@ export default function Onboarding() {
     }
   }, [stepKey])
 
-  const next = () => setStepIndex((i) => Math.min(i + 1, stepsOrder.length - 1))
+  const next = () => {
+    const currentStepKey = stepsOrder[stepIndex]
+    
+    // Check if we're on the infosPerso step and medications are selected
+    if (currentStepKey === 'infosPerso' && data.medicaments && data.medicaments.length > 0) {
+      setShowMedicationReminderModal(true)
+    } else {
+      setStepIndex((i) => Math.min(i + 1, stepsOrder.length - 1))
+    }
+  }
   const back = () => setStepIndex((i) => Math.max(i - 1, 0))
+
+  const handleMedicationReminderConfirm = (reminderTimes) => {
+    // Save the reminder times to data
+    setData(prev => ({
+      ...prev,
+      medicationReminders: reminderTimes
+    }))
+    // Continue to next step
+    setStepIndex((i) => Math.min(i + 1, stepsOrder.length - 1))
+  }
+
+  const handleMedicationReminderClose = () => {
+    setShowMedicationReminderModal(false)
+    // Don't advance step here - let the confirm handler do it
+  }
 
   const toggleInfos = (value) => {
     setData((prev) => ({
@@ -130,7 +337,7 @@ export default function Onboarding() {
 
         {stepKey === 'welcomeLoris' && (
           <div className="step-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center' }}>
-            <img className="onb-logo" src={logo} alt="Sencia" />
+            <img className="onb-logo" src="/logo.svg" alt="Sencia" />
             <h1 className="step-title" style={{ marginTop: 8 }}>Bienvenue <span style={{ color: '#2563eb' }}>Loris</span></h1>
             <p className="step-subtitle" style={{ maxWidth: 320 }}>Suivez quotidiennement vos symptômes et vos ressentis.</p>
           </div>
@@ -141,7 +348,7 @@ export default function Onboarding() {
             <div style={{ marginBottom: 4, textAlign: 'center', width: '100%' }}>
               <h1 className="step-title" style={{ marginTop: 8, marginBottom: 4 }}>Combien de fois souhaitez-vous <span className="brand-gradient-text">check-in</span> ?</h1>
               <p className="step-subtitle" style={{ maxWidth: 320, marginTop: 0, marginBottom: 0, margin: '0 auto' }}>
-                En créant de la répétition dans les check-ins, vous pourrez obtenir des informations précises sur votre état de santé.
+              Un check-in, c’est un moment pour faire le point. En quelques secondes, indiquez comment vous vous sentez, vos symptômes et les traitements pris.
               </p>
             </div>
             <div className="selection-grid grid-2x2" style={{ gap: '14px' }}>
@@ -165,14 +372,14 @@ export default function Onboarding() {
 
         {stepKey === 'welcome' && (
           <div className="step-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center' }}>
-            <img className="onb-logo centered" src={logo} alt="Sencia" />
+            <img className="onb-logo centered" src="/logo.svg" alt="Sencia" />
             <p className="splash-tagline">Votre santé, <span className="splash-tagline-accent">en toute clarté.</span></p>
           </div>
         )}
 
         {stepKey === 'propoval' && (
           <div className="step-content"style={{height: '100%'}}>
-            <img className="onb-logo" src={logo} alt="Sencia" />
+            <img className="onb-logo" src="/logo.svg" alt="Sencia" />
             <p className="splash-tagline">Bienvenue sur <span className="splash-tagline-accent">Sencia</span></p>
             <ul className="features-list" style={{ textAlign: 'left' }}>
               <li className="feature-item"><div className="feature-dot"><img src="/feature-1.png" alt="" /></div><div><div className="feature-title">Suivez vos symptômes</div><p className="feature-desc">Suivez quotidiennement vos symptômes et vos ressentis.</p></div></li>
@@ -185,14 +392,14 @@ export default function Onboarding() {
 
         {stepKey === 'welcomeText' && (
           <div className="step-content">
-            <img className="onb-logo" src={logo} alt="Sencia" />
+            <img className="onb-logo" src="/logo.svg" alt="Sencia" />
             <p className="welcome-subtitle">L'aventure commence ici...</p>
           </div>
         )}
 
         {stepKey === 'features' && (
           <div className="step-content" style={{ padding: '24px 20px', textAlign: 'left', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-            <img className="onb-logo" src={logo} alt="Sencia" style={{ width: '80px', marginBottom: '16px' }} />
+            <img className="onb-logo" src="/logo.svg" alt="Sencia" style={{ width: '80px', marginBottom: '16px' }} />
             <h2 className="features-title" style={{ fontSize: '30px', marginBottom: '20px', fontWeight: '300', marginTop: '20px' }}>Bienvenue sur <span className="welcome-loris">Sencia</span></h2>
             <ul className="features-list" style={{ listStyle: 'none', padding: '0', margin: '0' }}>
               <li className="feature-item" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
@@ -229,7 +436,7 @@ export default function Onboarding() {
 
         {stepKey === 'login' && (
           <div className="step-content">
-            <img className="onb-logo" src={logo} alt="Sencia" />
+            <img className="onb-logo" src="/logo.svg" alt="Sencia" />
           </div>
         )}
 
@@ -399,7 +606,7 @@ export default function Onboarding() {
 
         {stepKey === 'widget' && (
           <div className="step-content">
-            <img className="onb-logo" src={logo} alt="Sencia" />
+            <img className="onb-logo" src="/logo.svg" alt="Sencia" />
             <h2 className="features-title">Ajoutez le widget</h2>
             <img src="/widget.png" alt="widget" style={{ height: '120%',width: '120%', borderRadius: '24px', marginBottom: '16px',rotate:'6deg' }} />
           </div>
@@ -427,6 +634,12 @@ export default function Onboarding() {
           setShowLoginModal(false)
           next()
         }}
+      />
+
+      <MedicationReminderModal
+        isOpen={showMedicationReminderModal}
+        onClose={handleMedicationReminderClose}
+        onConfirm={handleMedicationReminderConfirm}
       />
     </>
   )

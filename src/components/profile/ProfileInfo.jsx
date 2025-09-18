@@ -1,11 +1,11 @@
 import React from 'react';
-import profileImage from '../../assets/profile-initials.png';
+// Profile image is now in public directory, using direct path
 
 function ProfileInfo() {
   return (
     <div className="profile-info-section">
       <div className="profile-avatar">
-        <img src={profileImage} alt="Profile" className="profile-image" />
+        <img src="/profile-initials.png" alt="Profile" className="profile-image" />
       </div>
       <h2 className="profile-name">Loris Duchamp</h2>
       <p className="profile-details">Homme, 47 ans</p>

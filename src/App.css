@@ -742,6 +742,7 @@ body {
   border-radius: 12px;
   min-width: 50px;
   flex: 1;
+  text-align: center;
 }
 
 .mobile-nav-item:hover {
@@ -774,10 +775,9 @@ body {
   display: flex;
   width: 61px;
   height: 61px;
-  padding: 23.18px;
+  padding: 0;
   justify-content: center;
   align-items: center;
-  gap: 6.1px;
   border-radius: 300px;
   background: #000;
   color: #fff !important;
@@ -787,6 +787,7 @@ body {
   border: 3px solid #fff;
   transition: all 0.2s ease;
   flex: 0 0 auto;
+  line-height: 1;
 }
 
 .add-btn:hover {
@@ -1082,9 +1083,10 @@ body {
   .add-btn {
     width: 55px;
     height: 55px;
-    padding: 20px;
+    padding: 0;
     font-size: 1.6rem;
     margin-top: -16px;
+    line-height: 1;
   }
   
   .top-logo-container {
@@ -1558,6 +1560,8 @@ body {
   position: relative;
   padding-bottom: 80px;
   z-index: 1;
+  overflow-x: visible;
+  overflow-y: auto;
 }
 
 .new-viz-header {
@@ -1589,11 +1593,12 @@ body {
   position: relative;
   z-index: 1;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: visible;
   white-space: nowrap;
   -webkit-overflow-scrolling: touch; /* Scroll fluide sur mobile */
   scrollbar-width: none; /* Cache la scrollbar sur Firefox */
   -ms-overflow-style: none; /* Cache la scrollbar sur IE */
+  flex-wrap: nowrap;
 }
 
 /* Cache la scrollbar sur Chrome/Safari */
@@ -1612,6 +1617,9 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   width: fit-content;
+  flex-shrink: 0;
+  white-space: nowrap;
+  min-width: fit-content;
 }
 
 .new-viz-filter-chip.active {

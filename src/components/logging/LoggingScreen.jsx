@@ -251,7 +251,7 @@ export const LoggingBloodPressureInput = ({
         </label>
         <input
           type="text"
-          placeholder="Ajoutez des notes sur votre mesure..."
+          placeholder="Ajoutez un commentaire..."
           value={data.notes}
           onChange={(e) => onChange('notes', e.target.value)}
           style={{

@@ -24,14 +24,202 @@ const LOGGING_STEPS = [
   'stress',    // Screen 7: How would you rate your stress level?
 ]
 
+// Medication Selection Modal Component
+const MedicationModal = ({ isOpen, onClose, selectedMedications, onMedicationsChange, onConfirm }) => {
+  const medications = [
+    'Hydrochlorothiazide',
+    'Valsartan'
+  ]
+
+  const toggleMedication = (medication) => {
+    if (selectedMedications.includes(medication)) {
+      onMedicationsChange(selectedMedications.filter(m => m !== medication))
+    } else {
+      onMedicationsChange([...selectedMedications, medication])
+    }
+  }
+
+  console.log('MedicationModal render - isOpen:', isOpen)
+
+  if (!isOpen) {
+    console.log('MedicationModal not rendering - isOpen is false')
+    return null
+  }
+
+  return (
+    <div 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999,
+        padding: '20px'
+      }}
+      onClick={(e) => {
+        e.stopPropagation()
+        onClose()
+      }}
+    >
+      <div 
+        style={{
+          backgroundColor: 'white',
+          borderRadius: '20px',
+          padding: '32px 24px',
+          width: '100%',
+          position: 'relative'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '16px',
+            right: '16px',
+            background: 'none',
+            border: 'none',
+            fontSize: '20px',
+            cursor: 'pointer',
+            color: '#666',
+            padding: '4px'
+          }}
+        >
+          ✕
+        </button>
+
+        {/* Title */}
+        <h2 style={{
+          fontSize: '24px',
+          fontWeight: '700',
+          marginBottom: '8px',
+          color: '#000',
+          lineHeight: '1.2'
+        }}>
+          Quels médicaments avez-vous pris ?
+        </h2>
+
+        {/* Subtitle */}
+        <p style={{
+          fontSize: '16px',
+          color: '#666',
+          marginBottom: '32px',
+          lineHeight: '1.4'
+        }}>
+          Suivez quotidiennement vos symptômes et vos ressentis.
+        </p>
+
+        {/* Medication Chips */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+          marginBottom: '32px'
+        }}>
+          {medications.map((medication) => (
+            <button
+              key={medication}
+              onClick={() => toggleMedication(medication)}
+              style={{
+                padding: '12px 16px',
+                borderRadius: '20px',
+                border: selectedMedications.includes(medication) 
+                  ? '2px solid #0e7afe' 
+                  : '1px solid #e0e0e0',
+                backgroundColor: selectedMedications.includes(medication) 
+                  ? 'rgba(14, 122, 254, 0.1)' 
+                  : 'white',
+                fontSize: '16px',
+                fontWeight: '500',
+                color: selectedMedications.includes(medication) 
+                  ? '#0e7afe' 
+                  : '#000',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                textAlign: 'left',
+                width: 'fit-content',
+                minWidth: '120px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                alignSelf: 'flex-start'
+              }}
+            >
+              {medication}
+            </button>
+          ))}
+        </div>
+
+        {/* Action Buttons */}
+        <div style={{
+          display: 'flex',
+          gap: '12px'
+        }}>
+          <button
+            onClick={onClose}
+            style={{
+              flex: 1,
+              padding: '16px',
+              borderRadius: '12px',
+              border: '1px solid #e0e0e0',
+              backgroundColor: 'white',
+              fontSize: '16px',
+              fontWeight: '600',
+              color: '#666',
+              cursor: 'pointer'
+            }}
+          >
+            Annuler
+          </button>
+          <button
+            onClick={() => {
+              if (onConfirm) onConfirm()
+              onClose()
+            }}
+            style={{
+              flex: 1,
+              padding: '16px',
+              borderRadius: '12px',
+              border: 'none',
+              backgroundColor: '#0e7afe',
+              fontSize: '16px',
+              fontWeight: '600',
+              color: 'white',
+              cursor: 'pointer'
+            }}
+          >
+            Confirmer
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export const LoggingModal = ({ open, onClose, onSubmit }) => {
   const [currentStep, setCurrentStep] = useState(0)
+  const [showMedicationModal, setShowMedicationModal] = useState(false)
+  
+  console.log('LoggingModal - showMedicationModal:', showMedicationModal)
+  
+  // Monitor modal state changes
+  useEffect(() => {
+    console.log('showMedicationModal changed to:', showMedicationModal)
+  }, [showMedicationModal])
+  
   const [loggingData, setLoggingData] = useState({
     mood: 50, // 0-100 scale
     symptoms: [],
     customSymptoms: '',
     bloodPressure: { systolic: '', diastolic: '', notes: '' },
     treatment: null, // null, true, false
+    selectedMedications: [], // Array of selected medication names
     consumption: [],
     customConsumption: '',
     activity: null, // null, 'plus_30', 'moins_30', 'non'
@@ -67,6 +255,7 @@ export const LoggingModal = ({ open, onClose, onSubmit }) => {
       customSymptoms: '',
       bloodPressure: { systolic: '', diastolic: '', notes: '' },
       treatment: null,
+      selectedMedications: [],
       consumption: [],
       customConsumption: '',
       activity: null,
@@ -88,7 +277,7 @@ export const LoggingModal = ({ open, onClose, onSubmit }) => {
         customSymptoms: loggingData.customSymptoms,
         tension: loggingData.treatment === true ? 'oui' : loggingData.treatment === false ? 'non' : null,
         tensionValue: `${loggingData.bloodPressure.systolic}/${loggingData.bloodPressure.diastolic}`,
-        treatments: [], // Keep empty for now
+        treatments: loggingData.selectedMedications, // Include selected medications
         customTreatments: '',
         foods: loggingData.consumption,
         customFoods: loggingData.customConsumption,
@@ -127,8 +316,8 @@ export const LoggingModal = ({ open, onClose, onSubmit }) => {
           {/* Progress Header */}
           <div style={{ padding: '32px 20px 8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button onClick={prevStep} disabled={currentStep === 0} style={{ background: 'none', border: 'none', fontSize: '18px', cursor: currentStep > 0 ? 'pointer' : 'not-allowed', opacity: currentStep > 0 ? 1 : 0.3 }}>←</button>
-            <div style={{ flex: 1 }}>
-              <div style={{ width: '100%', height: '4px', borderRadius: '999px', overflow: 'hidden' }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+              <div style={{ width: '100%', height: '4px', borderRadius: '999px', overflow: 'hidden', backgroundColor: '#D9D9D9' }}>
                 <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(90deg, #A69BF8 0%, #0E7AFE 100%)' }} />
               </div>
             </div>
@@ -173,8 +362,21 @@ export const LoggingModal = ({ open, onClose, onSubmit }) => {
             {stepKey === 'treatment' && (
               <TreatmentScreen 
                 value={loggingData.treatment}
-                onChange={(value) => updateData('treatment', value)}
-                onContinue={nextStep}
+                onChange={(value) => {
+                  console.log('Treatment value changed:', value)
+                  const booleanValue = value === 'true'
+                  updateData('treatment', booleanValue)
+                }}
+                onContinue={() => {
+                  console.log('Continue clicked, treatment value:', loggingData.treatment)
+                  if (loggingData.treatment === true) {
+                    console.log('Opening medication modal')
+                    setShowMedicationModal(true)
+                  } else {
+                    console.log('Going to next step')
+                    nextStep()
+                  }
+                }}
               />
             )}
 
@@ -206,6 +408,17 @@ export const LoggingModal = ({ open, onClose, onSubmit }) => {
           </div>
         </MobileFrame>
       </div>
+      
+      {/* Medication Selection Modal - Outside of main modal to avoid z-index issues */}
+      {showMedicationModal && (
+        <MedicationModal
+          isOpen={showMedicationModal}
+          onClose={() => setShowMedicationModal(false)}
+          selectedMedications={loggingData.selectedMedications}
+          onMedicationsChange={(medications) => updateData('selectedMedications', medications)}
+          onConfirm={nextStep}
+        />
+      )}
     </div>
   )
 }
@@ -284,7 +497,7 @@ const MoodScreen = ({ value, onChange, onContinue }) => {
     <>
       <LoggingScreenHeader 
         title="Comment vous sentez-vous ce matin Loris ?"
-        subtitle="Remember to check in regularly to spot patterns."
+        subtitle="N'oubliez pas de faire le point régulièrement pour repérer les tendances."
       />
 
       <LoggingSlider
@@ -312,10 +525,10 @@ const MoodScreen = ({ value, onChange, onContinue }) => {
 // Screen 2: Symptoms selection
 const SymptomsScreen = ({ selectedSymptoms, customSymptoms, onSymptomsChange, onCustomChange, onContinue }) => {
   const symptoms = [
-    'Maux de tête inhabituels',
+    'Maux de tête',
     'Vertiges', 
     'Tension dans la nuque ou poitrine',
-    'Bourdonnements d\'oreille',
+    'Acouphènes',
     'Palpitations'
   ]
 
@@ -331,7 +544,7 @@ const SymptomsScreen = ({ selectedSymptoms, customSymptoms, onSymptomsChange, on
     <>
       <LoggingScreenHeader 
         title="Avez-vous eu les symptômes suivants aujourd'hui ?"
-        subtitle="Sélectionnez les symptômes que vous avez ressenti aujourd'hui. Si vous n'en avez eu aucun, cliquez sur Suivant."
+        subtitle="Sélectionnez les symptômes que vous avez ressenti aujourd’hui. Si vous n’en avez eu aucun, cliquez sur Suivant."
       />
 
       <LoggingSelectionButtons
@@ -430,19 +643,19 @@ const TreatmentScreen = ({ value, onChange, onContinue }) => {
   const [hasInteracted, setHasInteracted] = useState(false)
 
   const treatmentSectors = {
-    true: [90, 270], // Left side (Oui)
-    false: [270, 90] // Right side (Non) - wraps around
+    'true': [90, 270], // Left side (Oui)
+    'false': [270, 90] // Right side (Non) - wraps around
   }
 
   const treatmentLabels = [
     {
-      value: true,
+      value: 'true',
       text: 'Oui',
       position: { x: 25, y: 50 },
       width: '50px'
     },
     {
-      value: false,
+      value: 'false',
       text: 'Non',
       position: { x: 75, y: 50 },
       width: '50px'
@@ -457,7 +670,7 @@ const TreatmentScreen = ({ value, onChange, onContinue }) => {
       />
 
       <LoggingWheelPicker
-        value={value}
+        value={value ? 'true' : value === false ? 'false' : null}
         onChange={(newValue) => {
           onChange(newValue)
           setHasInteracted(true)
@@ -498,7 +711,7 @@ const ConsumptionScreen = ({ selectedItems, customItems, onItemsChange, onCustom
     <>
       <LoggingScreenHeader 
         title="Avez-vous consommé l'un des éléments suivants aujourd'hui ?"
-        subtitle="Sélectionnez les symptômes que vous avez ressenti aujourd'hui."
+        subtitle="Sélectionnez les aliments que vous avez consommé aujourd’hui."
       />
 
       <LoggingSelectionButtons
@@ -531,6 +744,19 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
   const wheelRef = useRef(null)
   const selectorRef = useRef(null)
 
+  // Set initial position based on current value
+  useEffect(() => {
+    if (value === 'plus_30') {
+      setSelectorPosition({ x: 25, y: 25 }) // Top-left
+    } else if (value === 'moins_30') {
+      setSelectorPosition({ x: 75, y: 25 }) // Top-right
+    } else if (value === 'non') {
+      setSelectorPosition({ x: 50, y: 75 }) // Bottom
+    } else {
+      setSelectorPosition({ x: 50, y: 50 }) // Center
+    }
+  }, [value])
+
   const getSelectionFromAngle = (angle) => {
     // Convert angle to degrees and normalize to 0-360
     let degrees = (angle * 180 / Math.PI + 360) % 360
@@ -555,36 +781,50 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
     e.preventDefault()
   }, [])
 
-  const handleMouseMove = useCallback((e) => {
-    if (!isDragging || !wheelRef.current) return
+  const updateSelectorPosition = useCallback((clientX, clientY) => {
+    if (!wheelRef.current) return
 
     const rect = wheelRef.current.getBoundingClientRect()
     const centerX = rect.left + rect.width / 2
     const centerY = rect.top + rect.height / 2
     
     // Calculate position relative to wheel center
-    const deltaX = e.clientX - centerX
-    const deltaY = e.clientY - centerY
+    const deltaX = clientX - centerX
+    const deltaY = clientY - centerY
     
     // Convert to percentage within wheel bounds
-    const wheelRadius = rect.width / 2 * 0.8 // 80% of wheel radius to keep selector inside
+    const wheelRadius = rect.width / 2 * 0.7 // 70% of wheel radius to keep selector inside
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
     
+    let newX, newY
+    
     if (distance <= wheelRadius) {
-      const newX = ((deltaX / rect.width) * 100) + 50
-      const newY = ((deltaY / rect.height) * 100) + 50
-      setSelectorPosition({ x: newX, y: newY })
-      
-      // Calculate angle for sector detection
-      const angle = Math.atan2(-deltaY, deltaX) // Negative deltaY because screen coordinates are flipped
-      const newSelection = getSelectionFromAngle(angle)
-      
-      if (newSelection !== value) {
-        onChange(newSelection)
-        setHasInteracted(true)
-      }
+      // Within wheel bounds - follow pointer exactly
+      newX = ((deltaX / rect.width) * 100) + 50
+      newY = ((deltaY / rect.height) * 100) + 50
+    } else {
+      // Outside wheel bounds - constrain to edge
+      const angle = Math.atan2(deltaY, deltaX)
+      newX = ((Math.cos(angle) * wheelRadius / rect.width) * 100) + 50
+      newY = ((Math.sin(angle) * wheelRadius / rect.height) * 100) + 50
     }
-  }, [isDragging, value, onChange])
+    
+    setSelectorPosition({ x: newX, y: newY })
+    
+    // Calculate angle for sector detection
+    const angle = Math.atan2(-deltaY, deltaX) // Negative deltaY because screen coordinates are flipped
+    const newSelection = getSelectionFromAngle(angle)
+    
+    if (newSelection !== value) {
+      onChange(newSelection)
+      setHasInteracted(true)
+    }
+  }, [value, onChange])
+
+  const handleMouseMove = useCallback((e) => {
+    if (!isDragging) return
+    updateSelectorPosition(e.clientX, e.clientY)
+  }, [isDragging, updateSelectorPosition])
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false)
@@ -596,37 +836,11 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
   }, [])
 
   const handleTouchMove = useCallback((e) => {
-    if (!isDragging || !wheelRef.current) return
+    if (!isDragging) return
     e.preventDefault()
-
     const touch = e.touches[0]
-    const rect = wheelRef.current.getBoundingClientRect()
-    const centerX = rect.left + rect.width / 2
-    const centerY = rect.top + rect.height / 2
-    
-    // Calculate position relative to wheel center
-    const deltaX = touch.clientX - centerX
-    const deltaY = touch.clientY - centerY
-    
-    // Convert to percentage within wheel bounds
-    const wheelRadius = rect.width / 2 * 0.8 // 80% of wheel radius to keep selector inside
-    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
-    
-    if (distance <= wheelRadius) {
-      const newX = ((deltaX / rect.width) * 100) + 50
-      const newY = ((deltaY / rect.height) * 100) + 50
-      setSelectorPosition({ x: newX, y: newY })
-      
-      // Calculate angle for sector detection
-      const angle = Math.atan2(-deltaY, deltaX) // Negative deltaY because screen coordinates are flipped
-      const newSelection = getSelectionFromAngle(angle)
-      
-      if (newSelection !== value) {
-        onChange(newSelection)
-        setHasInteracted(true)
-      }
-    }
-  }, [isDragging, value, onChange])
+    updateSelectorPosition(touch.clientX, touch.clientY)
+  }, [isDragging, updateSelectorPosition])
 
   const handleTouchEnd = useCallback(() => {
     setIsDragging(false)
@@ -757,8 +971,8 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
               width: '43px',
               height: '43px',
               zIndex: 10,
-              transition: 'all 0.2s ease-out',
-              cursor: 'grab'
+              transition: isDragging ? 'none' : 'all 0.2s ease-out',
+              cursor: isDragging ? 'grabbing' : 'grab'
             }}
             onMouseDown={handleMouseDown}
             onTouchStart={handleTouchStart}
@@ -769,8 +983,9 @@ const ActivityScreen = ({ value, onChange, onContinue }) => {
               borderRadius: '50%',
               backgroundColor: isDragging ? 'rgba(14, 122, 254, 0.9)' : 'white',
               border: `2px solid ${isDragging ? '#0e7afe' : '#DADADA'}`,
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-              transition: 'all 0.2s ease'
+              boxShadow: isDragging ? '0 4px 12px rgba(14, 122, 254, 0.3)' : '0 2px 8px rgba(0, 0, 0, 0.1)',
+              transition: 'all 0.2s ease',
+              transform: isDragging ? 'scale(1.1)' : 'scale(1)'
             }} />
           </div>
         </div>

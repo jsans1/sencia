@@ -258,7 +258,7 @@
 /* Create Report Button */
 .create-report-button {
   position: fixed;
-  bottom: 80px; /* Further reduced space above mobile nav */
+  bottom: 100px; /* Increased space above mobile nav */
   left: 50%;
   transform: translateX(-50%);
   width: 361px;
@@ -297,6 +297,7 @@
     width: calc(100vw - 32px);
     left: 16px;
     transform: none;
+    bottom: 100px; /* Ensure consistent spacing on mobile */
   }
   
   .next-appointment-card {
