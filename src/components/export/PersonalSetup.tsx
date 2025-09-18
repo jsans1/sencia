@@ -81,20 +81,9 @@ const PersonalSetup: React.FC<PersonalSetupProps> = ({
   return (
     <div className="export-form-container">
       <div className="export-background" />
-      <div className="export-header">
-        <button className="back-button" onClick={onBack}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-        <button className="close-button" onClick={onClose}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-      </div>
+    
 
-      <div className="export-content" ref={containerRef}>
+      <div className="export-content export-content--with-sticky-footer" ref={containerRef}>
         <h1 className="export-title">Votre rapport personnel est bientôt prêt...</h1>
         <p className="export-subtitle">Entrez les dates entre lesquelles vous souhaitez un récapitulatif de votre état.</p>
         
@@ -262,7 +251,7 @@ const PersonalSetup: React.FC<PersonalSetupProps> = ({
         </div>
       </div>
 
-      <div className="export-footer">
+      <div className="export-footer sticky">
         <button 
           className={`continue-button ${isFormValid ? 'enabled' : 'disabled'}`}
           onClick={handleContinue}

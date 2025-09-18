@@ -9,7 +9,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onComplete();
-    }, 300000);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, [onComplete]);
