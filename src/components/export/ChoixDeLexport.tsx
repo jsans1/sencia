@@ -26,7 +26,7 @@ const ChoixDeLexport: React.FC<ChoixDeLexportProps> = ({
       
 
       {/* Content */}
-      <div className="export-content">
+      <div className="export-content export-content--with-fixed-footer">
         <h1 className="export-title">Choisissez le type de rapport</h1>
         <p className="export-subtitle">Sélectionnez l'utilisation prévue de votre rapport</p>
         
@@ -42,7 +42,7 @@ const ChoixDeLexport: React.FC<ChoixDeLexportProps> = ({
 
             </div>
             <div className="export-option-content">
-              <h3 className="export-option-title">Communication avec un praticien</h3>
+              <h3 className="export-option-title">Communiquer avec un praticien</h3>
               <p className="export-option-description">Pour partager avec votre médecin ou spécialiste</p>
             </div>
           </button>
@@ -67,7 +67,7 @@ const ChoixDeLexport: React.FC<ChoixDeLexportProps> = ({
       </div>
 
       {/* Continue Button */}
-      <div className="export-footer">
+      <div className="export-footer fixed">
         <button 
           className={`continue-button ${selectedType ? 'enabled' : 'disabled'}`}
           onClick={handleContinue}

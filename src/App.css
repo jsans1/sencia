@@ -687,7 +687,9 @@ body {
 .top-logo-container.sticky {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 17;
+  background-color: #F7F5F3;
+  padding-top: 30px;
 }
 
 .top-logo-container.not-sticky {

@@ -54,7 +54,7 @@ const Export2SpecialisteNext: React.FC<Export2SpecialisteNextProps> = ({
     <div className="export-form-container">
       <div className="export-background" />
       
-      <div className="export-content" ref={containerRef}>
+      <div className="export-content export-content--with-fixed-footer" ref={containerRef}>
         <h1 className="export-title">Votre <span className="highlight-text">prochain</span> rendez-vous avec votre cardiologue</h1>
         <p className="export-subtitle">Entrez la date de ce prochain rendez-vous et vous recevrez un rapport 48h avant.</p>
         
@@ -118,7 +118,7 @@ const Export2SpecialisteNext: React.FC<Export2SpecialisteNextProps> = ({
         </div>
       </div>
 
-      <div className="export-footer">
+      <div className="export-footer fixed">
         <button 
           className={`continue-button ${isFormValid ? 'enabled' : 'disabled'}`}
           onClick={handleContinue}

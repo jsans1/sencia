@@ -263,7 +263,6 @@ const Export = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <TopLogo />
-        <ProgressHeader />
         <div className="w-full max-w-[393px] min-h-screen relative">
           <LoadingScreen
             onComplete={handleLoadingComplete}
@@ -312,7 +311,6 @@ const Export = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <TopLogo />
-        <ProgressHeader />
         <div className="w-full max-w-[393px] min-h-screen relative">
           <LoadingScreen
             onComplete={handlePersonalLoadingComplete}

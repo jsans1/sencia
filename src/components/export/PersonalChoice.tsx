@@ -24,7 +24,7 @@ const PersonalChoice: React.FC<PersonalChoiceProps> = ({
     <div className="export-choice-container">
       <div className="export-background" />
 
-      <div className="export-content">
+      <div className="export-content export-content--with-fixed-footer">
         <h1 className="export-title">Quel type de rapport souhaitez-vous exporter ?</h1>
         <p className="export-subtitle">Vous pouvez créer des rapports pour en savoir plus sur votre santé mais également pour les communiquer à votre praticien.</p>
         
@@ -51,7 +51,7 @@ const PersonalChoice: React.FC<PersonalChoiceProps> = ({
         </div>
       </div>
 
-      <div className="export-footer">
+      <div className="export-footer fixed">
         <button 
           className={`continue-button ${selectedType ? 'enabled' : 'disabled'}`}
           onClick={handleContinue}

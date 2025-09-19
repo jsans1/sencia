@@ -258,7 +258,7 @@
 /* Create Report Button */
 .create-report-button {
   position: fixed;
-  bottom: 80px; /* Further reduced space above mobile nav */
+  bottom: 100px; /* Further reduced space above mobile nav */
   left: 50%;
   transform: translateX(-50%);
   width: 361px;
@@ -385,9 +385,9 @@
   z-index: 10;
 }
 
-/* When using sticky footer, add more bottom space so content isn't hidden */
-.export-content.export-content--with-sticky-footer {
-  padding-bottom: 140px;
+/* When using fixed footer, add more bottom space so content isn't hidden */
+.export-content.export-content--with-fixed-footer {
+  padding-bottom: 160px;
 }
 
 .export-title {
@@ -493,13 +493,21 @@
   z-index: 1;
 }
 
-.export-footer.sticky {
-  position: sticky;
-  bottom: 0;
+.export-footer.fixed {
+  position: fixed;
+  bottom: max(100px, env(safe-area-inset-bottom));
   left: 0;
   right: 0;
-  background: #FFFFFF;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  pointer-events: none; /* container lets clicks pass except button */
+  z-index: 30;
+}
+
+.export-footer.fixed .continue-button {
+  width: calc(100vw - 32px);
+  max-width: 393px;
+  pointer-events: auto; /* re-enable for button */
 }
 
 .continue-button {
