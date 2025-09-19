@@ -107,9 +107,12 @@ function PremiumUpgradePage({ onBack }) {
               <li>Support prioritaire 24/7</li>
               <li>Accès anticipé aux nouvelles fonctionnalités</li>
             </ul>
-            <button className="pricing-button annual">
-              Continuer avec ce plan
-            </button>
+            
+            <div className="pricing-cta">
+              <button className="pricing-button-gradient">
+                Passer à Premium
+              </button>
+            </div>
           </div>
         </div>
 

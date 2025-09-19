@@ -7,6 +7,7 @@ import LoggingFlow from './pages/LoggingFlow'
 import Visualization from './pages/Visualization'
 import Export from './pages/Export'
 import Profile from './pages/Profile'
+import VitalSigns from './pages/VitalSigns'
 import LoggingSuccessModal from './components/LoggingSuccessModal'
 // Removed unused pages: Splash, Features, AuthChoice, WelcomeLoris
 import React, { useState } from 'react';
@@ -45,6 +46,7 @@ function App() {
                   <Route path="visualization" element={<Visualization handleAdd={handleAdd} />} />
                   <Route path="export" element={<Export />} />
                   <Route path="profile" element={<Profile />} />
+                  <Route path="vital-signs" element={<VitalSigns handleAdd={handleAdd} />} />
                 </Route>
         </Routes>
         <LoggingModal open={loggingOpen} onClose={handleClose} onSubmit={handleLoggingComplete} />

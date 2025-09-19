@@ -10,9 +10,10 @@ import Export2SpecialisteNext from '../components/export/Export2SpecialisteNext'
 import PersonalChoice from '../components/export/PersonalChoice';
 import PersonalSetup from '../components/export/PersonalSetup';
 import LoadingScreen from '../components/export/LoadingScreen';
+import ModifyAppointment from '../components/export/ModifyAppointment';
 
 // Navigation state type
-type CurrentPage = 'dashboard' | 'export-choice' | 'last-appointment' | 'next-appointment' | 'loading' | 'personal-choice' | 'personal-setup' | 'personal-loading';
+type CurrentPage = 'dashboard' | 'export-choice' | 'last-appointment' | 'next-appointment' | 'loading' | 'personal-choice' | 'personal-setup' | 'personal-loading' | 'modify-appointment';
 
 const Export = () => {
   const navigate = useNavigate();
@@ -22,6 +23,12 @@ const Export = () => {
   // Persistent progress across questions
   const [progressStep, setProgressStep] = useState<number>(0);
   const [progressTotal, setProgressTotal] = useState<number>(0);
+  // Appointment data state
+  const [appointmentData, setAppointmentData] = useState({
+    doctor: "Dr. Martin - Cardiologue",
+    date: "14/12/2025",
+    time: "14:30"
+  });
 
   // Helper function to open PDF report in new tab
   const openReportPDF = () => {
@@ -121,8 +128,27 @@ const Export = () => {
   };
 
   const handleModifyAppointment = () => {
-    // Handle modify appointment
-    console.log('Modify appointment clicked');
+    setCurrentPage('modify-appointment');
+  };
+
+  const handleModifyAppointmentContinue = (data: { doctor: string; date: string; time: string }) => {
+    console.log('Modify appointment data:', data);
+    // Update the appointment data state
+    setAppointmentData({
+      doctor: data.doctor,
+      date: data.date,
+      time: data.time
+    });
+    setCurrentPage('dashboard');
+    // Reset progress when returning to dashboard
+    setProgressStep(0);
+    setProgressTotal(0);
+  };
+
+  const handleBackFromModifyAppointment = () => {
+    setCurrentPage('dashboard');
+    setProgressStep(0);
+    setProgressTotal(0);
   };
 
   const handleFilter = () => {
@@ -178,6 +204,8 @@ const Export = () => {
         return handleBackFromPersonalChoice;
       case 'personal-setup':
         return handleBackFromPersonalSetup;
+      case 'modify-appointment':
+        return handleBackFromModifyAppointment;
       default:
         return undefined;
     }
@@ -332,6 +360,23 @@ const Export = () => {
     );
   }
 
+  if (currentPage === 'modify-appointment') {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <TopLogo />
+        <div className="w-full max-w-[393px] min-h-screen relative">
+          <ModifyAppointment
+            onBack={handleBackFromModifyAppointment}
+            onClose={handleCloseExport}
+            onContinue={handleModifyAppointmentContinue}
+            initialData={appointmentData}
+          />
+        </div>
+        <MobileNav active="Care" onNav={handleNav} onAdd={handleAdd} />
+      </div>
+    );
+  }
+
   // Default dashboard view
   return (
     <div className="min-h-screen bg-[#F8F8F8] flex items-center justify-center">
@@ -342,6 +387,7 @@ const Export = () => {
           onModifyAppointment={handleModifyAppointment}
           onFilter={handleFilter}
           onReportClick={handleReportClick}
+          appointmentData={appointmentData}
         />
       </div>
       <MobileNav active="Care" onNav={handleNav} onAdd={handleAdd} />

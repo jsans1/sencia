@@ -575,7 +575,7 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
       <div className="homepage-section">
         <div className="homepage-biomarkers-header">
           <div className="homepage-section-title">Vos biomarqueurs</div>
-          <button className="homepage-see-more-button">Voir plus</button>
+          <button className="homepage-see-more-button" onClick={() => navigate('/app/vital-signs')}>Voir plus</button>
         </div>
         <div className="homepage-chart-card-simple w-full">
           <div className="flex gap-3 items-center justify-start w-full mb-4">
