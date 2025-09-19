@@ -1,5 +1,5 @@
 import React from 'react';
-import logo from '../../assets/logo.svg';
+// Logo is now in public directory, using direct path
 
 const OnboardingNavigation = ({ 
   onBack, 
@@ -12,7 +12,7 @@ const OnboardingNavigation = ({
 }) => {
   return (
     <div className="onboarding-nav">
-      <img src={logo} alt="Sencia" className="onb-logo tiny" />
+      <img src="/logo.svg" alt="Sencia" className="onb-logo tiny" />
       <div className="nav-top">
         <button className="nav-back" onClick={onBack} aria-label="Back">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">

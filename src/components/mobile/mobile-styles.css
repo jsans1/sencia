@@ -77,7 +77,7 @@
 }
 
 .homepage-section {
-  padding: 16px 20px;
+  padding: 20px 24px;
   display: flex;
   flex-direction: column;
   align-items: flex-start; /* Aligne tous les enfants à gauche */
@@ -85,13 +85,14 @@
   justify-content: flex-start; /* Force l'alignement à gauche */
   width: 100%;
   box-sizing: border-box;
+  margin-bottom: 8px;
 }
 
 .homepage-section-title {
   font-size: 24px;
   font-weight: 700;
   color: #000;
-  margin: 0 0 16px 0;
+  margin: 0 0 20px 0;
   line-height: 1.2;
   text-align: left;
   align-self: flex-start;
@@ -100,9 +101,9 @@
 .homepage-daily-checkin {
   background: white;
   border-radius: 20px;
-  padding: 24px;
+  padding: 28px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .homepage-checkin-content {
@@ -110,13 +111,13 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  gap: 24px;
+  gap: 28px;
 }
 
 .homepage-checkin-text {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   flex: 1;
 }
 
@@ -131,7 +132,7 @@
   font-family: 'SF Pro Display', sans-serif;
   font-weight: 400;
   font-size: 14px;
-  color: #606060;
+  color: #45413e;
   line-height: 1.2;
 }
 
@@ -160,9 +161,9 @@
 
 .homepage-status-card {
   display: flex;
-  padding: 16px;
+  padding: 20px;
   align-items: flex-start;
-  gap: 16px;
+  gap: 18px;
   align-self: stretch;
   border-radius: 20px;
   background: linear-gradient(90deg, #FFF 67.79%, #E4F7ED 100%);
@@ -170,7 +171,7 @@
   cursor: pointer;
   width: 100%;
   transition: all 0.2s ease;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   text-align: left;
   justify-content: flex-start;
   box-sizing: border-box;
@@ -191,11 +192,12 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
+  gap: 6px;
   flex: 1 0 0;
 }
 
 .homepage-status-title {
+  font-family: 'SF Pro Display', sans-serif;
   font-size: 16px;
   font-weight: 600;
   color: #000;
@@ -205,6 +207,7 @@
 }
 
 .homepage-status-description {
+  font-family: 'SF Pro Display', sans-serif;
   font-size: 14px;
   color: #45413e;
   line-height: 1.2;
@@ -331,8 +334,8 @@
 .homepage-insight-card {
   background: white;
   border-radius: 20px;
-  padding: 16px;
-  margin-bottom: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
   border: 1px solid #A69BF8;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   width: 100%;
@@ -343,16 +346,16 @@
 
 .homepage-insight-header {
   display: flex;
-  gap: 4px;
+  gap: 6px;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .homepage-insight-title-container {
   width: 100%;
   max-width: 100%;
   overflow: hidden;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .homepage-insight-icon {
@@ -372,10 +375,11 @@
 }
 
 .homepage-insight-title {
+  font-family: 'SF Pro Display', sans-serif;
   font-size: 16px;
   font-weight: 600;
   color: #000;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
   line-height: 1.2;
   text-align: left;
   align-self: flex-start;
@@ -386,6 +390,7 @@
 }
 
 .homepage-insight-description {
+  font-family: 'SF Pro Display', sans-serif;
   font-size: 12px;
   color: #45413e;
   margin-bottom: 0;
@@ -564,6 +569,8 @@
 .progress-indicator {
   flex: 1;
   margin: 0 16px;
+  display: flex;
+  align-items: center;
 }
 
 .progress-bar {
@@ -571,6 +578,7 @@
   height: 4px;
   border-radius: 2px;
   overflow: hidden;
+  background-color:#D9D9D9;
 }
 
 .progress-fill {
@@ -988,8 +996,9 @@
 }
 
 .step-title {
-  font-size: 22px;
-  font-weight: 700;
+  font-family: 'SF Pro Display', sans-serif;
+  font-size: 24px;
+  font-weight: 500;
   color: #000;
   margin: 8px 0 4px 0;
   line-height: 1.2;
@@ -1243,19 +1252,42 @@
 .onboarding-input select,
 select.onboarding-input {
   -webkit-appearance: none;
+  -moz-appearance: none;
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 16px;
-  padding-right: 40px;
+  background: #FFFFFF;
+  background-image: none;
+  padding-right: 14px;
   cursor: pointer;
 }
 
+/* Hide default dropdown arrows for all browsers */
+.onboarding-input[type="select-one"]::-ms-expand,
+.onboarding-input select::-ms-expand,
+select.onboarding-input::-ms-expand {
+  display: none;
+}
+
+.onboarding-input[type="select-one"]::-webkit-outer-spin-button,
+.onboarding-input[type="select-one"]::-webkit-inner-spin-button,
+.onboarding-input select::-webkit-outer-spin-button,
+.onboarding-input select::-webkit-inner-spin-button,
+select.onboarding-input::-webkit-outer-spin-button,
+select.onboarding-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.onboarding-input[type="select-one"]:hover,
+.onboarding-input select:hover,
+select.onboarding-input:hover,
 .onboarding-input[type="select-one"]:focus,
 .onboarding-input select:focus,
-select.onboarding-input:focus {
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+select.onboarding-input:focus,
+.onboarding-input[type="select-one"]:active,
+.onboarding-input select:active,
+select.onboarding-input:active {
+  background: #FFFFFF;
+  background-image: none;
 }
 
 .onboarding-input:focus {
@@ -1436,7 +1468,7 @@ select.onboarding-input:focus {
   }
   
   .step-title {
-    font-size: 20px;
+    font-size: 22px;
     margin: 6px 0 3px 0;
   }
   
@@ -1451,7 +1483,7 @@ select.onboarding-input:focus {
   }
   
   .homepage-section {
-    padding: 12px 16px;
+    padding: 16px 20px;
     align-items: flex-start;
     text-align: left;
     justify-content: flex-start;
@@ -1459,20 +1491,20 @@ select.onboarding-input:focus {
   
   .homepage-section-title {
     font-size: 20px;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
   }
   
   .homepage-daily-checkin {
-    padding: 16px;
-    margin: 0 16px 16px 16px;
+    padding: 20px;
+    margin: 0 16px 20px 16px;
   }
   
   .homepage-checkin-question {
-    font-size: 18px;
+    font-size: 19px;
   }
   
   .homepage-checkin-subtitle {
-    font-size: 13px;
+    font-size: 14px;
   }
   
   .homepage-plus-button {
@@ -1481,18 +1513,18 @@ select.onboarding-input:focus {
   }
   
   .homepage-status-card {
-    padding: 12px;
-    margin: 0 0 12px 0;
+    padding: 16px;
+    margin: 0 0 16px 0;
     align-items: flex-start;
     text-align: left;
   }
   
   .homepage-status-title {
-    font-size: 15px;
+    font-size: 16px;
   }
   
   .homepage-status-description {
-    font-size: 13px;
+    font-size: 14px;
   }
   
   .homepage-see-more-button {
@@ -1537,7 +1569,7 @@ select.onboarding-input:focus {
   }
   
   .homepage-insight-title {
-    font-size: 15px;
+    font-size: 16px;
   }
   
   .homepage-insight-description {
@@ -1569,7 +1601,7 @@ select.onboarding-input:focus {
   }
   
   .step-title {
-    font-size: 18px;
+    font-size: 20px;
     margin: 6px 0 4px 0;
   }
   

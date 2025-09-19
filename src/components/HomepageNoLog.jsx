@@ -391,7 +391,7 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
     return (
       <div className="homepage-header">
         <div className="homepage-greeting">
-          <div className="step-title" style={{ fontSize: "24px", margin: "0" }}>
+          <div className="step-title" style={{ margin: "0" }}>
             Bonjour, Loris !
           </div>
           <div className="homepage-streak-badge">
@@ -603,7 +603,7 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
           </div>
           <div className="homepage-chart-simple w-full">
             <img 
-              src="/src/assets/chart.svg" 
+              src="/chart.svg" 
               alt="Blood pressure chart" 
               className="w-full h-auto"
             />

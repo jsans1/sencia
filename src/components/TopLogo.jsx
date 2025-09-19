@@ -1,10 +1,10 @@
 import React from 'react';
-import logo from '../assets/logo.svg';
+// Logo is now in public directory, using direct path
 
 const TopLogo = ({ sticky = true }) => {
   return (
     <div className={`top-logo-container ${sticky ? 'sticky' : 'not-sticky'}`}>
-      <img src={logo} alt="Sencia" className="top-logo" />
+      <img src="/logo.svg" alt="Sencia" className="top-logo" />
     </div>
   );
 };

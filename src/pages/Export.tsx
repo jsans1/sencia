@@ -25,7 +25,7 @@ const Export = () => {
 
   // Helper function to open PDF report in new tab
   const openReportPDF = () => {
-    const pdfPath = '/src/assets/Rapport-Loris-Duchamp.pdf';
+    const pdfPath = '/Rapport-Loris-Duchamp.pdf';
     window.open(pdfPath, '_blank');
   };
 

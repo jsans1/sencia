@@ -4,15 +4,7 @@ import ProfileInfo from './ProfileInfo';
 import ProfileSection from './ProfileSection';
 import SectionItem from './SectionItem';
 import TopLogo from '../TopLogo';
-import infosSanteIcon from '../../assets/infos-sante.svg';
-import diagnosticIcon from '../../assets/diagnostic.svg';
-import traitementsIcon from '../../assets/traitements.svg';
-import careplanIcon from '../../assets/careplan.svg';
-import settingsIcon from '../../assets/Settings.svg';
-import cguIcon from '../../assets/cgu.svg';
-import appareilsIcon from '../../assets/appareils.svg';
-import etudesIcon from '../../assets/etudes.svg';
-import premiumIcon from '../../assets/premium.svg';
+// Icons are now in public directory, using direct paths
 
 function ProfileMain({ 
   onNavigateToHealthInfo, 
@@ -34,13 +26,13 @@ function ProfileMain({
       <ProfileSection title="Profil médical">
         <div className="section-items">
           <SectionItem 
-            icon={infosSanteIcon} 
+            icon="/infos-sante.svg" 
             text="Informations de santé" 
             onClick={onNavigateToHealthInfo} 
           />
-          <SectionItem icon={diagnosticIcon} text="Diagnostic" />
-          <SectionItem icon={traitementsIcon} text="Traitements" />
-          <SectionItem icon={careplanIcon} text="Care Plan" />
+          <SectionItem icon="/diagnostic.svg" text="Diagnostic" />
+          <SectionItem icon="/traitements.svg" text="Traitements" />
+          <SectionItem icon="/careplan.svg" text="Care Plan" />
         </div>
       </ProfileSection>
 
@@ -51,7 +43,7 @@ function ProfileMain({
         </p>
         <div className="section-items">
           <SectionItem 
-            icon={settingsIcon} 
+            icon="/Settings.svg" 
             text="Compte et mot de passe" 
             onClick={onNavigateToAccount} 
           />
@@ -62,22 +54,22 @@ function ProfileMain({
       <ProfileSection>
         <div className="section-items">
           <SectionItem 
-            icon={cguIcon} 
+            icon="/cgu.svg" 
             text="Conditions d'utilisation" 
             onClick={onNavigateToTerms} 
           />
           <SectionItem 
-            icon={appareilsIcon} 
+            icon="/appareils.svg" 
             text="Appareils connectés" 
             onClick={onNavigateToDevices} 
           />
           <SectionItem 
-            icon={etudesIcon} 
+            icon="/etudes.svg" 
             text="Études de recherche" 
             onClick={onNavigateToResearch} 
           />
           <SectionItem 
-            icon={premiumIcon} 
+            icon="/premium.svg" 
             text="Passer à Premium" 
             onClick={onNavigateToPremium} 
           />
