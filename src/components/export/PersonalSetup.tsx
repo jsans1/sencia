@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import '../export/export-styles.css';
+import '../profile/profile-styles.css';
 
 interface PersonalSetupProps {
   onBack: () => void;
@@ -23,7 +24,6 @@ const PersonalSetup: React.FC<PersonalSetupProps> = ({
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
   const [showStartCalendar, setShowStartCalendar] = useState(false);
   const [showEndCalendar, setShowEndCalendar] = useState(false);
-
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const startSelectedDate: Date | undefined = useMemo(() => {
@@ -76,10 +76,23 @@ const PersonalSetup: React.FC<PersonalSetupProps> = ({
     setEndYear("");
   };
 
-  const isFormValid = selectedPeriod || (startDay && startMonth && startYear && endDay && endMonth && endYear);
+  const isFormValid = selectedPeriod || (
+    startDay && startMonth && startYear && 
+    endDay && endMonth && endYear &&
+    // Ensure dates are valid numbers
+    !isNaN(parseInt(startDay)) && !isNaN(parseInt(startMonth)) && !isNaN(parseInt(startYear)) &&
+    !isNaN(parseInt(endDay)) && !isNaN(parseInt(endMonth)) && !isNaN(parseInt(endYear)) &&
+    // Ensure reasonable date ranges
+    parseInt(startDay) >= 1 && parseInt(startDay) <= 31 &&
+    parseInt(startMonth) >= 1 && parseInt(startMonth) <= 12 &&
+    parseInt(startYear) >= 2020 && parseInt(startYear) <= 2030 &&
+    parseInt(endDay) >= 1 && parseInt(endDay) <= 31 &&
+    parseInt(endMonth) >= 1 && parseInt(endMonth) <= 12 &&
+    parseInt(endYear) >= 2020 && parseInt(endYear) <= 2030
+  );
 
   return (
-    <div className="export-form-container">
+    <div className="export-form-container" style={{ minHeight: 'auto', height: '100%' }}>
       <div className="export-background" />
     
 
@@ -244,7 +257,6 @@ const PersonalSetup: React.FC<PersonalSetupProps> = ({
                 onClick={() => handlePeriodSelect('current-year')}
               >
                 Année en cours
-                <span className="premium-badge">Fonctionnalité Premium</span>
               </button>
             </div>
           </div>

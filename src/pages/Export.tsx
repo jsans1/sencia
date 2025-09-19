@@ -293,14 +293,25 @@ const Export = () => {
   if (currentPage === 'personal-setup') {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <TopLogo />
-        <ProgressHeader />
-        <div className="w-full max-w-[393px] min-h-screen relative">
-          <PersonalSetup
-            onBack={handleBackFromPersonalSetup}
-            onClose={handleCloseExport}
-            onContinue={handlePersonalSetupContinue}
-          />
+        <div className="w-full max-w-[393px] h-screen relative flex flex-col">
+          {/* Sticky Header with Logo */}
+          <div className="sticky top-0 z-50 bg-[#F7F5F3] flex-shrink-0">
+            <TopLogo />
+          </div>
+          
+          {/* Sticky Progress Bar */}
+          <div className="sticky top-[72px] z-40 bg-[#F7F5F3] flex-shrink-0">
+            <ProgressHeader />
+          </div>
+          
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto min-h-0">
+            <PersonalSetup
+              onBack={handleBackFromPersonalSetup}
+              onClose={handleCloseExport}
+              onContinue={handlePersonalSetupContinue}
+            />
+          </div>
         </div>
         <MobileNav active="Care" onNav={handleNav} onAdd={handleAdd} />
       </div>
