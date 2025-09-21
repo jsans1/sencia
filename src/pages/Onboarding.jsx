@@ -13,6 +13,7 @@ import TermsAndConditions from '../components/mobile/TermsAndConditions'
 import MedicationPills from '../components/mobile/MedicationPills'
 import GradientBackground from '../components/mobile/GradientBackground'
 import MultiSelectChips from '../components/onboarding/MultiSelectChips'
+import LoggingIntroModal from '../components/LoggingIntroModal'
 
 // Medication Reminder Modal Component
 const MedicationReminderModal = ({ isOpen, onClose, onConfirm }) => {
@@ -226,6 +227,7 @@ export default function Onboarding() {
   const [stepIndex, setStepIndex] = useState(0)
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [showMedicationReminderModal, setShowMedicationReminderModal] = useState(false)
+  const [showLoggingIntroModal, setShowLoggingIntroModal] = useState(false)
   const timeInputsRef = useRef([])
   const [editingTimeIdx, setEditingTimeIdx] = useState(-1)
   const [tempTime, setTempTime] = useState('')
@@ -374,6 +376,54 @@ export default function Onboarding() {
           <div className="step-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center' }}>
             <img className="onb-logo centered" src="/logo.svg" alt="Sencia" />
             <p className="splash-tagline">Votre santé, <span className="splash-tagline-accent">en toute clarté.</span></p>
+            
+            {/* Custom button layout for welcome step */}
+            <div style={{ 
+              position: 'fixed', 
+              bottom: 0, 
+              left: 0, 
+              right: 0, 
+              padding: '12px 24px calc(env(safe-area-inset-bottom) + 12px)',
+              zIndex: 10,
+              paddingBottom: 'max(12px, env(safe-area-inset-bottom) + 12px)'
+            }}>
+              <button 
+                className="secondary-button" 
+                onClick={() => setShowLoginModal(true)}
+                style={{
+                  background: '#FFFFFF',
+                  color: '#111',
+                  border: '1px solid #E5E5EA',
+                  borderRadius: '12px',
+                  padding: '12px 0',
+                  fontSize: '17px',
+                  fontWeight: '400',
+                  cursor: 'pointer',
+                  marginBottom: '8px',
+                  width: '100%'
+                }}
+              >
+                Se connecter
+              </button>
+              <button 
+                className="primary-button" 
+                onClick={next}
+                style={{
+                  width: '100%',
+                  background: '#000',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: '16px 24px',
+                  fontSize: '17px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                Commencer
+              </button>
+            </div>
           </div>
         )}
 
@@ -612,15 +662,17 @@ export default function Onboarding() {
           </div>
         )}
         
-        <BottomActions
-          primaryLabel={stepKey === 'widget' ? 'Commencer' : stepKey === 'cguWelcome' ? "J'accepte et je continue" : stepKey === 'login' ? 'Commencer' : 'Continuer'}
-          onPrimary={stepKey === 'widget' ? () => navigate('/logging') : stepKey === 'login' ? () => setShowLoginModal(true) : next}
-          disabled={!isStepValid(stepKey)}
-          solidBackground={stepKey === 'cguWelcome'}
-          showSecondary={stepKey === 'checkinFrequency'}
-          secondaryLabel={stepKey === 'checkinFrequency' ? 'Plus tard' : undefined}
-          onSecondary={stepKey === 'checkinFrequency' ? () => navigate('/logging') : undefined}
-        />
+        {stepKey !== 'welcome' && (
+          <BottomActions
+            primaryLabel={stepKey === 'widget' ? 'Commencer' : stepKey === 'cguWelcome' ? "J'accepte et je continue" : stepKey === 'login' ? 'Commencer' : 'Continuer'}
+            onPrimary={stepKey === 'widget' ? () => setShowLoggingIntroModal(true) : stepKey === 'login' ? () => setShowLoginModal(true) : next}
+            disabled={!isStepValid(stepKey)}
+            solidBackground={stepKey === 'cguWelcome'}
+            showSecondary={stepKey === 'checkinFrequency'}
+            secondaryLabel={stepKey === 'checkinFrequency' ? 'Plus tard' : undefined}
+            onSecondary={stepKey === 'checkinFrequency' ? () => setShowLoggingIntroModal(true) : undefined}
+          />
+        )}
       </MobileFrame>
       
       <LoginModal
@@ -628,11 +680,19 @@ export default function Onboarding() {
         onClose={() => setShowLoginModal(false)}
         onEmailLogin={() => {
           setShowLoginModal(false)
-          next()
+          if (stepKey === 'welcome') {
+            navigate('/app')
+          } else {
+            next()
+          }
         }}
         onPhoneLogin={() => {
           setShowLoginModal(false)
-          next()
+          if (stepKey === 'welcome') {
+            navigate('/app')
+          } else {
+            next()
+          }
         }}
       />
 
@@ -640,6 +700,15 @@ export default function Onboarding() {
         isOpen={showMedicationReminderModal}
         onClose={handleMedicationReminderClose}
         onConfirm={handleMedicationReminderConfirm}
+      />
+
+      <LoggingIntroModal
+        isOpen={showLoggingIntroModal}
+        onClose={() => setShowLoggingIntroModal(false)}
+        onStart={() => {
+          setShowLoggingIntroModal(false)
+          navigate('/logging')
+        }}
       />
     </>
   )
