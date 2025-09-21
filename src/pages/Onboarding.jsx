@@ -13,6 +13,7 @@ import TermsAndConditions from '../components/mobile/TermsAndConditions'
 import MedicationPills from '../components/mobile/MedicationPills'
 import GradientBackground from '../components/mobile/GradientBackground'
 import MultiSelectChips from '../components/onboarding/MultiSelectChips'
+import LoggingIntroModal from '../components/LoggingIntroModal'
 
 // Medication Reminder Modal Component
 const MedicationReminderModal = ({ isOpen, onClose, onConfirm }) => {
@@ -226,6 +227,7 @@ export default function Onboarding() {
   const [stepIndex, setStepIndex] = useState(0)
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [showMedicationReminderModal, setShowMedicationReminderModal] = useState(false)
+  const [showLoggingIntroModal, setShowLoggingIntroModal] = useState(false)
   const timeInputsRef = useRef([])
   const [editingTimeIdx, setEditingTimeIdx] = useState(-1)
   const [tempTime, setTempTime] = useState('')
@@ -663,12 +665,12 @@ export default function Onboarding() {
         {stepKey !== 'welcome' && (
           <BottomActions
             primaryLabel={stepKey === 'widget' ? 'Commencer' : stepKey === 'cguWelcome' ? "J'accepte et je continue" : stepKey === 'login' ? 'Commencer' : 'Continuer'}
-            onPrimary={stepKey === 'widget' ? () => navigate('/logging') : stepKey === 'login' ? () => setShowLoginModal(true) : next}
+            onPrimary={stepKey === 'widget' ? () => setShowLoggingIntroModal(true) : stepKey === 'login' ? () => setShowLoginModal(true) : next}
             disabled={!isStepValid(stepKey)}
             solidBackground={stepKey === 'cguWelcome'}
             showSecondary={stepKey === 'checkinFrequency'}
             secondaryLabel={stepKey === 'checkinFrequency' ? 'Plus tard' : undefined}
-            onSecondary={stepKey === 'checkinFrequency' ? () => navigate('/logging') : undefined}
+            onSecondary={stepKey === 'checkinFrequency' ? () => setShowLoggingIntroModal(true) : undefined}
           />
         )}
       </MobileFrame>
@@ -698,6 +700,15 @@ export default function Onboarding() {
         isOpen={showMedicationReminderModal}
         onClose={handleMedicationReminderClose}
         onConfirm={handleMedicationReminderConfirm}
+      />
+
+      <LoggingIntroModal
+        isOpen={showLoggingIntroModal}
+        onClose={() => setShowLoggingIntroModal(false)}
+        onStart={() => {
+          setShowLoggingIntroModal(false)
+          navigate('/logging')
+        }}
       />
     </>
   )
