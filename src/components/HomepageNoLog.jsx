@@ -548,21 +548,21 @@ const HomepageNoLog = ({ onPlusClick, onBackClick }) => {
         <HealthStatusCard
           icon={<Frame6050 />}
           title="Symptômes globaux"
-          description="You're improving this month, Loris ! Your symptoms were overall less painful as February this year."
+          description="Vos symptômes s’améliorent ce mois-ci, Loris ! Ils étaient en général moins douloureux que le mois précédent."
           status="good"
           onClick={() => console.log("Viewing global symptoms")}
         />
         <HealthStatusCard
           icon={<Frame6052 />}
-          title="Pression artérielle"
-          description="2-3 Moderate crises reported this month."
+          title="Tension artérielle"
+          description="3 tensions modérées reportées ce mois-ci."
           status="warning"
           onClick={() => console.log("Viewing blood pressure")}
         />
         <HealthStatusCard
           icon={<Frame6055 />}
           title="Adhérence aux traitements"
-          description="Try to stick to your prescription."
+          description="Votre adhérence est en baisse, essayez de respecter le plus possible votre posologie."
           status="error"
           onClick={() => console.log("Viewing treatment adherence")}
         />
