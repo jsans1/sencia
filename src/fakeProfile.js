@@ -11,7 +11,7 @@ const fakeProfile = {
   contexte: 'Surpoids léger, motivation élevée, arrêt du tabac récent, alimentation en amélioration',
   tech: 'Withings BPM Pro',
   motivation: "Début d'acceptation du diagnostic, motivé par l'entourage médical et un événement marquant.",
-  heures: ['08:00', '12:00', '19:00'],
+  heures: ['08:00', '19:00'],
   notifications: true,
   cgu: true,
   monthData: [

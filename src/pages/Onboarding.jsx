@@ -215,7 +215,7 @@ const stepsOrder = [
 ]
 
 const genreOptions = ['Homme', 'Femme', 'Non-binaire', "Préfère ne pas préciser"]
-const infosPersoOptions = ['Cardiovasculaire', 'Hypertension', 'Diabète', 'Asthme', 'Autre']
+const infosPersoOptions = ['Hypertension']
 
 const range = (min, max) => Array.from({ length: max - min + 1 }, (_, i) => min + i)
 const ageOptions = range(18, 100)
@@ -228,6 +228,11 @@ export default function Onboarding() {
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [showMedicationReminderModal, setShowMedicationReminderModal] = useState(false)
   const [showLoggingIntroModal, setShowLoggingIntroModal] = useState(false)
+  
+  // Clear any residual logging completion flags when starting onboarding
+  useEffect(() => {
+    sessionStorage.removeItem('loggingCompleted')
+  }, [])
   const timeInputsRef = useRef([])
   const [editingTimeIdx, setEditingTimeIdx] = useState(-1)
   const [tempTime, setTempTime] = useState('')
@@ -238,7 +243,7 @@ export default function Onboarding() {
     taille: 178,
     infosPerso: [],
     frequence: 3,
-    heures: ['08:00', '12:00', '19:00'],
+    heures: ['08:00', '19:00'],
     notifications: true,
     cguAccepted: false,
     selectedDevices: [],
@@ -315,7 +320,7 @@ export default function Onboarding() {
         return !!data.frequence
       case 'carePlanV2': {
         const heures = data.heures || []
-        return heures.length === 3 && heures.every(v => /^(\d{2}):(\d{2})$/.test(v))
+        return heures.length === 2 && heures.every(v => /^(\d{2}):(\d{2})$/.test(v))
       }
       default:
         return true
@@ -549,17 +554,7 @@ export default function Onboarding() {
             <select className="onboarding-input" value={data.maladie || ''} onChange={(e) => updateField('maladie', e.target.value)}>
               <option value="">Sélectionnez une maladie</option>
               <option value="Hypertension">Hypertension</option>
-              <option value="Diabète">Diabète</option>
-              <option value="Asthme">Asthme</option>
-              <option value="Maladie cardiovasculaire">Maladie cardiovasculaire</option>
-              <option value="Arthrite">Arthrite</option>
-              <option value="Maladie de Crohn">Maladie de Crohn</option>
-              <option value="Fibromyalgie">Fibromyalgie</option>
-              <option value="Autre">Autre</option>
             </select>
-            {data.maladie === 'Autre' && (
-              <input type="text" className="onboarding-input" placeholder="Précisez votre maladie" value={data.maladieAutre || ''} onChange={(e) => updateField('maladieAutre', e.target.value)} />
-            )}
             <label className="onboarding-label">Date de diagnostic</label>
             <input type="date" className="onboarding-input" value={data.diagDate || ''} onChange={(e)=>updateField('diagDate', e.target.value)} />
             <label className="onboarding-label">Médicaments</label>
@@ -576,8 +571,7 @@ export default function Onboarding() {
             <div className="care-times">
               {[
                 { label: 'Matin', idx: 0, defaultTime: '08:00' },
-                { label: 'Midi', idx: 1, defaultTime: '12:00' },
-                { label: 'Soir', idx: 2, defaultTime: '19:00' },
+                { label: 'Soir', idx: 1, defaultTime: '19:00' },
               ].map(({ label, idx, defaultTime }) => {
                 const current = (data.heures && data.heures[idx]) || defaultTime
                 return (
@@ -620,7 +614,7 @@ export default function Onboarding() {
                       type="button"
                       className="primary-button"
                       onClick={() => {
-                        const nextHeures = [...(data.heures || ['08:00','12:00','19:00'])]
+                        const nextHeures = [...(data.heures || ['08:00','19:00'])]
                         nextHeures[editingTimeIdx] = tempTime || nextHeures[editingTimeIdx]
                         updateField('heures', nextHeures)
                         setEditingTimeIdx(-1)

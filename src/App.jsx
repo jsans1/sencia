@@ -10,11 +10,12 @@ import Profile from './pages/Profile'
 import VitalSigns from './pages/VitalSigns'
 import LoggingSuccessModal from './components/LoggingSuccessModal'
 // Removed unused pages: Splash, Features, AuthChoice, WelcomeLoris
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function App() {
   const [loggingOpen, setLoggingOpen] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  
   
   const handleAdd = () => setLoggingOpen(true);
   const handleClose = () => setLoggingOpen(false);
