@@ -530,7 +530,7 @@
 /* Onboarding Navigation */
 .onboarding-nav {
   padding: 8px 24px 8px;
-  background: #F7F5F3;
+  background: transparent;
   position: sticky;
   top: 0; /* pinned to top */
   z-index: 50;
