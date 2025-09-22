@@ -129,7 +129,7 @@ function getPeriodDescription(tab, adherence, dateRangeIndex) {
   const period = periodText[tab] || 'Cette période';
   
   if (adherence >= 85) {
-    return `${period} vous avez maintenu une excellente adhérence au traitement et ressenti moins de symptômes douloureux.`;
+    return `${period} vous avez maintenu une excellente adhérence au traitement. Aussi, vous avez ressenti moins de symptômes.`;
   } else if (adherence >= 70) {
     return `${period} votre adhérence au traitement était bonne et vos symptômes sont restés contrôlés.`;
   } else {
