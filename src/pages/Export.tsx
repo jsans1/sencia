@@ -23,6 +23,8 @@ const Export = () => {
   // Persistent progress across questions
   const [progressStep, setProgressStep] = useState<number>(0);
   const [progressTotal, setProgressTotal] = useState<number>(0);
+  // Export type state to track which PDF to generate
+  const [exportType, setExportType] = useState<'practitioner' | 'personal' | null>(null);
   // Appointment data state
   const [appointmentData, setAppointmentData] = useState({
     doctor: "Dr. Martin - Cardiologue",
@@ -31,8 +33,17 @@ const Export = () => {
   });
 
   // Helper function to open PDF report in new tab
-  const openReportPDF = () => {
-    const pdfPath = '/Rapport-Loris-Duchamp.pdf';
+  const openReportPDF = (type?: 'practitioner' | 'personal') => {
+    let pdfPath: string;
+    
+    if (type === 'practitioner') {
+      pdfPath = '/Rapport-Docteur.pdf'; // Practitioner PDF
+    } else if (type === 'personal') {
+      pdfPath = '/Rapport-Loris-Duchamp.pdf'; // Personal PDF
+    } else {
+      pdfPath = '/Rapport-Loris-Duchamp.pdf'; // Default PDF
+    }
+    
     window.open(pdfPath, '_blank');
   };
 
@@ -71,9 +82,11 @@ const Export = () => {
     // Reset progress when leaving flow
     setProgressStep(0);
     setProgressTotal(0);
+    setExportType(null); // Reset export type
   };
 
   const handleExportContinue = (type: 'practitioner' | 'personal') => {
+    setExportType(type); // Store the export type for later use
     if (type === 'practitioner') {
       setCurrentPage('last-appointment');
       // Moving to next question in practitioner flow
@@ -102,7 +115,10 @@ const Export = () => {
 
   const handleLoadingComplete = () => {
     setCurrentPage('dashboard');
-    openReportPDF();
+    openReportPDF(exportType || 'practitioner'); // Use stored export type, default to practitioner
+    setProgressStep(0);
+    setProgressTotal(0);
+    setExportType(null); // Reset export type
   };
 
   const handleBackFromLastAppointment = () => {
@@ -187,9 +203,10 @@ const Export = () => {
 
   const handlePersonalLoadingComplete = () => {
     setCurrentPage('dashboard');
-    openReportPDF();
+    openReportPDF(exportType || 'personal'); // Use stored export type, default to personal
     setProgressStep(0);
     setProgressTotal(0);
+    setExportType(null); // Reset export type
   };
 
   const getBackHandler = () => {
