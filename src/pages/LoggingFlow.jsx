@@ -12,6 +12,7 @@ import {
   LoggingBloodPressureInput 
 } from '../components/logging/LoggingScreen'
 import { LoggingWheelPicker } from '../components/logging/LoggingWheelPicker'
+import LoggingSuccessModal from '../components/LoggingSuccessModal'
 import '../components/mobile/mobile-styles.css'
 
 // Define the steps for the logging flow based on Figma designs
@@ -204,6 +205,7 @@ export default function LoggingFlow() {
   const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(0)
   const [showMedicationModal, setShowMedicationModal] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
   
   console.log('LoggingFlow - showMedicationModal:', showMedicationModal)
   
@@ -232,11 +234,9 @@ export default function LoggingFlow() {
     if (currentStep < LOGGING_STEPS.length - 1) {
       setCurrentStep(currentStep + 1)
     } else {
-      // Complete logging flow - only show success modal if completing all steps
+      // Complete logging flow - show success modal
       console.log('Logging completed:', loggingData)
-      // Set flag to show success modal on homepage
-      sessionStorage.setItem('loggingCompleted', 'true')
-      navigate('/app')
+      setShowSuccessModal(true)
     }
   }
 
@@ -248,6 +248,16 @@ export default function LoggingFlow() {
 
   const updateData = (field, value) => {
     setLoggingData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false)
+    navigate('/app')
+  }
+
+  const handleViewData = () => {
+    setShowSuccessModal(false)
+    navigate('/app/visualization')
   }
 
   return (
@@ -372,6 +382,13 @@ export default function LoggingFlow() {
           onConfirm={nextStep}
         />
       )}
+
+      {/* Success Modal */}
+      <LoggingSuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleSuccessModalClose}
+        onViewData={handleViewData}
+      />
     </>
   )
 }
