@@ -6,6 +6,7 @@ interface ExportDashboardProps {
   onModifyAppointment: () => void;
   onFilter: () => void;
   onReportClick: (reportTitle: string) => void;
+  onBack?: () => void;
   appointmentData?: {
     doctor: string;
     date: string;
@@ -18,6 +19,7 @@ const ExportDashboard: React.FC<ExportDashboardProps> = ({
   onModifyAppointment,
   onFilter,
   onReportClick,
+  onBack,
   appointmentData
 }) => {
   const [showFilterPicker, setShowFilterPicker] = useState(false);
@@ -75,6 +77,15 @@ const ExportDashboard: React.FC<ExportDashboardProps> = ({
   return (
     <div className="export-dashboard">
       <div className="export-background" />
+      
+      {/* Back Button */}
+      {onBack && (
+        <button className="back-button" onClick={onBack}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      )}
       
       <div className="export-dashboard-content">
         {/* Next Appointment Section */}
