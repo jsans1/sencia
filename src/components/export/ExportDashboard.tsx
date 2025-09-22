@@ -14,6 +14,12 @@ interface ExportDashboardProps {
   };
 }
 
+// Helper function to open practitioner PDF
+const openPractitionerPDF = () => {
+  const pdfPath = '/Rapport-Docteur.pdf';
+  window.open(pdfPath, '_blank');
+};
+
 const ExportDashboard: React.FC<ExportDashboardProps> = ({
   onCreateReport,
   onModifyAppointment,
@@ -191,7 +197,7 @@ const ExportDashboard: React.FC<ExportDashboardProps> = ({
               <div 
                 key={index}
                 className="report-item"
-                onClick={() => onReportClick(report.title)}
+                onClick={() => openPractitionerPDF()}
               >
                 <div className="report-icon">
                   <svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">
